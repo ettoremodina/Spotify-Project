@@ -1,0 +1,26 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+file_name = "tracks_ettore"
+tracks = read.csv(paste0("../data/",file_name,".csv"),header = T)
+dim(tracks)
+head(tracks)
+```
+```{r}
+
+```
+
+
+
+
+
+
+
+
