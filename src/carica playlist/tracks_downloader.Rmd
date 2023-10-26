@@ -39,14 +39,9 @@ access_token <- get_spotify_access_token(
 ```{r}
 # Store the data in a dataframe
 EVERYTHING = "3EbHbn5D6oNFLJ5FrQKcAj?si=6ab30cd7e6794754"
-
-# 199 BRANI
 ALTERNATIVE="39VgCTxGok4VIgIycgyTRq?si=f0ee9b71e9f048b2"
-
 SHORT = "6zSzzHtzQxXVf9kuQXO3eS?si=7917643ebd854a5c"
-
 AMICA_ALE = "0fCgMTSTRKPWUKp11pYQ6F?si=165f512ebe7b4a59"
-
 ETTORE22 = "05oN1p78ynHAs0ulg4HvuF?si=069dd1d8a82b4d1e"
 
 file_name = "ALTERNATIVE"

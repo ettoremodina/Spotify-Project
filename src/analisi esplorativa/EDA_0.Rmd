@@ -3,18 +3,73 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+# TO DO LIST
+- riduce the number of genres-> produce a list
+
 ```{r}
 library(ggplot2)
+library(tidyverse)
 ```
 
 ```{r}
 file_name = "tracks_ettore"
-tracks = read.csv(paste0("../data/",file_name,".csv"),header = T)
+tracks = read.csv(paste0("../../data/",file_name,".csv"),header = T)
 dim(tracks)
 head(tracks)
-```
-```{r}
 
+colnames(tracks)
+```
+
+
+
+
+# Reduce genre_1
+```{r}
+tracks$genre_1 <- as.factor(tracks$genre_1)
+grouped.genres = c("rock",
+                   "alternative",
+                   "metal",
+                   "death",
+                   "psych",
+                   "rap",
+                   "hop", # hip hop
+                   "folk",
+                   "jazz",
+                   "classic",
+                   "pop",
+                   "indie",
+                   "punk",
+                   "soul",
+                   "songwriter",
+                   "core",
+                   "electronic")
+for (g in grouped.genres ){
+  tracks$genre_1 <- gsub(paste0(".*",g,".*"), g, tracks$genre_1, ignore.case = TRUE)
+}
+
+# keep only genres with more than "10" elements ( tracks)
+freq_table=table(tracks["genre_1"])
+filtered_values <- names(freq_table[freq_table >= 10])
+freq_table[filtered_values]
+
+# filter also the original dataset
+tracks_filtered = tracks[tracks$genre_1 %in% filtered_values,]
+```
+
+
+```{r}
+plot = ggplot(tracks_filtered, aes(energy,loudness , colour = genre_1 )) + 
+  geom_point()+
+  theme_bw()+
+  theme(legend.position = "none")
+
+plot
+```
+
+# prove a caso
+```{r}
+model = lm(sqrt(energy)~loudness,data=tracks)
+summary(model)
 ```
 
 
