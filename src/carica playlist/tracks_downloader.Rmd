@@ -38,19 +38,15 @@ access_token <- get_spotify_access_token(
 ```{r}
 questionare <- read.csv("../../data/Questionario Spotify (Risposte) - Risposte del modulo 1.csv")
 
-questionare=questionare[2:dim(questionare)[1],]
+questionare=questionare[3:dim(questionare)[1],]  #la prima riga è vuota e la seconda ha un link non valido
+lista_stringhe=questionare[,2]
+valori_non_http <- which(!grepl("^http", lista_stringhe))
 
-row.to.remove = c(36)
-questionare = questionare[-row.to.remove,]
+questionare = questionare[-valori_non_http,]
 
 
-link_playlists = questionare["Incolla.qua.il.link"]$Incolla.qua.il.link
-link_playlists = link_playlists
+link_playlists = questionare[,"Incolla.qua.il.link"]
 
-## for debugging
-link_playlists = link_playlists[2:4]
-
-##
 ```
 
 # Function to extract tracks features
@@ -103,24 +99,46 @@ extract_tracks <- function(spot_link){
 # create dataframe list
 ```{r}
 data_tracks = list()
+id_non_validi <- list()
+counter = 1
 
-for (l in link_playlists){
-  # Use regular expression to extract the identifier
-  id <- sub(".*/(.+)$", "\\1", l)
-  data_tracks[[id]] = extract_tracks(id)
+for (l in link_playlists) {
+  tryCatch({
+    # Use regular expression to extract the identifier
+    id <- sub(".*/(.+)$", "\\1", l)
+    data_tracks[[id]] <- extract_tracks(id)
+  }, error = function(e) {
+    # Se si verifica un errore, salva l'id non valido
+    id_non_validi <- c(id_non_validi, id)
+    cat("Errore nell'elaborazione dell'ID:", id, "\n")
+  })
   
+  if(counter%%5==0){  # every 5 playlists(500 songs) stops for 30 seconds
+  Sys.sleep(30)
+  }
+  
+  
+  print(counter)
+  counter=counter+1
 }
 ```
 
 
 # Save data (HOW??)
 ```{r}
-file_name = "data_tracks"
-file_name = paste0(file_name,".csv")
-write.csv(data_tracks, file =paste0("../../data/",file_name), row.names = FALSE)
+for (i in seq_along(data_tracks)) {
+  write.csv(data_tracks[[i]], paste0("../../data/tracks_info/file", i, ".csv"), row.names = FALSE)
+}
 ```
 
 # IGNORE
+
+```{r}
+file_name = "data_tracks"
+file_name = paste0(file_name,".csv")
+
+write.csv(data_tracks, file =paste0("../../data/",file_name), row.names = FALSE)
+```
 ```{r}
 # Store the data in a dataframe
 EVERYTHING = "3EbHbn5D6oNFLJ5FrQKcAj?si=6ab30cd7e6794754"
