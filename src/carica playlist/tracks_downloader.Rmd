@@ -3,6 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+# Import libraries
 ```{r}
 # install.packages('pacman')
 library(pacman)
@@ -14,11 +15,9 @@ pacman::p_load('spotifyr',  # To access the API
                'httpuv',    # To be able to access the Spotify URL
                'httr')      # In case you want to access the API w/o
                             # the package
-```
 
-```{r}
 library(spotifyr)
-?spotifyr
+library(dplyr )
 ```
 
 # Get access
@@ -35,26 +34,30 @@ access_token <- get_spotify_access_token(
 )
 ```
 
-
+# LOAD DATA
 ```{r}
-# Store the data in a dataframe
-EVERYTHING = "3EbHbn5D6oNFLJ5FrQKcAj?si=6ab30cd7e6794754"
-ALTERNATIVE="39VgCTxGok4VIgIycgyTRq?si=f0ee9b71e9f048b2"
-SHORT = "6zSzzHtzQxXVf9kuQXO3eS?si=7917643ebd854a5c"
-AMICA_ALE = "0fCgMTSTRKPWUKp11pYQ6F?si=165f512ebe7b4a59"
-ETTORE22 = "05oN1p78ynHAs0ulg4HvuF?si=069dd1d8a82b4d1e"
+questionare <- read.csv("../../data/Questionario Spotify (Risposte) - Risposte del modulo 1.csv")
 
-file_name = "ALTERNATIVE"
+questionare=questionare[2:dim(questionare)[1],]
+
+row.to.remove = c(36)
+questionare = questionare[-row.to.remove,]
 
 
-tracks <- get_playlist_audio_features(playlist_uris = ETTORE22)
-head(tracks[,36])
-dim(tracks)[1]
+link_playlists = questionare["Incolla.qua.il.link"]$Incolla.qua.il.link
+link_playlists = link_playlists
+
+## for debugging
+link_playlists = link_playlists[2:4]
+
+##
 ```
 
-
+# Function to extract tracks features
 ```{r}
-features=c(
+extract_tracks <- function(spot_link){
+  tracks <- get_playlist_audio_features(playlist_uris = spot_link)
+  features=c(
             "track.name" ,
             "track.album.name",
             "track.album.artists",
@@ -75,52 +78,64 @@ features=c(
             "valence",##
             "time_signature", #
             "track.id"  # used to add the tracks to another playlists
-)
-
-data = tracks[features]
-head(data)
-```
-
-
-```{r}
-for(i in 1:dim(data)[1]){
-  if(i%%500==0){
-    Sys.sleep(50)
+            )
+  data = tracks[features]
+  
+  for(i in 1:dim(data)[1]){
+    if(i%%500==0){
+      Sys.sleep(50)
+    }
+    data[i,"artists"] = data[i,"track.album.artists"][[1]][[1]][3][1,]
+    genres = get_artist(data[i,"track.album.artists"][[1]][[1]][[2]][1])$genres
+    if(length(genres)!=0){
+        for(j in 1:length(genres)){
+           data[i,paste0("genre_",j)] = genres[j]
+        }
+    }
   }
-  data[i,"artists"] = data[i,"track.album.artists"][[1]][[1]][3][1,]
-  genres = get_artist(data[i,"track.album.artists"][[1]][[1]][[2]][1])$genres
-  if(length(genres)!=0){
-      for(j in 1:length(genres)){
-         data[i,paste0("genre_",j)] = genres[j]
-      }
-  }
+  data$track.album.artists = NULL
+
+  # move the artists column at the beginning
+  data=data %>% relocate(artists, .after = track.name)
+  return(data)
 }
+```
+# create dataframe list
+```{r}
+data_tracks = list()
 
-
-data$track.album.artists = NULL
-
-# move the artists column at the beginning
-library(dplyr )
-data=data %>% relocate(artists, .after = track.name)
-head(data)
+for (l in link_playlists){
+  # Use regular expression to extract the identifier
+  id <- sub(".*/(.+)$", "\\1", l)
+  data_tracks[[id]] = extract_tracks(id)
+  
+}
 ```
 
 
+# Save data (HOW??)
 ```{r}
-dim(data)
-data[dim(data)[1],]
-```
-
-
-
-# Save data
-```{r}
-
+file_name = "data_tracks"
 file_name = paste0(file_name,".csv")
-write.csv(data, file =paste0("../data/",file_name), row.names = FALSE)
+write.csv(data_tracks, file =paste0("../../data/",file_name), row.names = FALSE)
 ```
 
+# IGNORE
+```{r}
+# Store the data in a dataframe
+EVERYTHING = "3EbHbn5D6oNFLJ5FrQKcAj?si=6ab30cd7e6794754"
+ALTERNATIVE="39VgCTxGok4VIgIycgyTRq?si=f0ee9b71e9f048b2"
+SHORT = "6zSzzHtzQxXVf9kuQXO3eS?si=7917643ebd854a5c"
+AMICA_ALE = "0fCgMTSTRKPWUKp11pYQ6F?si=165f512ebe7b4a59"
+ETTORE22 = "05oN1p78ynHAs0ulg4HvuF?si=069dd1d8a82b4d1e"
 
+
+
+
+tracks <- get_playlist_audio_features(playlist_uris = ETTORE22)
+head(tracks[,36])
+dim(tracks)[1]
+```
 
 
 
