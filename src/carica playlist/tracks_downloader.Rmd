@@ -46,7 +46,17 @@ questionare = questionare[-valori_non_http,]
 
 
 link_playlists = questionare[,"Incolla.qua.il.link"]
+```
+# manual corrections
+```{r}
+link_playlists[5]="https://open.spotify.com/playlist/37i9dQZF1F0sijgNaJdgit?si=ySYezdR1SrWx3Edh2_Gwzg"
+```
 
+
+
+## debug
+```{r}
+#link_playlists
 ```
 
 # Function to extract tracks features
@@ -97,6 +107,11 @@ extract_tracks <- function(spot_link){
 }
 ```
 # create dataframe list
+Note codice
+".*/(.+)$"
+è un'espressione regolare che corrisponde a una stringa che inizia con qualsiasi carattere (.*) seguito da una barra (/), e cattura quindi uno o più caratteri (.+) fino alla fine della stringa ($). Questo effettivamente cattura l'ultima parte di una stringa che segue l'ultima barra.
+
+
 ```{r}
 data_tracks = list()
 id_non_validi <- list()
@@ -113,8 +128,8 @@ for (l in link_playlists) {
     cat("Errore nell'elaborazione dell'ID:", id, "\n")
   })
   
-  if(counter%%5==0){  # every 5 playlists(500 songs) stops for 30 seconds
-  Sys.sleep(30)
+  if(counter%%3==0){  # every 3 playlists(500 songs) stops for 50 seconds
+  Sys.sleep(50)
   }
   
   
@@ -124,10 +139,13 @@ for (l in link_playlists) {
 ```
 
 
-# Save data (HOW??)
+# Save data 
+
+data of tracks will be saved separetly on csv files named with the link of the spotify playlist (only first 15 chars)
 ```{r}
 for (i in seq_along(data_tracks)) {
-  write.csv(data_tracks[[i]], paste0("../../data/tracks_info/file", i, ".csv"), row.names = FALSE)
+  name = substr(names(data_tracks)[i], start = 1, stop = 15)
+  write.csv(data_tracks[[i]], paste0("../../data/tracks_info_2/",name , ".csv"), row.names = FALSE)
 }
 ```
 
