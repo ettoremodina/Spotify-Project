@@ -106,6 +106,33 @@ extract_tracks <- function(spot_link){
   return(data)
 }
 ```
+
+```{r}
+already_done <- function(name_id){
+  name_id = paste0(name_id,".csv")
+  # Imposta il percorso della cartella
+  
+  cartella <- "../../data/tracks_info_2/"
+
+  # Ottieni la lista dei file nella cartella
+  lista_file <- list.files(path = cartella, full.names = TRUE)
+    # Definire la funzione
+  taglia_percorso <- function(elemento) {
+    return(sub(".*/(.+)$", "\\1", elemento))
+  }
+
+  # Applica la funzione a ogni elemento della lista
+  lista_file <- lapply(lista_file, taglia_percorso)
+
+
+  
+  # Stampa la lista dei file
+  return (name_id %in% lista_file)
+}
+```
+
+
+
 # create dataframe list
 Note codice
 ".*/(.+)$"
@@ -118,24 +145,32 @@ id_non_validi <- list()
 counter = 1
 
 for (l in link_playlists) {
-  tryCatch({
-    # Use regular expression to extract the identifier
-    id <- sub(".*/(.+)$", "\\1", l)
-    data_tracks[[id]] <- extract_tracks(id)
-  }, error = function(e) {
-    # Se si verifica un errore, salva l'id non valido
-    id_non_validi <- c(id_non_validi, id)
-    cat("Errore nell'elaborazione dell'ID:", id, "\n")
-  })
+  # Use regular expression to extract the identifier
+  id <- sub(".*/(.+)$", "\\1", l)
+  name_id = substr(id, start = 1, stop = 15)
   
-  if(counter%%3==0){  # every 3 playlists(500 songs) stops for 50 seconds
-  Sys.sleep(50)
+  # if the user has already been analysed it skips
+  if(!already_done(name_id)){
+      tryCatch({
+        data_tracks[[id]] <- extract_tracks(id)
+      }, error = function(e) {
+        # Se si verifica un errore, salva l'id non valido
+        id_non_validi <- c(id_non_validi, id)
+        cat("Errore nell'elaborazione dell'ID:", id, "\n")
+      })
+      
+      if(counter%%3==0){  # every 3 playlists(300 songs) stops for 50 seconds
+      Sys.sleep(50)
+      }
+      
+    # show progression
+      print(counter)
+      counter=counter+1
   }
-  
-  
-  print(counter)
-  counter=counter+1
+
 }
+
+id_non_validi
 ```
 
 
