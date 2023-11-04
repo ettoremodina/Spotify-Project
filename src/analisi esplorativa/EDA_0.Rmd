@@ -9,6 +9,8 @@ output: html_notebook
 ```{r}
 library(ggplot2)
 library(tidyverse)
+library(lubridate)
+library(dplyr)
 ```
 
 ```{r}
@@ -17,14 +19,117 @@ tracks = read.csv(paste0("../../data/",file_name,".csv"),header = T)
 dim(tracks)
 head(tracks)
 
+# rimuovi una colonna duplicata
+tracks = tracks[,-which(colnames(tracks)=="track.duration_ms.1")]
 colnames(tracks)
 ```
 
 
 
 
+NOTES: 
+audio features
+
+# Proposed data transformation, factors, renaming
+```{r}
+data = tracks
+colnames(data)[which(colnames(data)=="track.popularity")] = "popularity"
+colnames(data)[which(colnames(data)=="track.duration_ms")] = "duration_ms"
+colnames(data)[which(colnames(data)=="track.name" )] = "title"
+colnames(data)[which(colnames(data)=="track.album.release_date")] = "release_date"
+colnames(data)[which(colnames(data)=="track.album.name")] = "album_name"
+
+# factors
+data$key = as.factor(data$key)
+data$mode  = as.factor(data$mode)
+data$time_signature  = as.factor(data$time_signature )
+
+scaling_function <-function(column){
+  # example: min max, other functions could be chosen
+  class(column)
+  column = (column - min(column)) / ( max(column) -  min(column))
+  return(column)
+}
+
+data$loudness  = scaling_function(data$loudness)
+data$tempo   = scaling_function(data$tempo)
+data$popularity  = scaling_function(data$popularity)
+data$duration_ms  = scaling_function(data$duration_ms)
+
+## release date transformations
+data$release_date <- as.Date(data$release_date)
+
+# add a new year column
+data$year = year(data$release_date)
+
+# Define a function to get the season
+get_season <- function(date) {
+  month <- month(date)
+  if (month %in% c(12,1,2)) {
+    return("Winter")
+  } else if (month %in% c(3,4,5)) {
+    return("Spring")
+  } else if (month %in% c(6,7,8)) {
+    return("Summer")
+  } else {
+    return("Autumn")
+  }
+}
+
+
+data$season = sapply(data$release_date, get_season)
+data$season = as.factor(data$season)
+
+data=data %>% relocate(year, .after = release_date)
+data=data %>% relocate(season, .after = year)
+
+data$release_date = NULL # optional
+
+tracks = data
+
+```
+
+
+# Explore columns
+```{r}
+for (i in 1:dim(tracks)[2]){
+  print(paste0(i,"##",colnames(tracks)[i]))
+  print(tracks[1:10,i])
+}
+```
+# Ranges
+```{r}
+for (i in 5:19){
+  print(c(i,colnames(tracks)[i],range(tracks[,i])))
+}
+
+numerical_values = c(5:15,17,18)
+length(numerical_values)
+```
+
+
+# distributions
+```{r}
+numerical_values = 5:19
+for(col in colnames(tracks)[numerical_values]){
+  bins = range(tracks[[col]])[2]-range(tracks[[col]])[1]
+  plot <- ggplot(data = tracks, mapping = aes(x =.data[[col]])) +
+  geom_histogram(bins =30, fill = "blue", color = "black", alpha = 0.7) +
+  labs(title = col, x = "", y = "Frequency") +
+  theme_bw()
+  
+  print(plot)
+}
+
+```
+
+
+
+
+
 # Reduce genre_1
 ```{r}
+length(unique(tracks$genre_1))
 tracks$genre_1 <- as.factor(tracks$genre_1)
 grouped.genres = c("rock",
                    "alternative",
@@ -37,40 +142,44 @@ grouped.genres = c("rock",
                    "jazz",
                    "classic",
                    "pop",
+                   "country",
                    "indie",
                    "punk",
                    "soul",
                    "songwriter",
                    "core",
                    "electronic")
+
+tracks_grouped = tracks
 for (g in grouped.genres ){
-  tracks$genre_1 <- gsub(paste0(".*",g,".*"), g, tracks$genre_1, ignore.case = TRUE)
+  tracks_grouped$genre_1 <- gsub(paste0(".*",g,".*"), g, tracks_grouped$genre_1, ignore.case = TRUE)
 }
 
 # keep only genres with more than "10" elements ( tracks)
-freq_table=table(tracks["genre_1"])
+freq_table=table(tracks_grouped["genre_1"])
+length(unique(tracks_grouped$genre_1))
+```
+
+# remove less frequent genres
+```{r}
 filtered_values <- names(freq_table[freq_table >= 10])
 freq_table[filtered_values]
 
 # filter also the original dataset
-tracks_filtered = tracks[tracks$genre_1 %in% filtered_values,]
+tracks_filtered = tracks_grouped[tracks_grouped$genre_1 %in% filtered_values,]
 ```
 
-
+# Blueprint for plots 
 ```{r}
 plot = ggplot(tracks_filtered, aes(energy,loudness , colour = genre_1 )) + 
   geom_point()+
   theme_bw()+
   theme(legend.position = "none")
 
-plot
+print(plot)
 ```
 
-# prove a caso
-```{r}
-model = lm(sqrt(energy)~loudness,data=tracks)
-summary(model)
-```
+
 
 
 

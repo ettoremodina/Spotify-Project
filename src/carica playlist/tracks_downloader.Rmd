@@ -47,28 +47,52 @@ questionare = questionare[-valori_non_http,]
 
 link_playlists = questionare[,"Incolla.qua.il.link"]
 ```
+
 # manual corrections
 ```{r}
 link_playlists[5]="https://open.spotify.com/playlist/37i9dQZF1F0sijgNaJdgit?si=ySYezdR1SrWx3Edh2_Gwzg"
 ```
 
 
-
 ## debug
 ```{r}
 #link_playlists
+link_playlists = link_playlists[1:3]
+```
+# add_advanced_features
+
+questa funzione utilizza l'id del brano, che quindi non richiede l'accesso alla playlista, basta che track.id venga salvato
+ergo questa funzione può essere utilizzata anche in futuro
+```{r}
+add_advanced_features <- function(data){
+  ids = data$track.id
+
+  adv_features = get_track_audio_analysis(ids[1])
+  print(names(adv_features))
+  print(data.frame(adv_features$segments))
+}
+
 ```
 
+
 # Function to extract tracks features
+
+Note codice
+".*/(.+)$"
+è un'espressione regolare che corrisponde a una stringa che inizia con qualsiasi carattere (.*) seguito da una barra (/), e cattura quindi uno o più caratteri (.+) fino alla fine della stringa ($). Questo effettivamente cattura l'ultima parte di una stringa che segue l'ultima barra.
+
+
 ```{r}
 extract_tracks <- function(spot_link){
+  # Use regular expression to extract the identifier
+  spot_link <- sub(".*/(.+)$", "\\1", spot_link)
+  
   tracks <- get_playlist_audio_features(playlist_uris = spot_link)
   features=c(
             "track.name" ,
             "track.album.name",
             "track.album.artists",
             "track.album.release_date",
-            "track.duration_ms" ,
             "track.popularity",
             "acousticness", #
             "danceability", #
@@ -84,13 +108,15 @@ extract_tracks <- function(spot_link){
             "valence",##
             "time_signature", #
             "track.id"  # used to add the tracks to another playlists
+  
             )
+  
+  
   data = tracks[features]
+  # add_advanced_features(data)
+  
   
   for(i in 1:dim(data)[1]){
-    if(i%%500==0){
-      Sys.sleep(50)
-    }
     data[i,"artists"] = data[i,"track.album.artists"][[1]][[1]][3][1,]
     genres = get_artist(data[i,"track.album.artists"][[1]][[1]][[2]][1])$genres
     if(length(genres)!=0){
@@ -107,19 +133,24 @@ extract_tracks <- function(spot_link){
 }
 ```
 
+# funzioni ausiari per ottimizzare
+
+per evitare di scaricare più volte gli stessi dati faccio un controllo nella cartella in cui sono stati salvati
 ```{r}
 already_done <- function(name_id){
-  name_id = paste0(name_id,".csv")
+  name_file = paste0(name_id,".csv")
   # Imposta il percorso della cartella
   
-  cartella <- "../../data/tracks_info_2/"
+  cartella <- "../../data/tracks_info_3/"
 
   # Ottieni la lista dei file nella cartella
   lista_file <- list.files(path = cartella, full.names = TRUE)
-    # Definire la funzione
+    
+  
   taglia_percorso <- function(elemento) {
     return(sub(".*/(.+)$", "\\1", elemento))
   }
+  
 
   # Applica la funzione a ogni elemento della lista
   lista_file <- lapply(lista_file, taglia_percorso)
@@ -127,46 +158,42 @@ already_done <- function(name_id){
 
   
   # Stampa la lista dei file
-  return (name_id %in% lista_file)
+  return (name_file %in% lista_file)
 }
 ```
 
 
 
 # create dataframe list
-Note codice
-".*/(.+)$"
-è un'espressione regolare che corrisponde a una stringa che inizia con qualsiasi carattere (.*) seguito da una barra (/), e cattura quindi uno o più caratteri (.+) fino alla fine della stringa ($). Questo effettivamente cattura l'ultima parte di una stringa che segue l'ultima barra.
-
 
 ```{r}
 data_tracks = list()
 id_non_validi <- list()
 counter = 1
 
-for (l in link_playlists) {
-  # Use regular expression to extract the identifier
-  id <- sub(".*/(.+)$", "\\1", l)
-  name_id = substr(id, start = 1, stop = 15)
+for (url in link_playlists) {
+
+  name_id = sub(".*/(.+)$", "\\1", url)
+  name_id = substr(name_id, start = 1, stop = 15)
   
   # if the user has already been analysed it skips
   if(!already_done(name_id)){
       tryCatch({
-        data_tracks[[id]] <- extract_tracks(id)
+        data_tracks[[name_id]] <- extract_tracks(url)
       }, error = function(e) {
         # Se si verifica un errore, salva l'id non valido
-        id_non_validi <- c(id_non_validi, id)
-        cat("Errore nell'elaborazione dell'ID:", id, "\n")
+        id_non_validi <- c(id_non_validi, name_id)
+        cat("Errore nell'elaborazione dell'ID:", name_id, "\n")
       })
       
-      if(counter%%3==0){  # every 3 playlists(300 songs) stops for 50 seconds
-      Sys.sleep(50)
+      if(counter%%2==0){  # every 2 playlists(200 songs) stops for 50 seconds
+      Sys.sleep(35)
       }
       
-    # show progression
-      print(counter)
-      counter=counter+1
   }
+    # show progression
+    print(counter)
+    counter=counter+1
 
 }
 
@@ -179,10 +206,19 @@ id_non_validi
 data of tracks will be saved separetly on csv files named with the link of the spotify playlist (only first 15 chars)
 ```{r}
 for (i in seq_along(data_tracks)) {
-  name = substr(names(data_tracks)[i], start = 1, stop = 15)
-  write.csv(data_tracks[[i]], paste0("../../data/tracks_info_2/",name , ".csv"), row.names = FALSE)
+  name = names(data_tracks)[i]
+  write.csv(data_tracks[[i]], paste0("../../data/tracks_info_3/",name , ".csv"), row.names = FALSE)
 }
 ```
+
+# EXTRA
+
+## UTILS, prove codice
+
+```{r}
+data = extract_tracks(link_playlists[1])
+```
+
 
 # IGNORE
 

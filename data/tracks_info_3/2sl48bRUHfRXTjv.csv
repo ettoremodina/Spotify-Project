@@ -1,0 +1,102 @@
+"track.name","artists","track.album.name","track.album.release_date","track.popularity","acousticness","danceability","energy","instrumentalness","liveness","loudness","speechiness","tempo","key","mode","track.duration_ms","valence","time_signature","track.id","genre_1","genre_2","genre_3","genre_4"
+"Irene","Pinguini Tattici Nucleari","Gioventù brucata","2017-04-14",56,0.349,0.68,0.622,0,0.0942,-6.271,0.0417,120.016,7,1,311253,0.535,4,"2JeQN06RJrdNTh5LpCPBHq","bergamo indie","italian indie pop","italian pop","milan indie"
+"New Romantics","Taylor Swift","1989 (Deluxe)","2014-01-01",78,0.00463,0.633,0.889,0.000458,0.0658,-5.87,0.0715,121.956,5,1,230466,0.584,4,"0qAIiGFKLdV1xpNlEhjpq8","pop",NA,NA,NA
+"illicit affairs","Taylor Swift","folklore","2020-07-24",81,0.881,0.559,0.31,0,0.106,-10.445,0.0338,119.845,10,1,190898,0.46,4,"2NmsngXHeC1GQ9wWrzhOMf","pop",NA,NA,NA
+"august","Taylor Swift","folklore","2020-07-24",92,0.538,0.532,0.623,7.28e-05,0.0925,-9.208,0.0331,89.937,5,1,261922,0.403,4,"3hUxzQpSfdDqwM3ZTFQY0K","pop",NA,NA,NA
+"The Very First Night (Taylor's Version) (From The Vault)","Taylor Swift","Red (Taylor's Version)","2021-11-12",77,0.00115,0.678,0.733,0,0.104,-5.025,0.0281,121.009,7,1,200280,0.581,4,"6pYNq0ZwpPVazKzsqpf0G8","pop",NA,NA,NA
+"10K Scale","Tananai","Piccoli Boati","2020-02-21",53,0.458,0.571,0.443,0,0.0994,-8.723,0.0653,76.005,5,1,198157,0.266,4,"3WkjBJhPATpNsUF7rGSOwo","italian pop",NA,NA,NA
+"GIRASOLE","bnkr44","FARSI MALE A NOI VA BENE","2021-11-25",44,0.532,0.682,0.89,0,0.152,-4.986,0.0563,140.119,1,0,197453,0.827,4,"6Q5BuRgXZOWItqzvZfjKxw","hyperpop italiano",NA,NA,NA
+"Giovani Wannabe","Pinguini Tattici Nucleari","Giovani Wannabe","2022-05-27",63,0.0409,0.739,0.81,0,0.122,-5.317,0.0311,127.972,11,0,212966,0.948,4,"7iLuBTHJSXM2HalKHFqEEy","bergamo indie","italian indie pop","italian pop","milan indie"
+"right where you left me - bonus track","Taylor Swift","evermore (deluxe version)","2021-01-07",83,0.769,0.581,0.619,0.000106,0.117,-6.524,0.0282,137.915,10,1,245026,0.645,4,"3zwMVvkBe2qIKDObWgXw4N","pop",NA,NA,NA
+"Giugno","Tananai","Giugno","2020-01-17",50,0.602,0.599,0.437,0,0.304,-10.542,0.0465,124.888,1,1,177750,0.5,4,"2ViwZ1Ht21XTkO4UXqsicw","italian pop",NA,NA,NA
+"CASTELLI DI LENZUOLA","ARIETE","SPECCHIO","2022-02-24",53,0.589,0.602,0.556,0,0.185,-5.967,0.0337,99.977,0,1,184253,0.186,4,"6hLEPly11XS3mFlG9AyO4T","italian hip hop","italian pop","rome indie",NA
+"SUI MURI","PSICOLOGI","TRAUMA","2022-04-28",60,0.739,0.422,0.477,0,0.255,-8.12,0.0384,76.183,11,1,181529,0.39,4,"1pz0bN7LWZZLTx5odixW7a","italian hip hop","italian pop","rome indie",NA
+"champagne problems","Taylor Swift","evermore","2020-12-11",83,0.92,0.462,0.24,0,0.113,-12.077,0.0377,171.319,0,1,244000,0.32,4,"0sY6ZUTh4yoctD8VIXz339","pop",NA,NA,NA
+"BABY GODDAMN","Tananai","BABY GODDAMN","2021-03-26",62,0.0317,0.819,0.764,2.73e-05,0.0579,-3.311,0.1,114.033,10,0,149605,0.885,4,"3yWHQ4n4ARLDfYTuT2NhnN","italian pop",NA,NA,NA
+"18","One Direction","FOUR (Deluxe)","2014-11-17",82,0.22,0.681,0.582,0,0.119,-7.76,0.0313,124.038,6,0,248360,0.221,4,"3JjnGLK8IxkNLvo8Lb3KOM","boy band","pop","post-teen pop","talent show"
+"PAGINE","PSICOLOGI","TRAUMA","2022-04-28",46,0.0624,0.593,0.779,0,0.208,-6.752,0.13,146.05,4,1,175973,0.769,4,"7e1k5h3bkRBywv77P6n5Hm","italian hip hop","italian pop","rome indie",NA
+"the 1","Taylor Swift","folklore (deluxe version)","2020-08-18",75,0.75,0.78,0.361,7.14e-06,0.108,-6.942,0.048,139.902,0,1,210240,0.163,4,"4pfrrhvplbJZAIsfosGWQP","pop",NA,NA,NA
+"Volersi Male","Tananai","Volersi Male","2019-04-05",46,0.0818,0.729,0.797,0.0196,0.0748,-8.267,0.087,120.042,2,1,228000,0.419,3,"4DQUunFWrBHdGkNhYY6zZo","italian pop",NA,NA,NA
+"MANI STRETTE","bnkr44","FARSI MALE A NOI VA BENE","2021-11-25",30,0.0781,0.648,0.86,0,0.29,-6.189,0.052,141.964,3,1,209026,0.934,4,"5Qo4lrFwepxf9bofOradCv","hyperpop italiano",NA,NA,NA
+"Could Have Been Me","The Struts","Everybody Wants","2016-03-04",74,0.0158,0.541,0.907,0.000185,0.34,-4.512,0.0642,80.029,4,1,187653,0.434,4,"3IyCL4Em1GOpNGDf451Hg1","glam rock","modern alternative rock",NA,NA
+"betty","Taylor Swift","folklore","2020-07-24",79,0.6,0.593,0.377,0,0.0976,-8.761,0.0253,95.939,0,1,294521,0.502,4,"5kI4eCXXzyuIUXjQra0Cxi","pop",NA,NA,NA
+"Sensazioni Momentanee (feat. Lil Kvneki)","VillaBanks","Filtri + Nudo","2021-07-22",57,0.0943,0.529,0.766,0,0.133,-9.019,0.203,86.943,7,1,245707,0.494,4,"7B7MnH2GI5A9NfXdVQSmKh","italian hip hop","italian pop","trap italiana",NA
+"Nonono","Pinguini Tattici Nucleari","Fuori dall'Hype","2019-04-05",62,0.451,0.816,0.897,0,0.0803,-2.909,0.0682,95.005,7,1,210893,0.83,4,"4sE5wzpPd4s8kTdtVC18lY","bergamo indie","italian indie pop","italian pop","milan indie"
+"If I Could Fly","One Direction","Made In The A.M. (Deluxe Edition)","2015-11-13",69,0.781,0.565,0.245,0,0.0998,-9.132,0.0262,75.055,5,1,230320,0.307,4,"5CRVwXGikmqzoRO6q7FeAg","boy band","pop","post-teen pop","talent show"
+"my tears ricochet","Taylor Swift","folklore (deluxe version)","2020-08-18",75,0.814,0.456,0.265,0,0.0679,-10.663,0.0328,129.947,0,1,255893,0.112,4,"5P2bHCDM2tsgIaYWsZMhu5","pop",NA,NA,NA
+"Pierre","Ryn Weaver","The Fool","2015-08-28",60,0.289,0.607,0.827,2.95e-06,0.719,-4.282,0.0484,100.062,9,1,202733,0.552,4,"2vpVR1L7Qfkd7D6qFNuorq","electropop","indie poptimism",NA,NA
+"Calcutta","Tananai","Calcutta","2019-09-26",50,0.163,0.435,0.64,0,0.078,-7.542,0.174,178.256,6,1,210337,0.409,4,"22Im0DNjOpgvrj47feV9TI","italian pop",NA,NA,NA
+"Ridere","Pinguini Tattici Nucleari","Fuori dall'Hype Ringo Starr","2020-02-07",70,0.0493,0.713,0.902,0,0.0781,-3.009,0.0378,116.909,9,1,214733,0.72,4,"5LZVK19ieaV8Mk9FsqTL3F","bergamo indie","italian indie pop","italian pop","milan indie"
+"Enchanted","Taylor Swift","Speak Now","2010-10-25",79,0.0716,0.535,0.618,0.000388,0.169,-3.913,0.0273,81.975,8,1,352200,0.228,4,"04S1pkp1VaIqjg8zZqknR5","pop",NA,NA,NA
+"Una canzone che non so","Gazzelle","Post Punk","2019-10-25",59,0.384,0.705,0.502,0,0.123,-6.612,0.0262,119.855,11,1,185173,0.548,4,"5ZJ8NqYFgILvAba4GepqH3","italian adult pop","italian pop","rome indie",NA
+"SESSO OCCASIONALE","Tananai","SESSO OCCASIONALE","2022-02-03",58,0.00725,0.647,0.857,0,0.0608,-4.23,0.0654,130.007,0,1,195923,0.659,4,"0Dz9zyx2w3zYtRK6yp3VKD","italian pop",NA,NA,NA
+"La storia infinita","Pinguini Tattici Nucleari","AHIA!","2020-12-04",64,0.169,0.701,0.744,0,0.115,-3.421,0.0411,89.986,4,1,207802,0.651,4,"2r1SRt8bhtR6a9bMRR0AgV","bergamo indie","italian indie pop","italian pop","milan indie"
+"All Too Well (10 Minute Version) (Taylor's Version) (From The Vault)","Taylor Swift","Red (Taylor's Version)","2021-11-12",87,0.274,0.631,0.518,0,0.088,-8.771,0.0303,93.023,0,1,613026,0.205,4,"5enxwA8aAbwZbf5qCHORXi","pop",NA,NA,NA
+"Destri","Gazzelle","OK","2021-02-12",69,0.126,0.459,0.696,0,0.198,-4.953,0.0406,85.819,8,1,185503,0.422,4,"7nRFsITVaSHko2Fw2Gcy59","italian adult pop","italian pop","rome indie",NA
+"Tommaso","Fulminacci","La Vita Veramente","2019-04-10",58,0.02,0.745,0.905,4.3e-05,0.345,-3.35,0.0497,150.11,7,1,157640,0.733,4,"182Br0vkoUXaoowa62VU03","italian indie pop","italian pop","rome indie",NA
+"ACIDO","PSICOLOGI","TRAUMA","2022-04-28",40,0.101,0.51,0.808,0.000157,0.438,-5.968,0.0338,150.002,5,1,210200,0.67,3,"4GUbhJkgfDXC83pMS1WT5m","italian hip hop","italian pop","rome indie",NA
+"Out Of The Woods","Taylor Swift","1989 (Deluxe)","2014-01-01",76,0.000743,0.553,0.841,1.19e-05,0.341,-6.937,0.0396,92.008,7,1,235800,0.338,4,"0qUnBLZ8bJqUNEeQgayL9t","pop",NA,NA,NA
+"Lake Washington Boulevard","Pinguini Tattici Nucleari","Fuori dall'Hype","2019-04-05",62,0.234,0.708,0.745,0,0.0654,-3.249,0.0367,110.003,7,1,228466,0.808,4,"6Jn9qoprkuSfsRW7tTRkOV","bergamo indie","italian indie pop","italian pop","milan indie"
+"La Nuova Stella Di Broadway","Cesare Cremonini","La Teoria Dei Colori","2012-01-01",65,0.657,0.473,0.566,3.49e-05,0.0908,-7.984,0.0342,139.879,2,1,267746,0.296,4,"3qtuOAI0YyfoBM1s7Tvm46","italian adult pop","italian pop",NA,NA
+"TATUAGGI (feat. ARIETE)","PSICOLOGI","MILLENNIUM BUG","2020-06-11",59,0.346,0.609,0.69,0,0.162,-6.075,0.0949,94.973,5,1,185979,0.654,4,"15WIkk29b7NqOK2poTRnOU","italian hip hop","italian pop","rome indie",NA
+"Style","Taylor Swift","1989 (Deluxe)","2014-01-01",91,0.00245,0.588,0.791,0.00258,0.118,-5.595,0.0402,94.933,7,1,231000,0.487,4,"0ug5NqcwcFR2xrfTkc7k8e","pop",NA,NA,NA
+"L'uomo che inventò il fuoco","Pinguini Tattici Nucleari","Gioventù brucata","2017-04-14",46,0.621,0.712,0.771,2.08e-06,0.102,-6.092,0.173,100.034,0,1,323746,0.717,4,"3VVZQQhjaVyhszJctiwYW6","bergamo indie","italian indie pop","italian pop","milan indie"
+"Horror","NASKA","REBEL","2022-03-04",53,0.0282,0.455,0.677,0,0.564,-5.041,0.0338,179.981,4,1,219846,0.266,4,"6fPGBlx8wsAxhoDn7BwiAH","emo rap italiano",NA,NA,NA
+"sottacqua","chiamamifaro","sottacqua","2022-06-03",31,0.0789,0.593,0.898,0,0.156,-4.217,0.0606,145.967,1,0,201189,0.701,4,"2Pdr33YqelbFwPepOAwBQy",NA,NA,NA,NA
+"the last great american dynasty","Taylor Swift","folklore","2020-07-24",78,0.467,0.686,0.662,0.0023,0.109,-8.505,0.0413,147.922,7,1,230999,0.706,4,"2Eeur20xVqfUoM3Q7EFPFt","pop",NA,NA,NA
+"Tetris","Pinguini Tattici Nucleari","Gioventù brucata","2017-04-14",60,0.68,0.668,0.82,4.67e-06,0.112,-6.089,0.0625,114.98,4,1,350880,0.668,4,"5SGm0Q5Wur9mhpXnbzaPjG","bergamo indie","italian indie pop","italian pop","milan indie"
+"Tutta la vita","Gazzelle","Punk","2018-11-30",46,0.129,0.646,0.575,8.34e-06,0.0969,-4.202,0.029,120.086,5,1,185463,0.459,4,"6jfjt2OGDdVUECy47V4sqt","italian adult pop","italian pop","rome indie",NA
+"1312","PSICOLOGI","TRAUMA","2022-04-28",41,0.156,0.258,0.502,0,0.251,-8.143,0.0345,92.983,4,0,165413,0.415,5,"358uYHCGhL4ScusugjRV1z","italian hip hop","italian pop","rome indie",NA
+"Blank Space","Taylor Swift","1989 (Deluxe)","2014-01-01",91,0.103,0.76,0.703,0,0.0913,-5.412,0.054,95.997,5,1,231826,0.57,4,"1u8c2t2Cy7UBoG4ArRcF5g","pop",NA,NA,NA
+"How Far We've Come","Matchbox Twenty","How Far We've Come","2007-09-15",61,0.0045,0.566,0.905,0,0.21,-5.093,0.0646,83,0,1,212253,0.792,4,"1EHh1fC9FCKw31wotfXx7L","neo mellow","pop rock","post-grunge",NA
+"Antartide","Pinguini Tattici Nucleari","Fuori dall'Hype","2019-04-05",58,0.463,0.589,0.853,0,0.0769,-3.01,0.0483,169.934,4,1,274720,0.303,4,"66tVtoFKxaV62FBk5ihSPM","bergamo indie","italian indie pop","italian pop","milan indie"
+"Till Forever Falls Apart","Ashe","Till Forever Falls Apart","2021-03-02",72,0.413,0.509,0.498,0,0.0674,-6.94,0.0315,99.729,2,1,222860,0.283,4,"2769RhOZs0ezRncRW1vryp","alt z",NA,NA,NA
+"Getaway Car","Taylor Swift","reputation","2017-11-10",87,0.00465,0.562,0.689,2.23e-06,0.0888,-6.745,0.127,172.054,2,1,233626,0.351,4,"0VE4kBnHJUgtMf0dy6DRmW","pop",NA,NA,NA
+"1 step forward, 3 steps back","Olivia Rodrigo","SOUR","2021-05-21",80,0.941,0.473,0.203,0,0.126,-12.627,0.102,168.884,2,1,163586,0.419,4,"4wcBRRpIfesgcyUtis7PEg","pop",NA,NA,NA
+"7 su 7","NASKA","REBEL","2022-03-04",49,0.00246,0.443,0.895,0,0.318,-4.85,0.198,183.147,11,1,147586,0.801,4,"2E27zWyPLrjq2d38bOC2Xn","emo rap italiano",NA,NA,NA
+"Home","One Direction","Rarities - EP","2010-11-29",62,0.0115,0.42,0.867,0,0.0851,-5.397,0.0853,78.814,9,1,194906,0.63,4,"5UcphALlWd7sBBySclJvAi","boy band","pop","post-teen pop","talent show"
+"You're On Your Own, Kid","Taylor Swift","Midnights (3am Edition)","2022-10-22",72,0.416,0.694,0.38,8.47e-06,0.126,-10.307,0.0614,120.044,2,1,194206,0.376,4,"7gVWKBcfIW93YxNBi3ApIE","pop",NA,NA,NA
+"We Are Young (feat. Janelle Monáe)","fun.","Some Nights","2012-02-14",80,0.02,0.378,0.638,7.66e-05,0.0849,-5.576,0.075,184.086,10,1,250626,0.735,4,"5rgy6ghBq1eRApCkeUdJXf","baroque pop","metropopolis",NA,NA
+"La banalità del mare","Pinguini Tattici Nucleari","Fuori dall'Hype","2019-04-05",62,0.414,0.768,0.804,0,0.408,-3.4,0.036,104.967,4,1,192506,0.51,4,"4vseCIz3IuhWMQW9XiBnHC","bergamo indie","italian indie pop","italian pop","milan indie"
+"Che senso ha","Franco126","Che senso ha","2021-04-06",44,0.195,0.617,0.597,0,0.113,-6.112,0.0554,77.497,6,1,233806,0.448,4,"7CXdIdQAQU4aDk4l7NwznL","italian hip hop","italian pop","rome indie",NA
+"The Great War","Taylor Swift","Midnights (3am Edition)","2022-10-22",78,0.219,0.573,0.741,2.23e-05,0.0842,-8.987,0.0353,96.016,5,1,240355,0.554,4,"3UMrglJeju5yWyYIW6o99b","pop",NA,NA,NA
+"L'ultima notte","ARIETE","L'ultima notte","2021-05-03",65,0.268,0.618,0.687,0,0.126,-5.603,0.0446,94.037,2,1,157566,0.398,4,"63mdY4U0KvnbMkUEc7FHN8","italian hip hop","italian pop","rome indie",NA
+"Walking in the Wind","One Direction","Made In The A.M. (Deluxe Edition)","2015-11-13",68,0.0829,0.687,0.447,0,0.0878,-6.586,0.0486,114.578,8,1,202640,0.501,4,"1ZycJRpLOazlLcoFGxGROO","boy band","pop","post-teen pop","talent show"
+"Ferma A Guardare (feat. Pinguini Tattici Nucleari)","Ernia","Gemelli","2021-01-19",68,0.445,0.585,0.724,0,0.1,-5.611,0.0967,162.05,9,0,213542,0.547,4,"1eDC4NiUYgQSKpKDIvXxi4","italian hip hop","italian pop","milan indie",NA
+"Cruel Summer","Taylor Swift","Lover","2019-08-23",100,0.117,0.552,0.702,2.06e-05,0.105,-5.707,0.157,169.994,9,1,178426,0.564,4,"1BxfuPKGuaTgP7aM0Bbdwr","pop",NA,NA,NA
+"UMORE (feat. ARIETE)","PSICOLOGI","TRAUMA","2022-04-28",52,0.149,0.657,0.752,0,0.121,-7.239,0.0978,88.962,9,1,156952,0.614,4,"5AYkL6iVkGwli8di1NrC3K","italian hip hop","italian pop","rome indie",NA
+"Ready to Run","One Direction","FOUR (Deluxe)","2014-11-17",65,0.00229,0.524,0.831,0,0.171,-4.174,0.036,115.067,2,1,196053,0.299,4,"7GtGeeChOx4NS77bqK8SUx","boy band","pop","post-teen pop","talent show"
+"Pompeii","Bastille","All This Bad Blood","2013-01-01",78,0.0755,0.679,0.715,0,0.271,-6.383,0.0407,127.435,9,1,214147,0.571,4,"4Ub8UsjWuewQrPhuepfVpd","metropopolis","modern rock","pop",NA
+"Red (Taylor's Version)","Taylor Swift","Red (Taylor's Version)","2021-11-12",81,0.00108,0.516,0.777,1.62e-06,0.0761,-4.908,0.0375,125.047,1,0,223093,0.408,4,"4OAuvHryIVv4kMDNSLuPt6","pop",NA,NA,NA
+"Alcool & Acqua (feat. PSICOLOGI)","Bresh","ORO BLU","2022-03-04",60,0.198,0.703,0.706,0,0.121,-7.32,0.161,120.027,8,1,171437,0.705,4,"4UpCWcaJdu26OxLwxd3baF","italian hip hop","italian pop","rap genovese",NA
+"Fool's Gold","One Direction","FOUR (Deluxe)","2014-11-17",68,0.23,0.515,0.773,1.29e-06,0.0938,-4.848,0.0479,128.001,6,1,210893,0.379,4,"0L5gFNrzHyh4OhMwEz6DGS","boy band","pop","post-teen pop","talent show"
+"Pastello Bianco","Pinguini Tattici Nucleari","AHIA!","2020-12-04",71,0.451,0.546,0.652,0,0.123,-3.852,0.0339,139.875,0,1,236417,0.378,4,"0bKDQionn4VKcgNKbs4SWX","bergamo indie","italian indie pop","italian pop","milan indie"
+"Clean","Taylor Swift","1989 (Deluxe)","2014-01-01",73,0.232,0.815,0.377,0,0.1,-7.754,0.0346,103.97,4,1,271000,0.211,4,"1NmVZsG18CzCAtw7rnV3yA","pop",NA,NA,NA
+"8 miliardi di persone","Frah Quintale","Regardez moi","2017-11-24",66,0.546,0.63,0.824,0,0.107,-5.107,0.269,130.527,0,1,223384,0.38,4,"6mA9cV0ti1IICSv3Wb0rSt","italian hip hop","italian indie pop","italian pop","milan indie"
+"SPENSIERATEZZA","PSICOLOGI","MILLENNIUM BUG","2020-06-11",51,0.559,0.408,0.603,0,0.111,-7.42,0.329,86.462,4,1,169715,0.131,4,"2DzJYaFlsNdpmfoHMYecZ4","italian hip hop","italian pop","rome indie",NA
+"Bagatelle","Pinguini Tattici Nucleari","Il Re è nudo","2014-07-21",50,0.0871,0.538,0.675,0,0.173,-7.452,0.0412,125.084,4,1,251917,0.578,4,"6PTxwEyZm0lI4nR970KPsz","bergamo indie","italian indie pop","italian pop","milan indie"
+"exile (feat. Bon Iver)","Taylor Swift","folklore","2020-07-24",83,0.778,0.298,0.38,5.62e-05,0.11,-8.426,0.0287,75.602,6,1,285634,0.152,4,"4pvb0WLRcMtbPGmtejJJ6y","pop",NA,NA,NA
+"Everybody Talks","Neon Trees","Picture Show","2012-01-01",81,0.00301,0.471,0.924,0,0.313,-3.906,0.0586,154.961,8,1,177280,0.725,4,"2iUmqdfGZcHIhS3b9E9EWq","modern rock","neo mellow","pop rock","pov: indie"
+"Night Changes","One Direction","FOUR (Deluxe)","2014-11-17",89,0.859,0.672,0.52,0,0.115,-7.747,0.0353,120.001,8,1,226600,0.37,4,"5O2P9iiztwhomNh8xkR9lJ","boy band","pop","post-teen pop","talent show"
+"Sciare","Pinguini Tattici Nucleari","Gioventù brucata","2017-04-14",50,0.361,0.678,0.862,7.56e-06,0.267,-5.878,0.0343,109.964,9,1,281293,0.639,4,"3V9aCzb0dOvuLHRerJ8sJI","bergamo indie","italian indie pop","italian pop","milan indie"
+"Mr. Perfectly Fine (Taylor’s Version) (From The Vault)","Taylor Swift","Mr. Perfectly Fine (Taylor’s Version) (From The Vault)","2021-04-07",77,0.167,0.661,0.819,0,0.0647,-6.269,0.0519,135.937,11,0,277591,0.724,4,"7l2tmgUhV7Y2aJHjiszifg","pop",NA,NA,NA
+"stupido clark kent","rovere","ultima stagione","2019-10-25",28,0.00317,0.714,0.822,4.73e-05,0.238,-6.593,0.0348,104.005,7,1,216546,0.565,4,"3Vz0esG1pIfIIF56JecfR9","italian indie pop",NA,NA,NA
+"Half a Heart","One Direction","Midnight Memories (Deluxe)","2013-11-25",66,0.286,0.515,0.714,0,0.118,-4.516,0.0348,155.954,0,1,188546,0.495,4,"6nIE1oCE4udqMGv3bqVNVb","boy band","pop","post-teen pop","talent show"
+"Gaetano","Calcutta ","Mainstream (Deluxe Edition)","2016-06-03",64,0.752,0.609,0.483,3.96e-06,0.264,-7.778,0.0287,139.908,0,1,242320,0.254,4,"48Nh04YgUsE4b5V3y9sIdD","italian adult pop","italian pop","rome indie",NA
+"Death By A Thousand Cuts","Taylor Swift","Lover","2019-08-23",80,0.454,0.712,0.732,0,0.319,-6.754,0.0629,94.071,4,1,198533,0.313,4,"2dgFqt3w9xIQRjhPtwNk3D","pop",NA,NA,NA
+"tadb","rovere","disponibile anche in mogano","2019-03-29",42,0.0289,0.551,0.667,0,0.0859,-4.884,0.0958,200.064,1,0,189745,0.699,4,"3q6CTHUI3qjRkq0YqosAdt","italian indie pop",NA,NA,NA
+"Photograph","Ed Sheeran","x (Deluxe Edition)","2014-06-21",87,0.607,0.614,0.379,0.000464,0.0986,-10.48,0.0476,107.989,4,1,258986,0.201,4,"1HNkqx9Ahdgi1Ixy2xkKkL","pop","singer-songwriter pop","uk pop",NA
+"STOCCOLMA","Still Charles","STOCCOLMA","2022-06-17",38,0.0705,0.544,0.878,0,0.0736,-7.448,0.11,158.12,4,1,185644,0.777,4,"2YbyAH03K37nF4fOnOGkIo","emo trap italiana",NA,NA,NA
+"cardigan","Taylor Swift","folklore","2020-07-24",91,0.537,0.613,0.581,0.000345,0.25,-8.588,0.0424,130.033,0,0,239560,0.551,4,"4R2kfaDFhslZEMJqAFNpdd","pop",NA,NA,NA
+"Right Now","One Direction","Midnight Memories (Deluxe)","2013-11-25",82,0.218,0.645,0.78,0,0.0919,-5.165,0.0319,120.008,8,1,200400,0.372,4,"1dQQ2QlnvXUehsRUrukKmf","boy band","pop","post-teen pop","talent show"
+"NUOVO RANGE (con SFERA EBBASTA)","Rkomi","TAXI DRIVER","2021-11-30",69,0.233,0.68,0.76,0,0.13,-4.866,0.0556,82.54,1,0,176772,0.709,4,"5YSR0sWUZk7NuIbkycxndu","italian hip hop","italian pop",NA,NA
+"24/7","Tear&Drugz","24/7","2022-05-06",26,0.0293,0.618,0.744,0,0.0809,-5.474,0.107,80.082,7,1,139562,0.636,4,"032zxhpUSSgQMrHiplLHlY",NA,NA,NA,NA
+"Come Back...Be Here (Taylor's Version)","Taylor Swift","Red (Taylor's Version)","2021-11-12",74,0.0158,0.46,0.632,0,0.0822,-6.031,0.0302,79.846,4,1,223333,0.399,4,"4pNApnaUWAL2J4KO2eqokq","pop",NA,NA,NA
+"Poetica","Cesare Cremonini","Possibili Scenari","2017-11-24",61,0.014,0.393,0.607,0,0.0721,-6.569,0.0339,139.807,7,1,293960,0.202,3,"07qo9gnLM488CUr0EtgIA1","italian adult pop","italian pop",NA,NA
+"Amarsi Male","Lo Stato Sociale","Amore, Lavoro E Altri Miti Da Sfatare","2017-03-10",44,0.0189,0.536,0.879,0.0361,0.682,-4.162,0.0361,190.063,10,1,257906,0.884,4,"2Ros2t8vJWm9okVWJCvvZB","italian adult pop","italian alternative","italian indie pop","italian pop"
+"ESAGERATA","Tananai","ESAGERATA","2021-12-03",43,0.0233,0.753,0.65,9.57e-05,0.104,-5.337,0.0545,115.013,0,1,198782,0.407,4,"6yRqZK6gIT3zVu3y5JPcaF","italian pop",NA,NA,NA
+"this is me trying","Taylor Swift","folklore","2020-07-24",80,0.314,0.515,0.476,4.74e-05,0.171,-9.843,0.0328,135.886,9,1,195097,0.412,4,"7kt9e9LFSpN1zQtYEl19o1","pop",NA,NA,NA
+"The One That Got Away","Katy Perry","Teenage Dream","2010-08-24",70,0.000812,0.691,0.795,1.02e-06,0.156,-4.021,0.0355,133.971,1,0,227333,0.876,4,"4uQY80TKE1u4ZQZQKHzVEi","pop",NA,NA,NA
+"No Control","One Direction","FOUR (Deluxe)","2014-11-17",72,0.0278,0.558,0.916,0,0.0296,-3.145,0.0839,142.984,1,0,199720,0.85,4,"4JaLkM90MJutDAl5jD9BZX","boy band","pop","post-teen pop","talent show"
+"Cold Coffee","Ed Sheeran","Songs I Wrote With Amy","2011-12-09",42,0.453,0.544,0.529,0,0.131,-6.753,0.0256,92.936,6,1,254226,0.403,4,"0Qhut5Vj2My3pVxjHdwAAX","pop","singer-songwriter pop","uk pop",NA
+"Wonderland","Taylor Swift","1989 (Deluxe)","2014-01-01",74,0.0493,0.422,0.692,2.57e-05,0.177,-5.447,0.0549,184.014,3,1,245560,0.197,4,"6RvRzl1YJTDnUvdOtV21IK","pop",NA,NA,NA
