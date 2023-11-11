@@ -36,21 +36,25 @@ access_token <- get_spotify_access_token(
 
 # LOAD DATA
 ```{r}
-questionare <- read.csv("../../data/Questionario Spotify (Risposte) - Risposte del modulo 1.csv")
 
-questionare=questionare[3:dim(questionare)[1],]  #la prima riga è vuota e la seconda ha un link non valido
-lista_stringhe=questionare[,2]
+questionare <- read.csv("../../data/Spotify Survey  (Risposte) - Risposte del modulo 1.csv")
+#questionare <- read.csv("../../data/Questionario Spotify (Risposte) - Risposte del modulo 1.csv")
+italian  = "Incolla.qua.il.link"
+english = "Paste.here.the.link"
+link_column = english
+questionare=questionare[2:dim(questionare)[1],]  #la prima riga è vuota e la seconda ha un link non valido
+lista_stringhe=questionare[,link_column]
 valori_non_http <- which(!grepl("^http", lista_stringhe))
 
-questionare = questionare[-valori_non_http,]
+#questionare = questionare[-valori_non_http,]
 
 
-link_playlists = questionare[,"Incolla.qua.il.link"]
+link_playlists = questionare[,link_column]
 ```
 
 # manual corrections
 ```{r}
-link_playlists[5]="https://open.spotify.com/playlist/37i9dQZF1F0sijgNaJdgit?si=ySYezdR1SrWx3Edh2_Gwzg"
+# link_playlists[5]="https://open.spotify.com/playlist/37i9dQZF1F0sijgNaJdgit?si=ySYezdR1SrWx3Edh2_Gwzg"
 ```
 
 
@@ -205,10 +209,102 @@ id_non_validi
 
 data of tracks will be saved separetly on csv files named with the link of the spotify playlist (only first 15 chars)
 ```{r}
+names= c()
 for (i in seq_along(data_tracks)) {
-  name = names(data_tracks)[i]
-  write.csv(data_tracks[[i]], paste0("../../data/tracks_info_3/",name , ".csv"), row.names = FALSE)
+  names[i] = paste0(names(data_tracks)[i], ".csv")
+  write.csv(data_tracks[[i]], paste0("../../data/tracks_info_3/",names[i]), row.names = FALSE)
 }
+```
+
+# Proposed data transformation, factors, renaming
+```{r}
+unprocessed_data = list.files("../../data/tracks_info_3/")
+# example = read.csv(paste0("../../data/tracks_info_3/",names[1]))
+# head(example)
+unprocessed_data = unprocessed_data[1:3]
+```
+
+```{r}
+
+library(lubridate)
+library(dplyr)
+library(stringr)
+get_season <- function(date) {
+      month <- month(date)
+      if (month %in% c(12,1,2)) {
+        return("Winter")
+      } else if (month %in% c(3,4,5)) {
+        return("Spring")
+      } else if (month %in% c(6,7,8)) {
+        return("Summer")
+      } else if (month %in% c(9,10,11)){
+        return("Autumn")
+      } else{
+        return("missing")
+      }
+}
+```
+
+
+```{r}
+for( file in unprocessed_data){
+  data = read.csv(paste0("../../data/tracks_info_3/",file))
+  
+  colnames(data)[which(colnames(data)=="track.popularity")] = "popularity"
+  colnames(data)[which(colnames(data)=="track.duration_ms")] = "duration_ms"
+  colnames(data)[which(colnames(data)=="track.name" )] = "title"
+  colnames(data)[which(colnames(data)=="track.album.release_date")] = "release_date"
+  colnames(data)[which(colnames(data)=="track.album.name")] = "album_name"
+  
+  # factors
+  data$key = as.factor(data$key)
+  data$mode  = as.factor(data$mode)
+  data$time_signature  = as.factor(data$time_signature )
+  
+  data$year = rep(0,dim(data)[1])
+  data$season = rep(0,dim(data)[1])
+
+  
+  
+  # loop along every song and get year and season
+  for(i in 1:dim(data)[1]){
+    
+    
+    if(str_length(data$release_date[i])==10){
+      date_i <- as.Date(data$release_date[i])
+      # add a new year column
+      data$year[i] = year(date_i)
+      # Define a function to get the season
+      print("ok")
+      data$season[i] = get_season(date_i)
+      print("ok2")
+   
+      } else{
+      data$year[i] = data$release_date[i]
+      data$season[i] = "missing"
+    }
+  }
+
+  
+  data=data %>% relocate(year, .after = release_date)
+  data=data %>% relocate(season, .after = year)
+  
+  data$release_date = NULL # optional
+  
+  write.csv(data,paste0("../../data/transformed_data/",file))
+}
+```
+
+```{r}
+processed_data =  list.files("../../data/transformed_data/")
+dataset_list = list()
+for( file in unprocessed_data){
+  data = read.csv(paste0("../../data/transformed_data/",file))
+  dataset_list[[substr(file,1,15)]] = data
+  
+}
+dataset_list[[1]]
+saveRDS("../../data/data_list.RData",dataset_list)
 ```
 
 # EXTRA
@@ -242,6 +338,20 @@ ETTORE22 = "05oN1p78ynHAs0ulg4HvuF?si=069dd1d8a82b4d1e"
 tracks <- get_playlist_audio_features(playlist_uris = ETTORE22)
 head(tracks[,36])
 dim(tracks)[1]
+```
+```{r}
+  
+  # scaling_function <-function(column){
+  #   # example: min max, other functions could be chosen
+  #   class(column)
+  #   column = (column - min(column)) / ( max(column) -  min(column))
+  #   return(column)
+  # }
+  # 
+  # data$loudness  = scaling_function(data$loudness)
+  # data$tempo   = scaling_function(data$tempo)
+  # data$popularity  = scaling_function(data$popularity)
+  # data$duration_ms  = scaling_function(data$duration_ms)
 ```
 
 

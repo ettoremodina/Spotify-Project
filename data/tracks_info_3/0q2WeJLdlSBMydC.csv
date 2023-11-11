@@ -1,0 +1,102 @@
+"track.name","artists","track.album.name","track.album.release_date","track.popularity","acousticness","danceability","energy","instrumentalness","liveness","loudness","speechiness","tempo","key","mode","track.duration_ms","valence","time_signature","track.id","genre_1","genre_2","genre_3","genre_4","genre_5"
+"Bang Bang - New Version","K'NAAN","Troubadour (Champion Edition - Asian Version)","2009",48,0.0302,0.627,0.927,2.15e-06,0.0168,-1.783,0.174,179.977,10,0,183026,0.767,4,"2JlPbr69Ew5WJKtGKJabDM","reggae fusion",NA,NA,NA,NA
+"The Last Goodbye","ODESZA","Wide Awake","2022-06-08",24,0.00748,0.659,0.919,0.00237,0.125,-2.714,0.0803,114.985,9,1,358983,0.145,4,"0SPAmRhrRUcBvDV4uctdcx","chillwave","edm","indietronica",NA,NA
+"Diamantes","Carla Morrison","El Renacimiento","2022-04-29",62,0.249,0.812,0.546,1.98e-05,0.0974,-6.216,0.0267,108.01,1,0,197853,0.87,4,"7HPVL1OrloOoaW2E9zAssr","cantautora mexicana","mexican pop",NA,NA,NA
+"Kelede","DEKKO","Kelede","2022-02-01",53,0.461,0.879,0.634,1.3e-06,0.112,-5.918,0.0478,119.982,5,1,159306,0.477,4,"1rCvs0GO32USUA6DmPD6gf","reggaeton colombiano","urbano latino",NA,NA,NA
+"Moscow Mule","Bad Bunny","Un Verano Sin Ti","2022-05-06",85,0.294,0.804,0.674,1.18e-06,0.115,-5.453,0.0333,99.968,5,0,245939,0.292,4,"6Xom58OOXk2SoU711L2IXO","reggaeton","trap latino","urbano latino",NA,NA
+"No Hablo Español","Riordan","No Hablo Español","2022-02-18",30,0.0584,0.815,0.655,0.00721,0.0807,-9.385,0.0487,126.049,9,0,157242,0.705,4,"3M5LkEM40nh1EDdmC67qU0","tech house",NA,NA,NA,NA
+"La Bachata","Manuel Turizo","La Bachata","2022-05-26",86,0.583,0.835,0.679,1.98e-06,0.218,-5.329,0.0364,124.98,7,0,162637,0.85,4,"5ww2BF9slyYgNOk37BlC4u","colombian pop","reggaeton","reggaeton colombiano","trap latino","urbano latino"
+"HEART ATTACK","BRONSON","BRONSON","2020-08-07",61,0.161,0.735,0.65,0.21,0.109,-5.815,0.0737,122.048,6,0,209600,0.122,4,"4F8wogXmIgCXEsi1FK0gH4","vapor twitch",NA,NA,NA,NA
+"Me Fui de Vacaciones","Bad Bunny","Un Verano Sin Ti","2022-05-06",77,0.229,0.714,0.645,0.00083,0.0942,-5.493,0.0514,85.046,10,1,180929,0.434,4,"28GCbKgjlVD9eDmasGbe0T","reggaeton","trap latino","urbano latino",NA,NA
+"mathematics","bbno$","bag or die","2022-10-21",55,0.0575,0.759,0.842,1.54e-05,0.25,-2.842,0.271,169.883,3,0,147000,0.875,4,"3JavZqn7lRvLHbh0YZu7b5","canadian hip hop","dark trap","meme rap",NA,NA
+"Shakey x off these drugs","ShakeyFunnyAzz","Shakey x off these drugs","2021-11-15",54,0.335,0.743,0.484,0,0.109,-12.917,0.468,77.449,2,1,139676,0.301,4,"5hbjWmsPxsoUf8xupri1g7",NA,NA,NA,NA,NA
+"2019","Bazanji","2019","2019-01-04",61,0.153,0.596,0.881,0,0.16,-5.228,0.119,147.038,11,0,112244,0.302,4,"4DERbz1e89YD9VZt7or9GB","deep underground hip hop","indie pop rap",NA,NA,NA
+"Ojitos Lindos","Bad Bunny","Un Verano Sin Ti","2022-05-06",88,0.08,0.647,0.686,1.34e-06,0.528,-5.745,0.0413,79.928,3,0,258298,0.268,4,"3k3NWokhRRkEPhCzPmV8TW","reggaeton","trap latino","urbano latino",NA,NA
+"Apretaito","Ozuna","Apretaito","2022-04-07",56,0.0735,0.84,0.742,3.11e-05,0.053,-4.337,0.0487,88.001,5,1,199627,0.718,4,"0cW5cXANjlv8hgLAQwdvgE","puerto rican pop","reggaeton","trap latino","urbano latino",NA
+"Boogie Wonderland","Earth, Wind & Fire","I Am","1979-06",79,0.0843,0.802,0.756,0.00765,0.0521,-10.791,0.0349,131.715,2,0,288293,0.963,4,"6ztstiyZL6FXzh4aG46ZPD","disco","funk","jazz funk","soul",NA
+"San Lucas","Kevin Kaarl","San Lucas","2019-11-07",80,0.86,0.577,0.363,0.000282,0.0868,-12.378,0.0263,91.511,7,1,247196,0.265,4,"75UMtPC77vqKRwfSuYuNPO","indie triste",NA,NA,NA,NA
+"HOY COBRÉ","Bad Bunny","EL ÚLTIMO TOUR DEL MUNDO","2020-11-27",68,0.0464,0.86,0.725,9.1e-05,0.0994,-6.7,0.249,145.001,11,1,162151,0.375,4,"0tjZv2hChdHZCW1zFXpy1J","reggaeton","trap latino","urbano latino",NA,NA
+"Best Friend","Rex Orange County","Best Friend","2017-01-25",78,0.395,0.576,0.714,0,0.115,-5.247,0.0595,144.981,6,1,262231,0.321,4,"3rPtS4nfpy7PsARctAWpzd","bedroom pop","pov: indie",NA,NA,NA
+"help herself","bbno$","help herself","2021-01-29",66,0.623,0.607,0.851,0.351,0.107,-7.754,0.0364,168.049,4,0,188571,0.479,4,"4YMc3A256xFBS0xcT77Qce","canadian hip hop","dark trap","meme rap",NA,NA
+"Je M'appelle","Benzz","Je M'appelle","2022-04-21",75,0.17,0.807,0.75,0,0.164,-4.396,0.237,141.176,11,1,139574,0.961,4,"6A3SB2C4U6JtCavQOXLYNN",NA,NA,NA,NA,NA
+"Ten O'Clock Postman","Secret Service","Oh Susie","1979-01-01",51,0.0296,0.617,0.915,1.64e-06,0.261,-11.677,0.0658,134.189,5,1,220173,0.631,4,"0i8C3BEMvTtXtMaGZvHQIi","italo disco",NA,NA,NA,NA
+"Discoteca - Deorro Remix","IAmChino","The Most Winning","2022-11-17",49,0.0261,0.743,0.987,0.26,0.337,-2.089,0.0769,127.969,4,0,190312,0.59,4,"5YZX840FQQuMpLFUXE9Cla","cubaton","reggaeton",NA,NA,NA
+"Shot Down","Khalid","American Teen","2017-04-27",60,0.893,0.767,0.512,0.000223,0.103,-6.777,0.0591,123.921,6,1,207106,0.489,4,"1Ob94QesoxHSBrypyBbdfd","pop","pop r&b",NA,NA,NA
+"Sahara","Hensonn","Sahara","2021-11-16",78,0.146,0.615,0.521,0.772,0.11,-9.488,0.0318,115.016,2,1,171384,0.045,4,"6nqdgUTiWt4JbABDurkxMI","drift phonk","ukrainian phonk",NA,NA,NA
+"Stars On 45 Original 7-Inch A-side - Original 7-Inch Single Remastered","Stars On 45","Stars On 45","1981-01-02",40,0.299,0.769,0.666,1.18e-05,0.342,-9.997,0.0576,122.834,7,1,292203,0.965,4,"15naF3My6dw0Jenp8ksbQA",NA,NA,NA,NA,NA
+"Morad: Bzrp Music Sessions, Vol. 47","Bizarrap","Morad: Bzrp Music Sessions, Vol. 47","2021-12-08",70,0.468,0.77,0.859,0.00339,0.103,-4.526,0.0429,122.042,0,0,177583,0.548,4,"39yyHtQ4tkjZzd8TfIBKQw","argentine hip hop","pop venezolano","trap argentino","trap latino","urbano latino"
+"When I Get There","Big Wild","Invincible EP","2017-02-10",65,0.000192,0.693,0.488,0.588,0.131,-7.17,0.0367,96.015,0,1,220000,0.13,4,"7nYClzzNY6f3EcfeDFNqhS","vapor soul",NA,NA,NA,NA
+"POWER","Kanye West","My Beautiful Dark Twisted Fantasy","2010-11-22",81,0.0161,0.542,0.914,0,0.744,-4.747,0.113,153.993,0,0,292093,0.576,4,"2gZUPNdnz5Y45eiGxpHGSc","chicago rap","hip hop","rap",NA,NA
+"boosted","Ben Yen","boosted","2022-08-05",10,0.073,0.757,0.888,9.51e-05,0.121,-6.483,0.083,104.987,1,0,194351,0.722,4,"6LZyVGi31JHcyjVM7G2tq1",NA,NA,NA,NA,NA
+"It's A Killa","FISHER","It's A Killa","2022-03-11",57,0.00354,0.778,0.916,0.00776,0.152,-5.283,0.0433,125.987,7,1,200028,0.82,4,"0uU5k5t4YZ1NTnwXCPhga2","australian house","house",NA,NA,NA
+"150","Gold Citrus","150","2022-01-28",31,0.233,0.806,0.391,0.00132,0.0999,-8.065,0.0446,100.025,10,0,203125,0.496,4,"6VsxGy57wdMN3Dcsdaeu5s",NA,NA,NA,NA,NA
+"Twilight","GRAVECHILL","Twilight","2021-05-30",75,0.0111,0.889,0.884,0.804,0.0999,-4.323,0.0379,124.003,4,1,116129,0.789,4,"1Y5MJnYsIi3Qlifvss4jPI","chill phonk","drift phonk",NA,NA,NA
+"Music and Lights","Imagination","In the Heat of the Night","1982",55,0.55,0.775,0.509,0.0252,0.0768,-11.356,0.0391,99.972,4,0,322933,0.708,4,"3kEA66ZM9mCxwhynOxgsLh","brit funk","disco","post-disco",NA,NA
+"Love Letter","ODESZA","Love Letter","2022-03-23",50,0.0948,0.635,0.835,0.0119,0.285,-2.876,0.0589,109.987,8,1,253121,0.216,4,"26wuBc04catG1QQyYupr35","chillwave","edm","indietronica",NA,NA
+"TERRITORY","The Blaze","TERRITORY","2017-04-07",71,0.286,0.563,0.44,0.683,0.269,-11.943,0.0822,120.009,9,0,276373,0.213,4,"2W3EgJst61RLZtPPm3EQim","new french touch",NA,NA,NA,NA
+"knievel stunts.","Drew The Kiiid","iiintro.","2022-05-20",26,0.0332,0.889,0.421,0,0.213,-9.619,0.487,148.002,2,1,157297,0.296,4,"1qIiu8HIKM3FZ85teZZADY",NA,NA,NA,NA,NA
+"DOWN ON ME","Rilès","DOWN ON ME","2022-01-30",29,0.27,0.725,0.501,0.000222,0.11,-8.408,0.13,94.016,9,0,171012,0.369,4,"3jFl5marnaFEPTp9janbeS","french hip hop",NA,NA,NA,NA
+"C'est La Vie (with bbno$ & Rich Brian)","Yung Gravy","C'est La Vie","2022-09-23",65,0.0566,0.888,0.778,0,0.0653,-3.671,0.0945,142.128,9,1,160161,0.774,4,"0cgy8EueqwMuYzOZrW5vPB","meme rap","minnesota hip hop",NA,NA,NA
+"Tu - Mashup","Saigo","Tu (Mashup)","2021-12-26",27,0.12,0.777,0.895,0,0.0729,-0.558,0.106,92.995,10,1,224751,0.717,4,"413UnaoFdtaYQL7nHpJkFG",NA,NA,NA,NA,NA
+"悲しみがとまらない　I CAN'T STOP THE LONELINESS","Anri","Timely!!","1983-12-05",62,0.183,0.684,0.843,1.67e-05,0.0635,-4.256,0.0296,132.027,9,1,263706,0.885,4,"3FYDqY5BRtx3IVSaiQZSze","classic city pop",NA,NA,NA,NA
+"Mujeriego","Ryan Castro","Mujeriego","2021-12-17",72,0.0628,0.758,0.621,0,0.0809,-8.033,0.125,79.949,9,1,142500,0.92,4,"78kygHp1dvW1kncYjBgbe1","reggaeton","trap colombiano","trap latino","urbano latino",NA
+"Sunshine Reggae","Laid Back","Good Vibes - The Very Best of Laid Back","2008-10-06",66,0.101,0.704,0.79,0.00657,0.0769,-5.756,0.0432,167.816,8,1,257666,0.933,4,"0z0JSkE5Nw3i3nin3BBSuG","classic danish pop",NA,NA,NA,NA
+"Last Call","Khalid","Last Call","2022-03-03",63,0.0254,0.553,0.727,0.0113,0.107,-6.905,0.0348,173.972,5,1,191375,0.286,4,"7k0wVBW3cvV6Xmb87JikIf","pop","pop r&b",NA,NA,NA
+"last day on earth","Tai Verdes","last day on earth","2022-01-13",64,0.413,0.494,0.553,4.17e-05,0.218,-5.57,0.197,82.061,5,1,172755,0.359,4,"0fVDu1evgjX9CFD0cmuRrM","modern indie pop","singer-songwriter pop",NA,NA,NA
+"Pop Boy (feat. Aitch)","Stormzy","Heavy Is The Head","2019-12-13",56,0.0209,0.883,0.802,0,0.198,-3.234,0.313,109.914,9,1,151943,0.715,4,"3KcSwX6pyUnfJ0YZlcJE7d","grime","uk hip hop",NA,NA,NA
+"GIVENCHY","Duki","GIVENCHY","2022-07-20",72,0.142,0.607,0.619,0,0.231,-6.726,0.396,102.974,8,1,182610,0.377,3,"6bTVP50bbtMtD6RGe2cUoQ","argentine hip hop","trap argentino","trap latino","trap triste","urbano latino"
+"Here2Play","Stay Homas","Here2Play","2022-03-04",42,0.102,0.844,0.666,0.00371,0.0948,-5.218,0.042,126.989,1,1,175275,0.728,4,"7LtK6gwheZrxPGbScJF7aw","musica catalana",NA,NA,NA,NA
+"Party 2 RKT - Mashup","Saigo","Party 2 RKT (Mashup)","2022-03-14",15,0.0864,0.831,0.811,0,0.0918,-2.086,0.273,90.103,6,0,221924,0.811,4,"1SbrAUZ5XvTT7dfPPkxdua",NA,NA,NA,NA,NA
+"Everyday Normal Guy 2","Jon Lajoie","You Want Some of This?","2009-03-18",74,0.42,0.823,0.731,0,0.306,-4.273,0.307,90.302,3,1,195693,0.876,4,"2hhFpD32iXUd4GaCu6T4wn","comedy rap","comic","parody",NA,NA
+"Sin Frenos","Eladio Carrion","Sauce Boyz 2","2021-12-02",74,0.0723,0.657,0.702,0,0.188,-7.667,0.0482,145.022,9,0,211394,0.75,4,"1b62AO1IzcVr5SOgoguc9o","trap boricua","trap latino","trap triste","urbano latino",NA
+"残響散歌","Aimer","残響散歌","2021-12-06",73,0.000627,0.367,0.896,0,0.207,-4.002,0.091,170.863,11,1,184893,0.38,4,"7v8wKvNQQIxkugCFFjrkaO","anime","anime rock","j-pixie","j-pop","j-poprock"
+"Bff <3","DEKKO","Bff <3","2021-11-25",60,0.0467,0.739,0.663,0.00197,0.668,-4.209,0.19,80.916,11,1,173466,0.695,4,"0XQsWXjHkSjLuSHnHB1qLL","reggaeton colombiano","urbano latino",NA,NA,NA
+"LQRA Session #5","La Loquera","LQRA Session #5","2021-12-21",70,0.363,0.798,0.569,0,0.111,-5.575,0.0895,120.019,11,1,308000,0.599,4,"1YVyKeuVEhIGNTdhNjbREI",NA,NA,NA,NA,NA
+"Hands Up - Single Version","Ottawan","Hands Up","1980-01-01",67,0.61,0.888,0.876,3.25e-05,0.375,-4.249,0.0425,123.291,8,1,208573,0.992,4,"5xQr5TxQ77siaKfuyiJbT0","vintage french electronic",NA,NA,NA,NA
+"Chiquilla","A.B. Quintanilla III Y Los Kumbia Kings","Lo Mejor De...","2016-07-01",57,0.116,0.785,0.905,2.8e-06,0.22,-3.974,0.0508,110.011,0,1,201080,0.957,4,"4s35Piycz9wZ4xK7ROs0jK","tejano",NA,NA,NA,NA
+"Broken - Rezidential Remix","Alfie Templeman","Broken (Rezidential Remix)","2022-03-11",23,0.107,0.733,0.77,0,0.21,-5.021,0.317,118.008,0,1,151443,0.572,4,"6Q3PKsmoAoPtcMO2U6o7q0","modern alternative pop",NA,NA,NA,NA
+"TU AMOR - Remix","Tomy DJ","TU AMOR","2022-10-20",30,0.0972,0.57,0.804,0.000153,0.0972,-4.559,0.176,203.834,6,0,145894,0.7,4,"47httQ5eYGbDXpDHUWnnql","previa",NA,NA,NA,NA
+"Good Luck","Abhi The Nomad","Abhi vs The Universe","2021-09-01",55,0.383,0.876,0.75,1.19e-06,0.0963,-8.056,0.0568,115.985,11,0,135213,0.978,4,"6IVsYkP3RWt3AwMeHOgDFF","desi hip hop",NA,NA,NA,NA
+"Party, Humo y Alcohol","CNCO","Party, Humo y Alcohol","2022-01-13",45,0.0488,0.82,0.83,0,0.0899,-3.318,0.0286,108.013,3,1,216446,0.52,4,"4PsWkgvetxEeApf3RBHDbV","boy band","latin pop","reggaeton","urbano latino",NA
+"Knife Talk (with 21 Savage ft. Project Pat)","Drake","Certified Lover Boy","2021-09-03",83,0.0635,0.849,0.424,0,0.0834,-9.579,0.324,145.887,5,0,242965,0.153,4,"2BcMwX1MPV6ZHP4tUT9uq6","canadian hip hop","canadian pop","hip hop","pop rap","rap"
+"Married to the Bag","Shotgun Willy","Married to the Bag","2022-08-26",60,0.405,0.836,0.704,0,0.152,-7.274,0.038,122.059,9,0,143606,0.893,4,"3FPMiCJXJjZxrRoB6WDFek","meme rap",NA,NA,NA,NA
+"Body Funk","Purple Disco Machine","Soulmatic","2017-10-20",52,0.0019,0.84,0.876,0.284,0.0517,-6.327,0.045,121.999,7,1,256733,0.772,4,"2Qw4nXX0eCRLRIX8BT19p2","deep house","house",NA,NA,NA
+"Jordan","Ryan Castro","Jordan","2022-05-24",79,0.0575,0.796,0.68,0.000683,0.103,-5.555,0.37,179.923,10,0,176142,0.71,4,"6y8z28epOv5FlaxDv1Lo5B","reggaeton","trap colombiano","trap latino","urbano latino",NA
+"Brisa","Zion & Lennox","Brisa","2022-04-28",65,0.0938,0.817,0.932,0.0284,0.0792,-4.232,0.0467,126.008,11,0,259333,0.396,4,"5xhFO6kaUjGcSezSp5hIhG","reggaeton","urbano latino",NA,NA,NA
+"Brindo","Mario Bautista","Brindo","2021-09-09",61,0.281,0.752,0.587,8.74e-06,0.148,-5.374,0.0291,90.082,6,0,185460,0.584,3,"1oLp4xkeNCxjMy4glz0vbL","latin viral pop","mexican pop","reggaeton mexicano",NA,NA
+"Brickell","Cauty","Brickell","2022-02-03",20,0.191,0.947,0.669,0,0.227,-6.102,0.0881,129.975,5,0,214748,0.901,4,"0ptX5UGfC8dQ2sZn452sEd","reggaeton","reggaeton flow","trap latino","urbano latino",NA
+"Xerecation","DJ Nardini","Xerecation","2019-06-26",51,0.242,0.901,0.793,9.92e-05,0.0981,-2.443,0.258,129.886,10,1,182769,0.616,4,"69B1LNCFR2kjrJczNeQdRf","rave funk",NA,NA,NA,NA
+"Chucky73 - Bzrp 43","Catz 'n Dogz","Chucky73 - Bzrp 43","2021-12-03",46,0.00975,0.795,0.787,0.0398,0.321,-6.213,0.0525,126.004,2,1,194493,0.543,4,"4jmE3QZLQv9pIA791PGZ05","deep disco house","german techno","house","minimal tech house","minimal techno"
+"Late Night","ODESZA","A Moment Apart","2017-09-08",60,0.0358,0.612,0.628,0.00898,0.193,-6.754,0.0752,125.043,2,1,228590,0.434,4,"5Nu5Uyoauauy9LFePYL1Z3","chillwave","edm","indietronica",NA,NA
+"El Puma","Sexenni","El Puma","2021-06-04",32,0.142,0.804,0.822,1.45e-06,0.258,-5.544,0.0744,90.029,11,0,192333,0.699,4,"6v11D7e3IID1CkRnpLv1Ld","musica catalana",NA,NA,NA,NA
+"Powerade","Ion Miles","Powerade","2022-04-22",65,0.193,0.89,0.72,0.437,0.641,-5.202,0.0729,150.09,6,0,142400,0.935,4,"6icjOrzM57QrCAtBeWB5WF","german cloud rap","german hip hop",NA,NA,NA
+"Spinnin","Connor Price","Spinnin","2022-10-21",69,0.226,0.765,0.572,0,0.192,-6.153,0.128,140.013,11,0,110938,0.475,4,"5OzgCc3gQsqchX95k1C1Qa","singer-songwriter pop",NA,NA,NA,NA
+"Endaño","3AM","Rain City","2022-02-09",56,0.798,0.566,0.28,0,0.137,-9.888,0.0436,99.042,1,1,162755,0.314,3,"0CkvGcLzl6w4tWJdbulHyE","trap triste",NA,NA,NA,NA
+"Am0R","Akapellah","Am0R","2021-10-29",39,0.299,0.794,0.822,9.28e-06,0.295,-3.939,0.0831,129.973,9,0,195306,0.644,4,"3CxT8Sj5p65PjmJLy6lSoH","trap venezolano","venezuelan hip hop",NA,NA,NA
+"Mask Off","Future","FUTURE","2017-06-30",84,0.0102,0.833,0.434,0.0219,0.165,-8.795,0.431,150.062,2,1,204600,0.281,4,"0VgkVdmE4gld66l8iyGjgx","atl hip hop","hip hop","rap","southern hip hop","trap"
+"Encarcelado","Jaguayano","Todo Retumba","2018-06-24",32,0.447,0.654,0.843,0,0.065,-6.337,0.101,107.46,4,0,198882,0.883,4,"2u2nt5QuitVcDRiXvGzTB6",NA,NA,NA,NA,NA
+"First Class","Jack Harlow","Come Home The Kids Miss You","2022-05-06",81,0.111,0.902,0.582,3.18e-06,0.111,-5.902,0.109,107.005,5,0,173947,0.332,4,"0wHFktze2PHC5jDt3B17DC","deep underground hip hop","kentucky hip hop","pop rap","rap",NA
+"Por lo general","SinH","Por lo general","2021-12-24",23,0.0207,0.831,0.978,0.56,0.0694,-6.492,0.0798,126.024,5,0,205714,0.36,4,"4cMHFqrOaXDXMRSk9LSWeQ",NA,NA,NA,NA,NA
+"Portal","Robleis","Portal","2021-09-01",55,0.0488,0.899,0.633,0,0.0506,-5.812,0.0478,94.99,11,0,154263,0.718,4,"3lP4fU40BzHha9jcjr4XOi","pop argentino",NA,NA,NA,NA
+"Better Now","ODESZA","Better Now","2022-03-02",56,0.326,0.444,0.796,2.08e-06,0.161,-5.826,0.111,88.72,6,0,194110,0.354,4,"1iSuktdIdWrdfq0slQ4auO","chillwave","edm","indietronica",NA,NA
+"ImALonerDottie,ARebel","BONES","AmericanSweetheart","2022-07-06",40,0.105,0.812,0.791,0,0.132,-7.133,0.0503,142.041,7,1,148062,0.223,4,"0HapEDpi1scVgPrV6mHBzE","cloud rap","dark trap",NA,NA,NA
+"Quevedo: Bzrp Music Sessions, Vol. 52","Bizarrap","Quevedo: Bzrp Music Sessions, Vol. 52","2022-07-06",89,0.0125,0.621,0.782,0.033,0.23,-5.548,0.044,128.033,2,1,198937,0.55,4,"2tTmW7RDtMQtBk7m2rYeSw","argentine hip hop","pop venezolano","trap argentino","trap latino","urbano latino"
+"Na Na Na (Dulce Niña)","A.B. Quintanilla III Y Los Kumbia Kings","Lo Mejor De...","2016-07-01",68,0.442,0.782,0.793,0,0.295,-5.865,0.045,102.001,11,0,207693,0.969,4,"3o3eHNNF5HDU3I0Jg25SGD","tejano",NA,NA,NA,NA
+"Fair Trade (with Travis Scott)","Drake","Certified Lover Boy","2021-09-03",86,0.0503,0.666,0.465,0,0.215,-8.545,0.26,167.937,1,1,291175,0.292,4,"40iJIUlhi6renaREYGeIDS","canadian hip hop","canadian pop","hip hop","pop rap","rap"
+"On The Run","Thutmose","On The Run","2020-07-28",29,0.0333,0.54,0.832,8.77e-06,0.0704,-2.674,0.186,107.99,8,0,186435,0.368,4,"5ULqulOWifx9lbLkS3JHsd","indie pop rap",NA,NA,NA,NA
+"pa quererte","Rels B","pa quererte","2022-11-04",77,0.61,0.937,0.63,3.88e-06,0.0734,-6.063,0.0502,132.033,2,0,167272,0.943,4,"0FDTPGlLjF8SGWSsHyzNBe","r&b en espanol","spanish hip hop","trap latino","urbano espanol","urbano latino"
+"Makeba - Radio Edit","Jain","Makeba (Radio Edit)","2016-12-02",64,0.454,0.814,0.485,0.439,0.342,-14.604,0.0683,116.024,2,1,216293,0.431,4,"5FkBFIGzG8lYFktLyZNUq6","french pop",NA,NA,NA,NA
+"Monotonía","Shakira","Monotonía","2022-10-19",82,0.419,0.873,0.695,1.23e-06,0.211,-4.207,0.0459,131.963,0,0,158804,0.823,4,"6G12ZafqofSq7YtrMqUm76","colombian pop","dance pop","latin pop","pop",NA
+"Contacto","Lil Pump","Contacto","2021-11-26",41,0.003,0.912,0.508,9.34e-05,0.11,-7.461,0.12,96.065,2,1,140312,0.123,4,"7aCkJun2nsadc5v4JdFfep","emo rap","miami hip hop","pop rap","rap","trap"
+"Sunroof","Nicky Youre","Good Times Go","2023-06-09",86,0.352,0.768,0.714,0,0.15,-5.11,0.0401,131.443,10,1,163025,0.842,4,"5YqEzk3C5c3UZ1D5fJUlXA","singer-songwriter pop",NA,NA,NA,NA
+"One Leg","Jay Hover","One Leg","2022-03-31",35,0.015,0.926,0.763,6.5e-05,0.0989,-6.879,0.0875,131.008,6,1,207732,0.821,4,"2w8CuZYBt9Ns8OclCvp8ZE",NA,NA,NA,NA,NA
+"Ouais Ouais","LemKuuja","CHEESECAKE+","2018-06-30",43,0.0232,0.737,0.682,0.00317,0.44,-7.315,0.325,119.869,1,1,232629,0.787,4,"1nIYemzg7jWOitzpDRAUpk",NA,NA,NA,NA,NA
+"NO SE VA - EN VIVO","Grupo Frontera","El Comienzo","2023-08-25",81,0.0898,0.57,0.71,0,0.292,-4.526,0.0304,172.719,0,1,193816,0.752,4,"76kelNDs1ojicx1s6Urvck","musica chihuahuense",NA,NA,NA,NA
+"La Copa","Ozuna","La Copa","2022-09-14",53,0.116,0.913,0.803,0.000275,0.111,-3.911,0.0353,126.016,0,1,154628,0.947,4,"2gdBsRfuWGwJwe3X5XwZuI","puerto rican pop","reggaeton","trap latino","urbano latino",NA
+"Flash (Pointe-Noire)","Jain","Souldier","2018-08-24",37,0.12,0.68,0.614,0,0.313,-6.773,0.0426,131.925,5,0,137653,0.635,4,"5Lch0S3bp6QaXC3btut6ES","french pop",NA,NA,NA,NA
+"Chachachá","Jósean Log","Háblate de Mí","2016-10-14",81,0.791,0.68,0.321,4.67e-06,0.125,-10.944,0.0376,110.827,5,1,215986,0.416,4,"6aommJFM8i3iT4inKuDSXh","mexican indie",NA,NA,NA,NA
+"Calm Down (with Selena Gomez)","Rema","Calm Down (with Selena Gomez)","2022-08-25",91,0.382,0.801,0.806,0.000669,0.114,-5.206,0.0381,106.999,11,1,239317,0.802,4,"0WtM2NBVQNNJLh6scP13H8","afrobeats","nigerian pop",NA,NA,NA
+"Five Minutes - Her Rework","Her","Five Minutes (Her Rework)","2016-10-28",44,0.184,0.616,0.683,0.000356,0.1,-4.63,0.0837,99.919,10,0,169200,0.36,4,"5PcxBxZOCD66pFfqk1x1YI","french indie pop","french indietronica","rennes indie",NA,NA
+"Come","Jain","Zanaka (Deluxe)","2016-11-25",58,0.222,0.819,0.784,0.00786,0.0809,-6.524,0.0435,99.989,1,1,162360,0.831,4,"02R2z7JWV0G8VuU1xs58OB","french pop",NA,NA,NA,NA
+"CAMBIANDO LA PIEL","WOS","OSCURO ÉXTASIS","2021-11-18",64,0.0372,0.744,0.748,0,0.0985,-3.728,0.184,110.984,9,1,158121,0.962,4,"2y2iEADc8O0Vv5IKHSs21i","argentine indie","trap argentino",NA,NA,NA
+"top gun","bbno$","top gun","2022-10-05",48,0.0279,0.572,0.881,3.07e-05,0.342,-5.041,0.142,160.182,2,1,141133,0.784,4,"5DZLRMLNeGRS73q0psBiBq","canadian hip hop","dark trap","meme rap",NA,NA
