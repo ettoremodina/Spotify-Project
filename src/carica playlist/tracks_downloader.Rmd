@@ -259,7 +259,7 @@ for( file in unprocessed_data){
   # factors
   data$key = as.factor(data$key)
   data$mode  = as.factor(data$mode)
-  data$time_signature  = as.factor(data$time_signature )
+  data$time_signature  = as.factor(data$time_signature)
   
   data$year = rep(0,dim(data)[1])
   data$season = rep(0,dim(data)[1])
@@ -275,12 +275,10 @@ for( file in unprocessed_data){
       # add a new year column
       data$year[i] = year(date_i)
       # Define a function to get the season
-      print("ok")
       data$season[i] = get_season(date_i)
-      print("ok2")
-   
+
       } else{
-      data$year[i] = data$release_date[i]
+      data$year[i] = substr(data$release_date[i],1,4)
       data$season[i] = "missing"
     }
   }
@@ -292,6 +290,7 @@ for( file in unprocessed_data){
   data$release_date = NULL # optional
   
   write.csv(data,paste0("../../data/transformed_data/",file))
+  head(data)
 }
 ```
 
@@ -304,7 +303,8 @@ for( file in unprocessed_data){
   
 }
 dataset_list[[1]]
-saveRDS("../../data/data_list.RData",dataset_list)
+saveRDS(dataset_list,"../../data/data_list.RData")
+load("../../data/data_list.RData")
 ```
 
 # EXTRA

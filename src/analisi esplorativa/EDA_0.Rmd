@@ -14,6 +14,7 @@ library(dplyr)
 ```
 
 ```{r}
+dataset_list = readRDS("../../data/data_list.RData")
 file_name = "tracks_ettore"
 tracks = read.csv(paste0("../../data/",file_name,".csv"),header = T)
 dim(tracks)
@@ -22,6 +23,8 @@ head(tracks)
 # rimuovi una colonna duplicata
 tracks = tracks[,-which(colnames(tracks)=="track.duration_ms.1")]
 colnames(tracks)
+
+head(dataset_list[1])
 ```
 
 
