@@ -1,0 +1,176 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+library(stringdist)
+```
+# Import
+```{r}
+dataset_list = readRDS("../../data/data_list.RData")
+```
+
+# choose 1 dataset for now
+```{r}
+df = dataset_list[[1]]
+```
+
+```{r}
+raggruppa_parole <- function(parole, soglia, len_words,accoppiate) {
+  gruppi <- list()
+  first_iter_flag <- FALSE
+   for (parola in parole) {
+     if( parola %in% accoppiate){
+       next 
+     }
+     flag <- FALSE
+     # se la parola è più corta di len_words non la filtra e la aggiunge direttamente
+    if ((nchar(parola) <= len_words) | !first_iter_flag) { 
+      gruppi[[parola]] <- parola
+    }else{
+      
+      
+      # altrimenti
+      for(g in 1:length(gruppi)){
+        gruop = names(gruppi)[g]
+        # cerca se c'è gia una parola simile
+        if((stringdist::stringdist(gruop, parola) <= soglia)){
+          # in caso aggiungila al gruppo
+          gruppi[[gruop]] <- append(gruppi[[gruop]] , parola) 
+          flag <- TRUE
+        }
+      }
+      
+      
+             # se non hai trovato nulla di simile, crea un nuovo gruppo
+      if(!flag & first_iter_flag){
+        flag <- FALSE
+        gruppi[[parola]] <- parola
+        
+      }
+    }
+    first_iter_flag <- TRUE
+   }
+  
+   for(g in 1:length(gruppi)){
+        gruppi[[g]] = unique( gruppi[[g]] )
+   }
+    
+  return( gruppi)
+}
+
+
+# Function to split each string into words
+split_into_words <- function(x) unlist(strsplit(x, " "))
+```
+
+
+
+# create a vector with all genres
+
+word_genres_grouped is a vector with all the unique words present in the genres vector
+Also to this vector is applied a vector that removes all the uncatched duplicates
+for example "italiano" and "italian" is the same
+To be catched duplicates must be longer than 4 and have at most 2 different letters, these parameters can be tuned
+```{r,warning=FALSE}
+genres = df$genre_1
+genres_unique=unique(genres)
+
+freq_table_genres = table(genres)
+as.data.frame(freq_table_genres)
+
+
+# Applying the function to each element in the vector
+word_genres <- unique(unlist(lapply(genres_unique, split_into_words)))
+```
+
+
+
+
+```{r,warning=FALSE}
+# alcuni generi hanno due parole, tipo "hip hop", inserisci (per ora manualmente) 
+# in questo vettore una delle 2 parole in modo da evitare ripetizioni
+# in futuro puoi scirvere una funzione che controlla se due parole appaiono sempre insieme
+# in tal caso inserisce nel vettore una delle due parole
+
+accoppiate = c("hop")
+word_grouped_list <- raggruppa_parole(word_genres, soglia = 2,len_words = 4,accoppiate)
+word_genres_grouped <- names(word_grouped_list)
+word_genres_grouped
+```
+
+```{r,warning=FALSE}
+differences_vector <- word_genres[!( word_genres %in% word_genres_grouped)]
+print(differences_vector)
+```
+
+## Riduciamo i generi
+```{r}
+genre_reduced_freq_list <- list()
+
+# per ogni genere raggruppato
+for(groupGenre in word_genres_grouped){
+  count = 0
+  #df$groupGenre = rep(NA,dim(df)[1])
+  # tieni conto di tutte le parole simile
+  for(subGenre in word_grouped_list[[groupGenre]]){
+    # e vedi quante occorrenze ci sono per quel genere
+    for(genere_vanilla in genres){
+      if(subGenre %in% unlist(lapply(genere_vanilla, split_into_words))){
+        count = count + 1
+        genre_reduced_freq_list[[groupGenre]] <- count
+      }
+    }
+   
+  }
+}
+
+genre_reduced_freq_list = genre_reduced_freq_list[order(-unlist(genre_reduced_freq_list))]
+hist(unlist(genre_reduced_freq_list))
+
+```
+
+```{r}
+df = dataset_list[[1]]
+count_genre = 0
+for(groupGenre in word_genres_grouped){
+  count_genre = count_genre+1
+  rows = c()
+  for(subGenre in word_grouped_list[[groupGenre]]){
+    for(r in 1:dim(df)[1]){
+      if(subGenre %in% unlist(lapply(df$genre_1[r], split_into_words))){
+        rows = c(rows,r)
+      }
+    }
+  }
+  
+  # sovrascrivo i generi superiori a 1
+  df[,paste0("genre_",count_genre+1)] = rep(NA,dim(df)[1])
+  df[rows,paste0("genre_",count_genre+1)] = groupGenre
+}
+
+df[,20:dim(df)[2]]
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
