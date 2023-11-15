@@ -14,12 +14,7 @@ library(stringdist)
 ```{r}
 dataset_list = readRDS("../../data/data_list.RData")
 ```
-
-# choose 1 dataset for now
-```{r}
-df = dataset_list[[1]]
-```
-
+# funzione raggruppante
 ```{r}
 raggruppa_parole <- function(parole, soglia, len_words,accoppiate) {
   gruppi <- list()
@@ -71,6 +66,11 @@ split_into_words <- function(x) unlist(strsplit(x, " "))
 
 
 
+# choose 1 dataset for now
+```{r}
+df = dataset_list[[4]]
+```
+
 # create a vector with all genres
 
 word_genres_grouped is a vector with all the unique words present in the genres vector
@@ -78,7 +78,9 @@ Also to this vector is applied a vector that removes all the uncatched duplicate
 for example "italiano" and "italian" is the same
 To be catched duplicates must be longer than 4 and have at most 2 different letters, these parameters can be tuned
 ```{r,warning=FALSE}
+df$genre_1[is.na(df$genre_1)] <- "missing"
 genres = df$genre_1
+
 genres_unique=unique(genres)
 
 freq_table_genres = table(genres)
@@ -90,7 +92,7 @@ word_genres <- unique(unlist(lapply(genres_unique, split_into_words)))
 ```
 
 
-
+# rimuovi parole sempre accoppiate
 
 ```{r,warning=FALSE}
 # alcuni generi hanno due parole, tipo "hip hop", inserisci (per ora manualmente) 
@@ -98,12 +100,12 @@ word_genres <- unique(unlist(lapply(genres_unique, split_into_words)))
 # in futuro puoi scirvere una funzione che controlla se due parole appaiono sempre insieme
 # in tal caso inserisce nel vettore una delle due parole
 
-accoppiate = c("hop")
+accoppiate = c("hop","d'autore")
 word_grouped_list <- raggruppa_parole(word_genres, soglia = 2,len_words = 4,accoppiate)
 word_genres_grouped <- names(word_grouped_list)
 word_genres_grouped
 ```
-
+# cosa è stato tolto?
 ```{r,warning=FALSE}
 differences_vector <- word_genres[!( word_genres %in% word_genres_grouped)]
 print(differences_vector)
@@ -116,7 +118,6 @@ genre_reduced_freq_list <- list()
 # per ogni genere raggruppato
 for(groupGenre in word_genres_grouped){
   count = 0
-  #df$groupGenre = rep(NA,dim(df)[1])
   # tieni conto di tutte le parole simile
   for(subGenre in word_grouped_list[[groupGenre]]){
     # e vedi quante occorrenze ci sono per quel genere
@@ -132,12 +133,13 @@ for(groupGenre in word_genres_grouped){
 
 genre_reduced_freq_list = genre_reduced_freq_list[order(-unlist(genre_reduced_freq_list))]
 hist(unlist(genre_reduced_freq_list))
+word_genres_grouped=names(genre_reduced_freq_list)
 
 ```
-
+# aggiungiamo i generi al dataframe
 ```{r}
-df = dataset_list[[1]]
 count_genre = 0
+
 for(groupGenre in word_genres_grouped){
   count_genre = count_genre+1
   rows = c()
@@ -155,6 +157,28 @@ for(groupGenre in word_genres_grouped){
 }
 
 df[,20:dim(df)[2]]
+```
+
+# quanti generi per raggiungere alpha percentile
+
+```{r}
+alpha = 0.8
+first = 1
+count = 0
+rows = c()
+
+for(i in first:count_genre){
+  if (length(rows)/dim(df)[1]<alpha){
+    count = count +1
+    rows = unique(c(rows,as.vector(df[!is.na(df[,paste0("genre_",i+1)]),"X"])))
+  }
+}
+count
+```
+# info finali
+```{r}
+colums_to_keep = c(1:22,(22+first):(22+first+count-1))
+main_genres = word_genres_grouped[first:(first+count-1)]
 ```
 
 
