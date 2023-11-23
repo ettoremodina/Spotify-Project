@@ -68,7 +68,7 @@ split_into_words <- function(x) unlist(strsplit(x, " "))
 
 # choose 1 dataset for now
 ```{r}
-df = dataset_list[[4]]
+df = dataset_list[[21]]
 ```
 
 # create a vector with all genres
@@ -111,7 +111,7 @@ differences_vector <- word_genres[!( word_genres %in% word_genres_grouped)]
 print(differences_vector)
 ```
 
-## Riduciamo i generi
+# Riduciamo i generi
 ```{r}
 genre_reduced_freq_list <- list()
 
@@ -183,7 +183,108 @@ main_genres = word_genres_grouped[first:(first+count-1)]
 
 
 
+# FINAL FUCNTION
+```{r}
+renovate_genres <- function(df,  alpha = 0.8,first = 1){
+  ######### 1- rimuovi NA
+  df$genre_1[is.na(df$genre_1)] <- "missing"
+  genres = df$genre_1
+  genres_unique=unique(genres)
+  
+  # splittiamo tutte le parole
+  word_genres <- unique(unlist(lapply(genres_unique, split_into_words)))
+  ######## raggruppiamo per somiglianza le parole
+  
+  accoppiate = c("hop","d'autore")
+  word_grouped_list <- raggruppa_parole(word_genres, soglia = 2,len_words = 4,accoppiate)
+  word_genres_grouped <- names(word_grouped_list)
+  ######## printiamo quali parole sono state rimosse
+  
+  differences_vector <- word_genres[!( word_genres %in% word_genres_grouped)]
+  print(differences_vector)
 
+  ######## costruiamo una lista delle frequenze per ogni genere
+  
+  genre_reduced_freq_list <- list()
+
+  # per ogni genere raggruppato
+  for(groupGenre in word_genres_grouped){
+    count = 0
+    # tieni conto di tutte le parole simile
+    for(subGenre in word_grouped_list[[groupGenre]]){
+      # e vedi quante occorrenze ci sono per quel genere
+      for(genere_vanilla in genres){
+        if(subGenre %in% unlist(lapply(genere_vanilla, split_into_words))){
+          count = count + 1
+          genre_reduced_freq_list[[groupGenre]] <- count
+        }
+      }
+     
+    }
+  }
+  
+  genre_reduced_freq_list = genre_reduced_freq_list[order(-unlist(genre_reduced_freq_list))]
+  word_genres_grouped=names(genre_reduced_freq_list)
+  ########## costruiamo il nuovo dataset coi generi manipolati
+  
+  count_genre = 0
+  
+  for(groupGenre in word_genres_grouped){
+    count_genre = count_genre+1
+    rows = c()
+    for(subGenre in word_grouped_list[[groupGenre]]){
+      for(r in 1:dim(df)[1]){
+        if(subGenre %in% unlist(lapply(df$genre_1[r], split_into_words))){
+          rows = c(rows,r)
+        }
+      }
+    }
+    
+    # sovrascrivo i generi superiori a 1
+    df[,paste0("genre_",count_genre+1)] = rep(NA,dim(df)[1])
+    df[rows,paste0("genre_",count_genre+1)] = groupGenre
+  }
+    
+  ######### teniamo i generi relativamente ad un quantile specificato
+  count = 0
+  rows = c()
+  
+  for(i in first:count_genre){
+    if (length(rows)/dim(df)[1]<alpha){
+      count = count +1
+      rows = unique(c(rows,as.vector(df[!is.na(df[,paste0("genre_",i+1)]),"X"])))
+    }
+  }
+  print(count)
+  print("-------")
+  ######## tagliamo il dataset
+  
+  colums_to_keep = c(1:22,(22+first):(22+first+count-1))
+ # main_genres = word_genres_grouped[first:(first+count-1)]
+  df = df[,colums_to_keep]
+  return(list(df,genre_reduced_freq_list))
+
+}
+```
+
+# run for all datasets
+```{r}
+datasets_manipulated <- list()
+freq_list <- list()
+id_count = 1
+for (dataset in dataset_list){
+  list_temp = renovate_genres(dataset,0.8,1)
+  id = names(dataset_list)[id_count]
+  datasets_manipulated[[id]] = list_temp[[1]]
+  freq_list[[id]] = list_temp[[2]]
+  id_count= id_count+1
+}
+print(id_count)
+```
+# Save new dataset list
+```{r}
+saveRDS(datasets_manipulated,"../../data/data_genres_cleaned.RData")
+```
 
 
 
