@@ -1,0 +1,19 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library(ggplot2)
+```
+
+# Load Datasets
+```{r}
+dataset_list = readRDS("../data/data_list.RData")
+names(dataset_list)
+dataset_list[[1]]
+```
+
+# Save new dataset list
+```{r}
+saveRDS(datasets_manipulated,"../data/data_genres_cleaned.RData")
+```
