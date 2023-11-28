@@ -285,6 +285,11 @@ print(id_count)
 ```{r}
 saveRDS(datasets_manipulated,"../../data/data_genres_cleaned.RData")
 ```
+```{r}
+data = readRDS("../../data/data_genres_cleaned.RData")
+data[[2]]
+```
+
 
 
 

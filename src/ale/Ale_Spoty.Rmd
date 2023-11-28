@@ -1,0 +1,203 @@
+---
+title: 'N'
+author: "Alessandra Pescina"
+date: "2023-11-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(848)
+```
+
+##Upload useful function and load data
+```{r}
+source("normalize_numeric_global.R")
+dataset_list = readRDS("../../data/data_list.RData")
+```
+
+
+##Remove dataframe in the list that are of too poor/rich of data
+```{r}
+#clean dataset
+n_row <- numeric(length(dataset_list ))
+
+for (i in seq_along(dataset_list )) {
+  n_row[i] <- nrow(dataset_list [[i]])
+}
+
+hist(n_row)
+# Function to filter out data frames with wrong nrow and crop the one too long
+filter_nrow <- function(df) {
+  nrow(df) != 3
+}
+
+
+filtered_list <- Filter(filter_nrow, dataset_list)
+filtered_list[[26]] <- filtered_list[[26]][1:101, ]
+dataset_list<- filtered_list
+
+n_row <- numeric(length(dataset_list ))
+for (i in seq_along(dataset_list )) {
+  n_row[i] <- nrow(dataset_list [[i]])
+}
+
+```
+## Preprocess numeric data
+This chunk provides numeric data normalized in a global way
+Note that the covariates *duration* and *years* are not normalized on purpose
+```{r}
+
+numeric_list <- list()
+for (i in seq_along(dataset_list)) {
+  data <- dataset_list[[i]]
+  numeric_list[[i]] <- data[, c(5, 7:15, 18, 19)]
+}
+numeric_list <- normalize_numeric_global(numeric_list)
+
+combined_numeric <- do.call(rbind, numeric_list)
+combined_numeric <-round(combined_numeric,3)
+
+temp <- rep(seq_along(n_row), times = n_row)
+combined_numeric$id<-temp
+
+head(combined_numeric)
+```
+Let's save in two different dataframes the mean and variance  for each variable in each playlist
+```{r}
+library(dplyr)
+```
+
+```{r}
+
+temp<-combined_numeric
+temp <- temp %>%
+  group_by(id) %>%
+  summarize_all(mean)
+
+mean_df<-temp
+
+temp<-combined_numeric
+temp <- temp %>%
+  group_by(id) %>%
+  summarize_all(var)
+
+variance_df<-temp
+
+```
+
+## Save data
+```{r}
+saveRDS(combined_numeric,"../../data/data_numeric_cleaned.RData")
+saveRDS(mean_df,"../../data/data_mean.RData")
+saveRDS(variance_df,"../../data/data_variance.RData")
+```
+
+
+
+
+## Visualise numeric data
+```{r}
+#use this to have a boxplot of the variables you want to visualize
+#change this line with the number of the numeric dataset you want to open
+#numeric<-numeric_list[[1]]
+
+par(mfrow = c(2, 3))
+numeric<-numeric_list[[45]]
+col_names<-colnames(numeric)
+boxplot(numeric[,1:2], col = "lightblue", main = "Boxplots", names = col_names[1:2], cex.axis = 0.5)
+boxplot(numeric[,3:4], col = "lightblue", main = "Boxplots", names = col_names[3:4], cex.axis = 0.5)
+boxplot(numeric[,5:6], col = "lightblue", main = "Boxplots", names = col_names[5:6], cex.axis = 0.5)
+abline(h=c(0.5,0.8),col="red")
+boxplot(numeric[,7:8], col = "lightblue", main = "Boxplots", names = col_names[7:8], cex.axis = 0.5)
+boxplot(numeric[,9:10], col = "lightblue", main = "Boxplots", names = col_names[9:10], cex.axis = 0.5)
+par(mfrow = c(1, 2))
+boxplot(numeric[,11], col = "lightblue", main = "Duration", names = col_names[11], cex.axis = 0.5)
+boxplot(numeric[,12], col = "lightblue", main = "Year", names = col_names[12], cex.axis = 0.5)
+
+```
+
+
+## Cluster by k_mean
+Obv in order to apply k-mean we need scaled variables so we are gonna scale *duration* and *year* as well
+
+Rescale data and esclude id from clusterization
+```{r}
+temp<-combined_numeric
+  
+  min_max_normalize <- function(x) {
+    return((x - min(x)) / (max(x) - min(x)))
+  }
+  
+temp$duration<-  min_max_normalize(temp[,11])
+temp$year<-  min_max_normalize(temp[,12])
+
+scaled_data<-temp
+cluster_subset <- temp[, -which(names(temp) == "id")]
+```
+
+Try to inspect with elbow method the number of clusters to build
+(non converge.. provo con 8)
+```{r}
+library(factoextra)
+fviz_nbclust(cluster_subset, kmeans, method = "wss")
+```
+
+```{r}
+k<-8
+kmeans_result <- kmeans(scaled_data, centers = k)
+clustered <- cbind(combined_numeric, cluster = kmeans_result$cluster)
+aggregate(cluster_subset, by = list(cluster = clustered$cluster), FUN = mean)
+```
+Asses the quality of the clustering
+By now I've used euclidean distance to compute distance between data, but could be useful
+to take into account correlation between covariates (so maybe mahalanobis)
+
+(fanno schifo ciao)
+```{r}
+library(cluster)
+dist_matrix <- as.matrix(dist(cluster_subset, method ="euclidean" ))
+silhouette_score <- silhouette(kmeans_result$cluster, dist_matrix)
+summary(silhouette_score)
+```
+## PCA
+
+So far no satisfactory result, maybe better to try Pca and then do clustering on latent variables
+
+```{r}
+
+library(FactoMineR)
+```
+
+```{r}
+
+pca_result <- PCA(cluster_subset, graph = FALSE)
+summary(pca_result)  
+
+plot(pca_result, choix = "var") 
+
+```
+we need at least 8 dim to take into account 80% of the variability
+(first five almost 65%)
+1 dim-> +loudness, +energy,-acusticness
+2 dim-> +duration, -year, -speechiness, -danceability
+3 dim-> -pop,-danceability, +speechiness
+4 dim-> -pop, +liveness
+5 dim-> +tempo, -liveness
+
+risultati abbastanza confusi e direi soprattutto non affidabili..
+
+
+## Preprocessing factors
+
+```{r}
+factor_list <- list()
+for (i in seq_along(dataset_list)) {
+  data <- dataset_list[[i]]
+  factor_list[[i]] <- data[,c(2,3,4,6,16,17,20:ncol(data))]
+}
+
+```
+
+## Ideas
+fit kernel density estimation in order to have a distributuion for each on of the covariates
