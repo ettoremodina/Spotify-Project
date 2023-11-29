@@ -80,6 +80,7 @@ temp <- temp %>%
   summarize_all(mean)
 
 mean_df<-temp
+mean_df$id<-names(dataset_list)
 
 temp<-combined_numeric
 temp <- temp %>%
@@ -87,6 +88,7 @@ temp <- temp %>%
   summarize_all(var)
 
 variance_df<-temp
+variance_df$id<-names(dataset_list)
 
 ```
 
