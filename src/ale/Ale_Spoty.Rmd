@@ -9,6 +9,11 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 set.seed(848)
 ```
+# Libraries
+```{r}
+library(dplyr)
+```
+
 
 ##Upload useful function and load data
 ```{r}
@@ -26,10 +31,10 @@ for (i in seq_along(dataset_list )) {
   n_row[i] <- nrow(dataset_list [[i]])
 }
 
-hist(n_row)
+hist(n_row,main = "before")
 # Function to filter out data frames with wrong nrow and crop the one too long
 filter_nrow <- function(df) {
-  nrow(df) != 3
+  nrow(df) > 5
 }
 
 
@@ -41,6 +46,7 @@ n_row <- numeric(length(dataset_list ))
 for (i in seq_along(dataset_list )) {
   n_row[i] <- nrow(dataset_list [[i]])
 }
+hist(n_row, main = "after")
 
 ```
 ## Preprocess numeric data
@@ -62,14 +68,12 @@ temp <- rep(seq_along(n_row), times = n_row)
 combined_numeric$id<-temp
 
 head(combined_numeric)
+dim(combined_numeric)
 ```
 Let's save in two different dataframes the mean and variance  for each variable in each playlist
-```{r}
-library(dplyr)
-```
+
 
 ```{r}
-
 temp<-combined_numeric
 temp <- temp %>%
   group_by(id) %>%
