@@ -131,9 +131,9 @@ Rescale data and esclude id from clusterization
 ```{r}
 temp<-combined_numeric
   
-  min_max_normalize <- function(x) {
-    return((x - min(x)) / (max(x) - min(x)))
-  }
+min_max_normalize <- function(x) {
+  return((x - min(x)) / (max(x) - min(x)))
+}
   
 temp$duration<-  min_max_normalize(temp[,11])
 temp$year<-  min_max_normalize(temp[,12])

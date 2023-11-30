@@ -53,11 +53,28 @@ for(col in colnames(tracks)[numerical_values]){
 }
 
 ```
+```{r}
+dataset_survey = read.csv("../../data/Questionario Spotify (Risposte) - Risposte del modulo 1.csv")
+dataset_survey = read.csv("../../data/Spotify Survey  (Risposte) - Risposte del modulo 1.csv")
+```
+```{r}
+
+name_id = substr(sub(".*/(.+)$", "\\1", dataset_survey[,"Paste.here.the.link"]), start = 1, stop = 15)
+dataset_survey$name.id = name_id
+dataset_survey_new = dataset_survey[,4:22]
+colnames(dataset_survey)
+saveRDS(dataset_survey,"../../data/Survey")
+```
+
+
 
 ```{r}
 # Add a column indicating the source data frame
 df_list_with_names <- lapply(seq_along(dataset_list), function(i) {
   dataset_list[[i]]$id <- names(dataset_list)[i]
+  # here you can add all kind of columns from the survey dataset
+  #dataset_list[[i]]$study <- dataset_survey[i,"Che.cosa.studi."]
+  dataset_list[[i]]$state <- dataset_survey[i,"In.che.stato.vivi."]
   return(dataset_list[[i]])
 })
 
@@ -68,6 +85,10 @@ df_all_in_one <- bind_rows(df_list_with_names)
 print(df_all_in_one[seq(1,1000,50),])
 df_all_in_one=df_all_in_one[,-1]
 ```
+```{r}
+table(df_all_in_one$genre_2)
+```
+
 
 
 
@@ -77,7 +98,7 @@ columns = colnames(df_all_in_one)[numerical_values_new]
 #columns =colnames(tracks)[7:10]
 for(i in 1:(length(columns)-1)){
   for(j in (i+1):length(columns)){
-    plot = ggplot(df_all_in_one, aes(df_all_in_one[,columns[i]],df_all_in_one[,columns[j]] , colour = id )) + 
+    plot = ggplot(df_all_in_one, aes(df_all_in_one[,columns[i]],df_all_in_one[,columns[j]] , colour = state )) + 
         geom_point()+
         theme_bw()+
         theme(legend.position = "none")+
