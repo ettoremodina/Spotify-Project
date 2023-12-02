@@ -290,7 +290,11 @@ data = readRDS("../../data/data_genres_cleaned.RData")
 data[[2]]
 ```
 
+# min max
+```{r}
 
+
+```
 
 
 

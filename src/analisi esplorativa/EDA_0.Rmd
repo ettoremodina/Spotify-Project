@@ -14,41 +14,34 @@ library(dplyr)
 ```
 
 ```{r}
-dataset_list = readRDS("../../data/data_list.RData")
-file_name = "tracks_ettore"
-tracks = read.csv(paste0("../../data/",file_name,".csv"),header = T)
+dataset_list = readRDS("../../data/data_genres_cleaned.RData")
+tracks = dataset_list[[1]]
 dim(tracks)
 head(tracks)
-
-# rimuovi una colonna duplicata
-tracks = tracks[,-which(colnames(tracks)=="track.duration_ms.1")]
-colnames(tracks)
-
-head(dataset_list[1])
+tracks = tracks[,-1]
 ```
 
 
 # Explore columns
 ```{r}
 for (i in 1:dim(tracks)[2]){
-  print(paste0(i,"##",colnames(tracks)[i]))
+  print(paste0(i,"----",colnames(tracks)[i]))
   print(tracks[1:10,i])
 }
 ```
 # Ranges
 ```{r}
-for (i in 5:19){
+numerical_values = 5:18
+for (i in numerical_values){
   print(c(i,colnames(tracks)[i],range(tracks[,i])))
 }
-
-numerical_values = c(5:15,17,18)
 length(numerical_values)
 ```
 
 
 # distributions
 ```{r}
-numerical_values = 5:19
+
 for(col in colnames(tracks)[numerical_values]){
   bins = range(tracks[[col]])[2]-range(tracks[[col]])[1]
   plot <- ggplot(data = tracks, mapping = aes(x =.data[[col]])) +
@@ -64,10 +57,46 @@ for(col in colnames(tracks)[numerical_values]){
 
 
 
+```{r}
+# Add a column indicating the source data frame
+df_list_with_names <- lapply(seq_along(dataset_list), function(i) {
+  dataset_list[[i]]$id <- names(dataset_list)[i]
+  # here you can add all kind of columns from the survey dataset
+  #dataset_list[[i]]$study <- dataset_survey[i,"Che.cosa.studi."]
+  dataset_list[[i]]$state <- dataset_survey[i,"In.che.stato.vivi."]
+  return(dataset_list[[i]])
+})
+
+# Combine the data frames into a single data frame
+df_all_in_one <- bind_rows(df_list_with_names)
+
+# Print the result
+print(df_all_in_one[seq(1,1000,50),])
+df_all_in_one=df_all_in_one[,-1]
+```
+
+
+# exploration d = 2 + color
+```{r}
+numerical_values_new = numerical_values[-which(numerical_values%in%c(9,10))]
+columns = colnames(df_all_in_one)[numerical_values_new]
+#columns =colnames(tracks)[7:10]
+for(i in 1:(length(columns)-1)){
+  for(j in (i+1):length(columns)){
+    plot = ggplot(df_all_in_one, aes(df_all_in_one[,columns[i]],df_all_in_one[,columns[j]] , colour = state )) + 
+        geom_point()+
+        theme_bw()+
+        theme(legend.position = "none")+
+        labs(x =columns[i],y = columns[j] )
+    print(plot)
+  }
+}
+```
+
 
 # Blueprint for plots 
 ```{r}
-plot = ggplot(tracks_filtered, aes(energy,loudness , colour = genre_1 )) + 
+plot = ggplot(tracks, aes(energy,loudness , colour = genre_1 )) + 
   geom_point()+
   theme_bw()+
   theme(legend.position = "none")
