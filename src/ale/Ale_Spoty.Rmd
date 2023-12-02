@@ -1,14 +1,15 @@
 ---
-title: 'N'
+title: 'Preprocess_numeric'
 author: "Alessandra Pescina"
 date: "2023-11-22"
 output: html_document
 ---
-ciao ettore
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 set.seed(848)
 ```
+
 # Libraries
 ```{r}
 library(dplyr)
@@ -64,7 +65,8 @@ numeric_list <- normalize_numeric_global(numeric_list)
 combined_numeric <- do.call(rbind, numeric_list)
 combined_numeric <-round(combined_numeric,3)
 
-temp <- rep(seq_along(n_row), times = n_row)
+names<-names(dataset_list)
+temp <- rep(names, times = n_row)
 combined_numeric$id<-temp
 
 head(combined_numeric)
@@ -94,19 +96,22 @@ variance_df$id<-names(dataset_list)
 
 ## Save data
 ```{r}
-saveRDS(combined_numeric,"../../data/data_numeric_cleaned.RData")
+saveRDS(combined_numeric,"../../data/data_numeric_cleaned2.RData")
 saveRDS(mean_df,"../../data/data_mean.RData")
 saveRDS(variance_df,"../../data/data_variance.RData")
 ```
 
 
+```{r}
+tt= readRDS("../../data/data_numeric_cleaned2.RData")
+```
 
 
 ## Visualise numeric data
 ```{r}
 #use this to have a boxplot of the variables you want to visualize
 #change this line with the number of the numeric dataset you want to open
-#numeric<-numeric_list[[1]]
+numeric<-numeric_list[[9]]
 
 par(mfrow = c(2, 3))
 numeric<-numeric_list[[45]]
