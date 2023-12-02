@@ -20,6 +20,19 @@ dim(tracks)
 head(tracks)
 tracks = tracks[,-1]
 ```
+```{r}
+dataset_survey = read.csv("../../data/Questionario Spotify (Risposte) - Risposte del modulo 1.csv")
+#dataset_survey = read.csv("../../data/Spotify Survey  (Risposte) - Risposte del modulo 1.csv")
+```
+```{r}
+name_id = substr(sub(".*/(.+)$", "\\1", dataset_survey[,"Incolla.qua.il.link"]), start = 1, stop = 15)
+dataset_survey$name.id = name_id
+dataset_survey_new = dataset_survey[,4:24]
+colnames(dataset_survey)
+saveRDS(dataset_survey_new,"../../data/Questionario.RData")
+
+```
+
 
 
 # Explore columns
@@ -63,7 +76,7 @@ df_list_with_names <- lapply(seq_along(dataset_list), function(i) {
   dataset_list[[i]]$id <- names(dataset_list)[i]
   # here you can add all kind of columns from the survey dataset
   #dataset_list[[i]]$study <- dataset_survey[i,"Che.cosa.studi."]
-  dataset_list[[i]]$state <- dataset_survey[i,"In.che.stato.vivi."]
+  dataset_list[[i]]$music_importance <- dataset_survey[i,"Quanto.è.importante.per.te.la.musica..Quanto.influenza.la.tua.vita.quotidiana."]
   return(dataset_list[[i]])
 })
 
@@ -83,7 +96,7 @@ columns = colnames(df_all_in_one)[numerical_values_new]
 #columns =colnames(tracks)[7:10]
 for(i in 1:(length(columns)-1)){
   for(j in (i+1):length(columns)){
-    plot = ggplot(df_all_in_one, aes(df_all_in_one[,columns[i]],df_all_in_one[,columns[j]] , colour = state )) + 
+    plot = ggplot(df_all_in_one, aes(df_all_in_one[,columns[i]],df_all_in_one[,columns[j]] , colour = music_importance )) + 
         geom_point()+
         theme_bw()+
         theme(legend.position = "none")+
@@ -96,7 +109,7 @@ for(i in 1:(length(columns)-1)){
 
 # Blueprint for plots 
 ```{r}
-plot = ggplot(tracks, aes(energy,loudness , colour = genre_1 )) + 
+plot = ggplot(tracks, aes(energy,loudness , colour = genre_1,size = popularity )) + 
   geom_point()+
   theme_bw()+
   theme(legend.position = "none")
@@ -106,6 +119,10 @@ print(plot)
 
 
 
+```{r}
+quest = readRDS("../../data/data_numeric_cleaned.RData")
+colnames(quest)
+```
 
 
 
