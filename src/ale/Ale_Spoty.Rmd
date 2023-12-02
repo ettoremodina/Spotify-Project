@@ -197,13 +197,17 @@ risultati abbastanza confusi e direi soprattutto non affidabili..
 ## Preprocessing factors
 
 ```{r}
-factor_list <- list()
-for (i in seq_along(dataset_list)) {
-  data <- dataset_list[[i]]
-  factor_list[[i]] <- data[,c(2,3,4,6,16,17,20:ncol(data))]
-}
-
+data_genres = readRDS("../../data/data_genres_cleaned.RData")
 ```
 
+```{r}
+factor_list <- list()
+for (i in seq_along(data_genres)) {
+  data <- data_genres[[i]]
+  factor_list[[i]] <- data[,c(2,3,4,6,16,17,20:ncol(data))]
+}
+```
+
+
 ## Ideas
-fit kernel density estimation in order to have a distributuion for each on of the covariates
+fit kernel density estimation in order to have a distribution for each on of the covariates
