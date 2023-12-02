@@ -1,0 +1,34 @@
+---
+title: 'Survey data'
+author: "Alessandra Pescina"
+date: "2023-11-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(848)
+```
+
+## Load Data
+```{r}
+Survey_data = readRDS("../../data/Survey.RData")
+Quest_data = readRDS("../../data/Questionario.RData")
+```
+
+##Remove useless cols
+```{r}
+Quest_data<-Quest_data[,-18]
+```
+
+##Rename cols
+```{r}
+names_cols<-c("età", "sesso", "educazione", "campo.studi", "stato", "libri", "lavoro", "importanza.musica", "genere", "come.ascolti.musica","quando.ascolti.musica", "concerti", "strumento", "sport", "estero", "politica", "hobby", "regione", "abitanti.città", "id" )
+names(Quest_data)<-names_cols
+```
+
+```{r}
+
+ 
+```
+
