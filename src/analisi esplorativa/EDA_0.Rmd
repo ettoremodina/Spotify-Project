@@ -53,18 +53,7 @@ for(col in colnames(tracks)[numerical_values]){
 }
 
 ```
-```{r}
-dataset_survey = read.csv("../../data/Questionario Spotify (Risposte) - Risposte del modulo 1.csv")
-dataset_survey = read.csv("../../data/Spotify Survey  (Risposte) - Risposte del modulo 1.csv")
-```
-```{r}
 
-name_id = substr(sub(".*/(.+)$", "\\1", dataset_survey[,"Paste.here.the.link"]), start = 1, stop = 15)
-dataset_survey$name.id = name_id
-dataset_survey_new = dataset_survey[,4:22]
-colnames(dataset_survey)
-saveRDS(dataset_survey,"../../data/Survey")
-```
 
 
 
@@ -85,13 +74,9 @@ df_all_in_one <- bind_rows(df_list_with_names)
 print(df_all_in_one[seq(1,1000,50),])
 df_all_in_one=df_all_in_one[,-1]
 ```
-```{r}
-table(df_all_in_one$genre_2)
-```
 
 
-
-
+# exploration d = 2 + color
 ```{r}
 numerical_values_new = numerical_values[-which(numerical_values%in%c(9,10))]
 columns = colnames(df_all_in_one)[numerical_values_new]
