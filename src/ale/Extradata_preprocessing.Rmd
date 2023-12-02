@@ -12,6 +12,10 @@ set.seed(848)
 
 ## Load Data
 ```{r}
+
+```
+
+```{r}
 Survey_data = readRDS("../../data/Survey.RData")
 Quest_data = readRDS("../../data/Questionario.RData")
 ```
@@ -28,7 +32,7 @@ names(Quest_data)<-names_cols
 ```
 
 ```{r}
-
+read.csv("../../data/Questionario Spotify (Risposte) - Risposte del modulo 1 (1).csv")
  
 ```
 
