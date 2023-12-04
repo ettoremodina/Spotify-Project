@@ -1,0 +1,87 @@
+```{r}
+env = load("~/Desktop/Spotify_Project/Spotify-Project/data/environment.RData")
+```
+
+```{r}
+library(hexbin)
+library(ggplot2)
+```
+
+```{r}
+combined_data <- merge(data_numeric_cleaned, questionario, by.x = "id", by.y = "name.id")
+
+missing_ids <- questionario[!(questionario$name.id %in% combined_data$id), ]
+
+# Visualizzare gli ID mancanti
+print(missing_ids)
+```
+
+```{r}
+person_id <- "03Nplw4GO2h5ut5"  # Sostituisci con l'ID della persona desiderata
+covariate <- "danceability"  # Sostituisci con la covariata desiderata
+
+# Seleziona le osservazioni per la persona specifica
+person_data <- combined_data[combined_data$id == person_id, ]
+
+# Calcola l'EDF per la covariata specifica
+edf <- ecdf(person_data[[covariate]])
+
+# Visualizza l'EDF
+plot(edf, main = paste("EDF for", covariate, "for Person", person_id),
+     xlab = covariate, ylab = "Empirical Probability")
+
+```
+
+```{r}
+
+```
+
+```{r}
+# Esempio di calcolo della profondità della funzione per una covariata specifica
+covariate <- "energy"  # Sostituisci con la covariata desiderata
+
+# Creare una lista di EDF per tutte le persone
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = "Empirical Distribution Functions (EDF)",
+     xlab = "Data Values", ylab = "Probability")
+
+# Tracciare ogni EDF dalla lista
+for (i in seq_along(edf_list)) {
+  lines(edf_list[[i]], lwd = 0.5, cex = 0.1)
+}
+```
+
+```{r}
+# Esempio di calcolo della profondità della funzione per una covariata specifica
+covariate <- "popularity"  # Sostituisci con la covariata desiderata
+
+# Creare una lista di EDF per tutte le persone
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+# Definisci una palette di colori in base ai valori unici nella colonna di gruppo
+num_groups <- length(unique(combined_data$Lavori.))
+color_palette <- rainbow(num_groups)
+
+unique_groups = unique(combined_data$Lavori.)
+print(unique_groups)
+
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = "Empirical Distribution Functions (EDF)",
+     xlab = "Data Values", ylab = "Probability")
+
+# Tracciare ogni EDF dalla lista con colore basato sulla colonna di gruppo
+for (i in seq_along(edf_list)) {
+  group_value <- questionario$Lavori.[i + 1]
+  lines(edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)
+}
+
+```
