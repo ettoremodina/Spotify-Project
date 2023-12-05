@@ -304,6 +304,7 @@ names<-names(dataset_list)
 temp <- rep(names, times = n_row)
 combined_factor$id<-temp
 id_playlists <- unique(combined_factor$id)
+combined_factor<- as.data.frame(lapply(combined_factor, as.factor))
 ```
 
 ### Diversity coefficient
@@ -350,6 +351,39 @@ compute_D <- function(df) {
 ```{r}
 survey_data<- compute_D(combined_factor)
 ```
+
+## Cluster by gneres, artists, key
+
+```{r}
+subset<-combined_factor[,c(2,5,9,10)]
+```
+
+
+
+```{r}
+library(klaR)
+
+
+# Aggregate song data to playlist level
+subset <- aggregate(. ~ id, data = subset, function(x) toString(unique(x)))
+
+# Apply kmodes clustering
+result <- kmodes(subset[, c("artists", "key", "genre")], modes = 4, iter.max = 10)
+
+# Display the cluster assignments
+cluster_assignments <- result$cluster
+
+# Visualize 
+library(vcd)
+
+clustered_data <- cbind(result$cluster, subset[, c("artists", "key", "genre")])
+subset<- as.data.frame(lapply(subset, as.factor))
+mosaic(clustered_data)
+????
+```
+ 
+ 
+
 
 ## Ideas
 fit kernel density estimation in order to have a distribution for each on of the covariates
