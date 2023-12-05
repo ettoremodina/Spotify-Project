@@ -295,4 +295,18 @@ do_barplot(11)
 do_barplot(12)
 do_barplot(13)
 ```
+Missing data analysis
+```{r}
+reduced[reduced == "/"] <- "NA"
+reduced[reduced == "missing"] <- "NA"
+na_counts <- colSums(is.na(reduced)) 
+#11 NA in region given by people who live abroad, 4 NA in field of studies
+```
+
+## Saving Survey data cleaned
+```{r}
+saveRDS(reduced,"../../data/Surveycleaned.RData")
+```
+
+
 

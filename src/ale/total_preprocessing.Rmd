@@ -201,18 +201,155 @@ risultati abbastanza confusi e direi soprattutto non affidabili..
 
 ## Preprocessing factors
 
-```{r}
-data_genres = readRDS("../../data/data_genres_cleaned.RData")
-```
 
 ```{r}
 factor_list <- list()
-for (i in seq_along(data_genres)) {
-  data <- data_genres[[i]]
-  factor_list[[i]] <- data[,c(2,3,4,6,16,17,20:ncol(data))]
+for (i in seq_along(dataset_list)) {
+  data <- dataset_list[[i]]
+factor_list[[i]] <- data[,c(2,3,4,6,16,17,20:ncol(data))]
 }
 ```
 
+###Cleaning genres
+
+function to rename the single genre
+```{r}
+transform_genre <- function(old_g){
+  worlds <- unlist(strsplit(old_g, " "))
+  
+
+  pop <- c("indie", "pop", "Indie", "Pop", "hyperpop", "mellow", "britpop", "folk-pop", "boy", "dreamo", "europop", "show", "romantic", "austropop", "bubblegum", "cartoni", "group", "electropop", "afropop", "beat", "austindie", "standards", "broadway", "musical", "tontipop","etherpop", "cover","nederpop","c86", "alley", "sophisti-pop")
+  
+  rock <- c("rock", "alternative", "rock-and-roll", "beatlesque", "madchester", "punk", "alt", "revival", "shoegaze", "grunge", "j-rock", "bubblegrunge","emo")
+  
+  electronic <- c("techno", "wave", "electropowerpop", "afrofuturism", "electro", "disco", "edm", "dembow", "tech", "psytrance","afrobeat", "touch", "tekk", "chillwave","vapor", "cubaton", "house", "electronic", "afrobeats", "indietronica", "downtempo", "brostep", "room", "fi", "lo-fi", "ambient", "ai", "afroswing", "acidcore", "soundtrack", "ambient", "experimental", "dance", "electronica", "folktronica", "eurodance", "aussietronica", "psych","basshall", "neo-psychedelic", "covertronica", "easy", "electra", "hi-nrg", "balearic","bass", "speedrun", "video", "dub", "chiptune", "moombahton", "lounge", "weirdcore", "dancehall", "vogue")
+  
+  hiphop <- c("rap", "trap", "hip", "drill", "urbano", "reggaeton", "phonk", "grime", "plugg", "neoperreo")
+  
+  country <- c("country", "tejano")
+  
+  jazz <- c("jazz", "blues", "bebop", "bossa", "americana", "melancholia", "post-bop")
+  
+  classical <- c("classical", "orchestra", "chamber", "baroque", "violin")
+  
+  folk <- c("folk", "cantautorato", "autore", "d'autore", "singer-songwriter", "neomelodici", "cantautora", "musica", "anime", "brasileiro", "tuareg", "sebene", "chicha", "bajki", "cumbia", "bachata", "cha-cha-cha", "cantautor", "mariachi", "bolero", "christian", "ccm", "canzone", "celtic", "chanson", "cappella", "canadian", "native", "mambo", "stomp", "mpb", "flamenco", "ska", "calypso")
+  
+  soul <- c("soul", "R&B", "funk", "r&b", "reggae", "groove", "funky", "charango", "motown", "souldies", "storm", "afro-funk")
+  
+  metal <- c("metal", "metalcore", "deathcore", "slayer", "djent")
+  
+  missing <- c("previa", "fluxwork", "metropopolis", "meme", "bossbeat", "comic", "concurso")
+  
+  #l'output della funzione è il nuvo genere
+  if (is.na(old_g)){
+    return ("missing")
+  }
+  if (any(!is.na(match(worlds, pop)))){
+    return ("pop")}
+  if (any(!is.na(match(worlds, rock)))){
+    return ("rock")}
+  if (any(!is.na(match(worlds, electronic)))){
+    return ("electronic")}
+  if (any(!is.na(match(worlds, hiphop)))){
+    return ("hiphop")}
+  if (any(!is.na(match(worlds, country)))){
+    return ("country")}
+  if (any(!is.na(match(worlds, jazz)))){
+    return ("jazz")}
+  if (any(!is.na(match(worlds, classical)))){
+    return ("classical")}
+  if (any(!is.na(match(worlds, folk)))){
+    return ("folk")}
+  if (any(!is.na(match(worlds, soul)))){
+    return ("soul")}
+  if (any(!is.na(match(worlds, metal)))){
+    return ("metal")}
+  if (any(!is.na(match(worlds, missing)))){
+    return ("missing")
+  }
+  return (old_g)
+}
+
+
+```
+
+function to update genres of the playlist
+```{r}
+transform_playlist <- function(genre) {
+  #matching_indices <- c()
+  for (i in 1:dim(genre)[1]) {
+    new_g <- transform_genre(genre[i,])
+   genre[i,] <- new_g
+  }
+  #print (genre[matching_indices,])
+  return(unlist(genre))
+}
+```
+
+Updating factor list
+```{r}
+for (i in 1:69){
+  temp<-factor_list[[i]]
+  old_g <- temp["genre_1"]
+  factor_list[[i]] <- factor_list[[i]][, 1:8]
+  factor_list[[i]]$genre <- transform_playlist(old_g)
+  
+}
+```
+
+
+```{r}
+combined_factor <- do.call(rbind,factor_list)
+names<-names(dataset_list)
+temp <- rep(names, times = n_row)
+combined_factor$id<-temp
+id_playlists <- unique(combined_factor$id)
+```
+
+### Diversity coefficient
+$$ D=1-N_a/N_p$$
+The more D increase the more artists in the playlist
+
+```{r}
+survey_data<-readRDS("../../data/Surveycleaned.RData")
+```
+
+```{r}
+compute_D <- function(df) {
+  # Inizializza un vettore per immagazzinare i valori di D
+  results_D <- numeric(69)
+
+  # Itera su ogni riga del dataframe
+  for (i in 1:69) {
+    # Estrai l'id della playlist corrente
+    
+    # Filtra il dataframe per la playlist corrente
+    playlist_current <- df[df$id == id_playlists[i], ]
+
+    # Calcola il numero unico di artisti (Na)
+    artists <- length(unique(playlist_current$artists))
+
+    # Calcola il numero di canzoni nella playlist (Np)
+    num_songs <- nrow(playlist_current)
+
+    # Calcola il valore D e assegnalo alla posizione corrente nel vettore risultati_D
+    results_D[i] <- artists /   num_songs
+    
+    
+    survey_data[which(survey_data$id == id_playlists[i]), "D_coef"] <- results_D[i]
+
+
+  }
+
+  # Restituisci il dataframe con la colonna 'D' aggiunta
+  return(survey_data )
+}
+
+```
+
+```{r}
+survey_data<- compute_D(combined_factor)
+```
 
 ## Ideas
 fit kernel density estimation in order to have a distribution for each on of the covariates
