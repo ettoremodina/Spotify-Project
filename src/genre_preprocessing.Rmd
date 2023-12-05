@@ -3,7 +3,7 @@ title: "Preporcessin_genre"
 output: html_document
 date: "2023-12-03"
 ---
-
+3
 #importo il dataset
 
 ```{r}
@@ -88,7 +88,7 @@ transform_genre <- function(old_g){
   if (any(!is.na(match(worlds, classical)))){
     return ("classical")}
   if (any(!is.na(match(worlds, folk)))){
-    return ("ffolk")}
+    return ("folk")}
   if (any(!is.na(match(worlds, soul)))){
     return ("soul")}
   if (any(!is.na(match(worlds, metal)))){
