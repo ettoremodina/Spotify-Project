@@ -21,7 +21,7 @@ Quest_data = readRDS("../../data/Questionario.RData")
 ##Rename cols
 
 ```{r}
-names_cols<-c("età", "sesso", "educazione", "campo.studi", "stato", "libri", "lavoro", "importanza.musica", "genere", "come.ascolti.musica","quando.ascolti.musica", "concerti", "strumento", "sport", "estero", "politica", "hobby", "regione", "abitanti.città", "id" )
+names_cols<-c("et�", "sesso", "educazione", "campo.studi", "stato", "libri", "lavoro", "importanza.musica", "genere", "come.ascolti.musica","quando.ascolti.musica", "concerti", "strumento", "sport", "estero", "politica", "hobby", "regione", "abitanti.citta", "id" )
 names(Quest_data)<-names_cols
 names(Survey_data)<-names_cols
 ```
@@ -62,16 +62,16 @@ filtered_data$strumento<-temp
 
 ```{r}
 temp<-filtered_data$politica
-temp[c(68)]="Sì molto"
+temp[c(68)]="S� molto"
 filtered_data$politica<-temp
 ```
 
 ```{r}
-temp<-filtered_data$abitanti.città
+temp<-filtered_data$abitanti.citta
 temp[c(69)]= "Tra 100.000 e 500.000 abitanti"
-temp[c(64,65,66,67,68,70)]="Più di 500 000 abitanti" 
+temp[c(64,65,66,67,68,70)]="Pi� di 500 000 abitanti" 
 temp[1]="Tra 100.000 e 500.000 abitanti"
-filtered_data$abitanti.città<-temp
+filtered_data$abitanti.citta<-temp
 ```
 
 ```{r}
@@ -112,11 +112,9 @@ filtered_data$libri<-as.factor(filtered_data$libri)
 filtered_data$lavoro<-as.factor(filtered_data$lavoro)
 filtered_data$importanza.musica<-as.factor(filtered_data$importanza.musica)
 filtered_data$come.ascolti.musica<-as.factor(filtered_data$come.ascolti.musica)
-filtered_data$strumento<-as.factor(filtered_data$strumento)
 filtered_data$politica<-as.factor(filtered_data$politica)
-filtered_data$abitanti.città<-as.factor(filtered_data$abitanti.città)
+filtered_data$abitanti.citta<-as.factor(filtered_data$abitanti.citta)
 filtered_data$estero<-as.factor(filtered_data$estero)
-filtered_data$regione<-as.factor(filtered_data$regione)
 filtered_data$sport<-as.factor(filtered_data$sport)
 ```
 
@@ -145,41 +143,133 @@ removing the guy with only 3 songs in the playlist
 the one with id: "4YjSpxvniwzXvBB"
 
 ```{r}
-filtered_data<-filtered_data[-75,]
+filtered_data<-filtered_data[-which(filtered_data$id=="4YjSpxvniwzXvBB"),]
 ```
+
+
+Process genres
+```{r}
+transform_genre <- function(old_g){
+
+  worlds <- unlist(strsplit(old_g, " "))
+  
+
+  pop <- c("Pop-rock","indie","pop","Indie","Pop","Pop/Indie","Pop-commerciale", "emergente")
+  
+  rock <- c("rock", "Pop/Rock","Rock", "Rock/pop")
+  
+  electronic <- c("EDM","elettronica")
+  
+  hiphop <- c("Rap","hop","urban", "rap/trap", "Raggaetton","Spanish","rap")
+  
+  country <- c()
+  
+  jazz <- c("Jazz","blues")
+  
+  classical <- c("Classica")
+  
+  folk <- c("Cantautori","italiano", "italiana")
+  
+  soul <- c( "r&b;")
+  
+  metal <- c("Metal")
+  
+  missing <- c("Non","non"," ")
+  
+  #l'output della funzione è il nuvo genere
+  if (is.na(old_g)){
+    return ("missing")
+  }
+  if (any(!is.na(match(worlds, rock)))){
+    return ("rock")}
+  if (any(!is.na(match(worlds, pop)))){
+    return ("pop")}
+  if (any(!is.na(match(worlds, electronic)))){
+    return ("electronic")}
+  if (any(!is.na(match(worlds, hiphop)))){
+    return ("hiphop")}
+  if (any(!is.na(match(worlds, country)))){
+    return ("country")}
+  if (any(!is.na(match(worlds, jazz)))){
+    return ("jazz")}
+  if (any(!is.na(match(worlds, classical)))){
+    return ("classical")}
+  if (any(!is.na(match(worlds, folk)))){
+    return ("folk")}
+  if (any(!is.na(match(worlds, soul)))){
+    return ("soul")}
+  if (any(!is.na(match(worlds, metal)))){
+    return ("metal")}
+  if (any(!is.na(match(worlds, missing)))){
+    return ("missing")
+  }
+  return (old_g)
+}
+
+```
+
+```{r}
+genre<-filtered_data[,9]
+for (i in 1:69){
+ filtered_data[i,9]<-transform_genre(genre[i]) 
+}
+ filtered_data[1,9]="missing"
+
+```
+
+
+Categorize *strumento*
+```{r}
+instrument=filtered_data[,13]
+test<-instrument!="No"
+instrument_new<-ifelse(test,"Si","No")
+filtered_data[,13]<-instrument_new
+filtered_data$strumento<-as.factor(filtered_data$strumento)
+```
+
+Categorize *regioni*
+
+```{r}
+filtered_data$regione[which(filtered_data$regione %in% c("Lombardia", "Veneto", "Emilia Romagna "))] <- "nord"
+filtered_data$regione[which(filtered_data$regione %in% c("Toscana","Abruzzo"))] <- "centro"
+filtered_data$regione[which(filtered_data$regione %in% c("Puglia", "Lazio"))] <- "sud"
+filtered_data$regione[which(filtered_data$regione %in% c("/"))] <- "missing"
+filtered_data$regione<-as.factor(filtered_data$regione)
+```
+
+
+## Visualize data
 
 So far we have:
 id 
-numeric -> età, concerti 
+numeric -> et�, concerti 
 factors -> anything else
 
 TODO
 cosa non so trattare al momento
 - hobby
-- generi (aspetto divisione tancre)
 - quando ascolti musica
-- sport
-
-
-## Visualize data
+- sport 
+Secondo me trascurabili
 
 ```{r}
-summary(filtered_data)
+reduced<-filtered_data[,-c(11,14,17)]
+```
+
+```{r}
+summary(reduced)
 ```
 Save processed data so far
 
 ```{r}
-reduced<-filtered_data[,-c(9,11,14,17)]
-```
-
-```{r}
-factor_columns<-c(2,3,4,5,6,7,8,9,11,12,13,14,15)
+factor_columns<-c(2,3,4,5,6,7,8,9,10,12,13,14,15,16)
 cols<-names(reduced[,factor_columns])
 reduced_factors<-reduced[,factor_columns]
 ```
 
 
 ```{r}
+library(ggplot2)
 names<-colnames(reduced_factors)
 do_barplot<-function(i){
 ggplot(as.data.frame(reduced_factors)) + 
@@ -189,7 +279,7 @@ ggplot(as.data.frame(reduced_factors)) +
 
 ```
 
-regà non mi andava la funzione in un ciclo for
+reg� non mi andava la funzione in un ciclo for
 ```{r}
 do_barplot(1)
 do_barplot(2)
