@@ -116,6 +116,7 @@ filtered_data$politica<-as.factor(filtered_data$politica)
 filtered_data$abitanti.citta<-as.factor(filtered_data$abitanti.citta)
 filtered_data$estero<-as.factor(filtered_data$estero)
 filtered_data$sport<-as.factor(filtered_data$sport)
+
 ```
 
 Here nothing special, I had to adjust capslocks in order to have unique levels 
@@ -215,6 +216,7 @@ for (i in 1:69){
 }
  filtered_data[1,9]="missing"
 
+filtered_data$genere<-as.factor( filtered_data$genere)
 ```
 
 

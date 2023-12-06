@@ -164,7 +164,7 @@ Asses the quality of the clustering
 By now I've used euclidean distance to compute distance between data, but could be useful
 to take into account correlation between covariates (so maybe mahalanobis)
 
-(fanno schifo ciao)
+
 ```{r}
 library(cluster)
 dist_matrix <- as.matrix(dist(cluster_subset, method ="euclidean" ))
@@ -353,6 +353,10 @@ survey_data<- compute_D(combined_factor)
 ```
 
 ## Cluster by gneres, artists, key
+
+idea alternativa costruire matrice simmetrica contenente numero di artisti 
+uguali tra pe 6 playlist e applicare a quest'ultima una distanza che classifichi 
+le persone in cluster 
 
 ```{r}
 subset<-combined_factor[,c(2,5,9,10)]

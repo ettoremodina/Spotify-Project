@@ -1,0 +1,286 @@
+---
+title: 'Analysis by ecdf'
+author: "Alessandra Pescina"
+date: "2023-11-22"
+output: html_document
+---
+
+## Loading numeric and survey data
+```{r}
+survey_data<-readRDS("../../data/Surveycleaned.RData")
+numeric_data<-readRDS("../../data/data_numeric_cleaned2.RData")
+```
+
+```{r}
+survey_data <- survey_data[order(survey_data$id), ]
+numeric_data <-numeric_data[order(numeric_data$id), ]
+```
+
+
+## Merging dataset
+```{r}
+combined_data <- merge(numeric_data, survey_data, by.x = "id", by.y = "id")
+```
+
+standardize values *duration* and *year* in order to have consistent analysis
+```{r}
+min_max_normalize <- function(x) {
+  return((x - min(x)) / (max(x) - min(x)))
+}
+  
+combined_data$duration<-  min_max_normalize(combined_data[,12])
+combined_data$year<-  min_max_normalize(combined_data[,13])
+```
+
+## Ecdf list per person
+```{r}
+names_cov<-colnames(combined_data)
+for (i in names_cov[2:13]){
+  
+covariate <-i
+
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = paste("EDF for", covariate),
+     xlab = "Data Values", ylab = "Probability")
+
+for (i in seq_along(edf_list)) {
+  lines(edf_list[[i]], lwd = 0.5, cex = 0.1)
+
+}}
+```
+
+
+## Ecdf list per person by category
+
+### Sesso
+```{r}
+ sapply(combined_data, class)
+```
+
+```{r}
+
+names_cov<-colnames(combined_data)
+for (i in names_cov[2:13]){
+  
+covariate <-i
+categorical<- survey_data$sesso
+
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+num_groups <- length(unique(categorical))
+color_palette <- rainbow(num_groups)
+
+unique_groups = unique(categorical)
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = paste("EDF for", covariate),
+     xlab = "Data Values", ylab = "Probability")
+
+for (i in seq_along(edf_list)) {
+  group_value <- categorical[i]
+  lines(edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex =0.1)
+  }
+legend("topright", legend = unique_groups, fill = color_palette,cex = 0.6, x.intersp = 0.7, y.intersp = 0.7)
+}
+
+
+```
+
+### Come ascolti musica
+
+```{r}
+names_cov<-colnames(combined_data)
+for (i in names_cov[2:13]){
+  
+covariate <-i
+categorical<- survey_data$come.ascolti.musica
+
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+num_groups <- length(unique(categorical))
+color_palette <- rainbow(num_groups)
+
+unique_groups = unique(categorical)
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = paste("EDF for", covariate),
+     xlab = "Data Values", ylab = "Probability")
+
+for (i in seq_along(edf_list)) {
+  group_value <- categorical[i]
+  lines(edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)}
+legend("topright", legend = unique_groups, fill = color_palette,cex = 0.6, x.intersp = 0.7, y.intersp = 0.7)
+}
+```
+### Educazione
+
+```{r}
+names_cov<-colnames(combined_data)
+for (i in names_cov[2:13]){
+  
+covariate <-i
+categorical<- survey_data$educazione
+
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+num_groups <- length(unique(categorical))
+color_palette <- rainbow(num_groups)
+
+unique_groups = unique(categorical)
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = paste("EDF for", covariate),
+     xlab = "Data Values", ylab = "Probability")
+
+for (i in seq_along(edf_list)) {
+  group_value <- categorical[i]
+  lines(edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)}
+legend("topright", legend = unique_groups, fill = color_palette,cex = 0.6, x.intersp = 0.7, y.intersp = 0.7)
+}
+```
+
+### Campo Studi
+qua non so se ha senso confrontare STEM con altro ma sicuramente i dati sono più significativi
+in quanto del resto delle categorie non abbiano molti dati
+
+```{r}
+test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
+survey_data$campo.studi<-ifelse(test,"Altro","STEM (Science, Technology, Engineering, Mathematics)" )
+
+names_cov<-colnames(combined_data)
+for (i in names_cov[2:13]){
+  
+covariate <-i
+categorical<- survey_data$campo.studi
+categorical<- na.omit(categorical)
+
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+num_groups <- length(unique(categorical))
+color_palette <- rainbow(num_groups)
+
+unique_groups = unique(categorical)
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = paste("EDF for", covariate),
+     xlab = "Data Values", ylab = "Probability")
+
+for (i in seq_along(edf_list)) {
+  group_value <- categorical[i]
+  lines(edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)}
+legend("topright", legend = unique_groups, fill = color_palette,cex = 0.6, x.intersp = 0.7, y.intersp = 0.7)
+}
+```
+### Stato
+```{r}
+
+test<-survey_data$stato!="Italia"
+survey_data$stato<-ifelse(test,"Estero","Italia")
+
+names_cov<-colnames(combined_data)
+for (i in names_cov[2:13]){
+  
+covariate <-i
+categorical<- survey_data$stato
+
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+num_groups <- length(unique(categorical))
+color_palette <- rainbow(num_groups)
+
+unique_groups = unique(categorical)
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = paste("EDF for", covariate),
+     xlab = "Data Values", ylab = "Probability")
+
+for (i in seq_along(edf_list)) {
+  group_value <- categorical[i]
+  lines(edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)}
+legend("topright", legend = unique_groups, fill = color_palette,cex = 0.6, x.intersp = 0.7, y.intersp = 0.7)
+}
+```
+
+### Generi
+
+```{r}
+
+
+names_cov<-colnames(combined_data)
+for (i in names_cov[2:13]){
+  
+covariate <-i
+categorical<- survey_data$genere
+
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+num_groups <- length(unique(categorical))
+color_palette <- rainbow(num_groups)
+
+unique_groups = unique(categorical)
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = paste("EDF for", covariate),
+     xlab = "Data Values", ylab = "Probability")
+
+for (i in seq_along(edf_list)) {
+  group_value <- categorical[i]
+  lines(edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)}
+legend("topright", legend = unique_groups, fill = color_palette,cex = 0.6, x.intersp = 0.7, y.intersp = 0.7)
+}
+```
+
+### Strumento
+
+```{r}
+
+
+names_cov<-colnames(combined_data)
+for (i in names_cov[2:13]){
+  
+covariate <-i
+categorical<- survey_data$strumento
+
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  ecdf(person_data[[covariate]])
+})
+
+num_groups <- length(unique(categorical))
+color_palette <- rainbow(num_groups)
+
+unique_groups = unique(categorical)
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = paste("EDF for", covariate),
+     xlab = "Data Values", ylab = "Probability")
+
+for (i in seq_along(edf_list)) {
+  group_value <- categorical[i]
+  lines(edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)}
+legend("topright", legend = unique_groups, fill = color_palette,cex = 0.6, x.intersp = 0.7, y.intersp = 0.7)
+}
+```
