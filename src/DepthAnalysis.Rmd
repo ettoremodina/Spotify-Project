@@ -1,5 +1,5 @@
 ```{r}
-env = load("~/Desktop/Spotify_Project/Spotify-Project/data/environment.RData")
+env = load("../data/environment.RData")
 ```
 
 ```{r}
