@@ -1,4 +1,8 @@
 ```{r}
+```
+
+
+```{r}
 env = load("../data/environment.RData")
 ```
 
@@ -33,7 +37,7 @@ plot(edf, main = paste("EDF for", covariate, "for Person", person_id),
 ```
 
 ```{r}
-
+#prova branching
 ```
 
 ```{r}
