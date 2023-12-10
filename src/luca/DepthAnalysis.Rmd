@@ -1,5 +1,5 @@
 ```{r}
-env = load("~/Desktop/Spotify_Project/Spotify-Project/data/environment.RData")
+env = load("../../data/environment.RData")
 ```
 
 ```{r}
@@ -52,63 +52,66 @@ for (i in seq_along(edf_list)) {
   lines(edf_list[[i]], lwd = 0.5, cex = 0.1)
 }
 ```
-
 ```{r}
-# Esempio di calcolo della profondità della funzione per una covariata specifica
-covariate <- "energy"  # Sostituisci con la covariata desiderata
-colonna = "Livello.di.educazione."
-
-grid <- seq(0, 1, length.out = 1000)
-
-# Creare una lista di EDF per tutte le persone
-edf_list <- lapply(unique(combined_data$id), function(person_id) {
-  person_data <- combined_data[combined_data$id == person_id, ]
-  ecdf = ecdf(person_data[[covariate]])
-  val = ecdf(grid)
-  return(val)
-})
-
-# Definisci una palette di colori in base ai valori unici nella colonna di gruppo
-num_groups <- length(unique(combined_data$Livello.di.educazione))
-color_palette <- rainbow(num_groups)
-
-unique_groups = unique(combined_data$Livello.di.educazione)
-indices_list <- list()
-
-
-for (group in unique_groups) {
-  indices <- which(questionario$Livello.di.educazione == group)
-  indices_list[[as.character(group)]] <- indices
-}
-
-
-{matrice_da_lista <- do.call(cbind, edf_list)}
-
-f_data = fData(grid, t(matrice_da_lista))
-modified_band_depth <- MBD(Data = f_data)
-median_curve <- median_fData(fData = f_data, type = "MBD")
-
-plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
-     main = "Empirical Distribution Functions (EDF)",
-     xlab = "Data Values", ylab = "Probability")
-
-
-# Tracciare ogni EDF dalla lista con colore basato sulla colonna di gruppo
-for (i in seq_along(edf_list)) {
-  group_value <- questionario$Livello.di.educazione[i + 1]
-  lines(grid, edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)
-}
-
-
-for (i in 1:num_groups) {
-  matrice_da_lista <- do.call(cbind, edf_list[indices_list[[i]]])
+depth_covcov <- function(music_cov, survey_cov){
+  # Esempio di calcolo della profondità della funzione per una covariata specifica
+  covariate <- "energy"  # Sostituisci con la covariata desiderata
+  colonna = "Livello.di.educazione."
+  
+  grid <- seq(0, 1, length.out = 1000)
+  
+  # Creare una lista di EDF per tutte le persone
+  edf_list <- lapply(unique(combined_data$id), function(person_id) {
+    person_data <- combined_data[combined_data$id == person_id, ]
+    ecdf = ecdf(person_data[[music_cov]])
+    val = ecdf(grid)
+    return(val)
+  })
+  
+  # Definisci una palette di colori in base ai valori unici nella colonna di gruppo
+  num_groups <- length(unique(combined_data[,survey_cov]))
+  color_palette <- rainbow(num_groups)
+  
+  unique_groups = unique(combined_data[,survey_cov])
+  indices_list <- list()
+  
+  
+  for (group in unique_groups) {
+    indices <- which(questionario[,survey_cov] == group)
+    indices_list[[as.character(group)]] <- indices
+  }
+  
+  
+  {matrice_da_lista <- do.call(cbind, edf_list)}
+  
   f_data = fData(grid, t(matrice_da_lista))
   modified_band_depth <- MBD(Data = f_data)
   median_curve <- median_fData(fData = f_data, type = "MBD")
-  lines(grid, median_curve$values, col = color_palette[i], lwd = 4)
+  
+  plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+       main = "Empirical Distribution Functions (EDF)",
+       xlab = "Data Values", ylab = "Probability")
+  
+  
+  # Tracciare ogni EDF dalla lista con colore basato sulla colonna di gruppo
+  for (i in seq_along(edf_list)) {
+    group_value <- questionario[i + 1,survey_cov]
+    lines(grid, edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)
+  }
+  
+  
+  for (i in 1:num_groups) {
+    matrice_da_lista <- do.call(cbind, edf_list[indices_list[[i]]])
+    f_data = fData(grid, t(matrice_da_lista))
+    modified_band_depth <- MBD(Data = f_data)
+    median_curve <- median_fData(fData = f_data, type = "MBD")
+    lines(grid, median_curve$values, col = color_palette[i], lwd = 4)
+  }
 }
 
-
+depth_covcov("energy","Livello.di.educazione")
 ```
+
+
 
 \

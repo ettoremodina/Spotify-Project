@@ -28,7 +28,7 @@ combined_data$year<-  min_max_normalize(combined_data[,13])
 
 # fdata function 
 ```{r}
-buil_fData <- function(edf_list,graphics){
+build_fData <- function(edf_list,graphics){
   # common x values
   my_set = c()
   for (ecd in edf_list){
@@ -72,23 +72,47 @@ buil_fData <- function(edf_list,graphics){
 ```
 
 
+
+
 ## Ecdf list per person
+
+survey covariate
+
+
 ```{r}
-names_cov<-colnames(combined_data)
-f_data_list = list()
-for (i in names_cov[2:13]){
-  
-  covariate <-i
-  
-  edf_list <- lapply(unique(combined_data$id), function(person_id) {
-    person_data <- combined_data[combined_data$id == person_id, ]
-    ecdf(person_data[[covariate]])
-  })
-  
-  f_data = buil_fData(edf_list, 1)
-  f_data_list[[i]] = f_data
+col_survey = colnames(survey_data)[c(1:10,12:16)]
+col_survey = colnames(survey_data)[c(1:3)]
+names_cov<-colnames(combined_data)[2:13]
+
+f_data_external_list <- list()
+
+for (surv_cov in col_survey){
+  levels_surv = levels(combined_data[,surv_cov])
+  f_data_covariate_list = list()
+  for (covariate in names_cov){
+    f_data_lvl_list = list()
+    
+    for(lvl in levels_surv){
+      temp_dataset =combined_data[ which(combined_data[,surv_cov]==lvl),]
+      
+        edf_list <- lapply(unique(temp_dataset$id), function(person_id) {
+        person_data <- temp_dataset[temp_dataset$id == person_id, ]
+        ecdf(person_data[[covariate]])
+        })
+        
+      f_data = build_fData(edf_list, 0)
+      f_data_lvl_list[[lvl]] = f_data 
+    }
+    f_data_covariate_list[[covariate]] <- f_data_lvl_list
+    
+  }
+  f_data_external_list[[surv_cov]] <- f_data_covariate_list
 }
 ```
+```{r}
+names(f_data_external_list$età$popularity)
+```
+
 # come funziona ecdf, extra
 ```{r}
 person_data_year <- sort(combined_data[combined_data$id == unique(combined_data$id)[1],"year" ])
