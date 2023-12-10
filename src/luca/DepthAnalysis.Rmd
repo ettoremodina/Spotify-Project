@@ -1,14 +1,11 @@
 ```{r}
-```
-
-
-```{r}
-env = load("../data/environment.RData")
+env = load("~/Desktop/Spotify_Project/Spotify-Project/data/environment.RData")
 ```
 
 ```{r}
 library(hexbin)
 library(ggplot2)
+library(roahd)
 ```
 
 ```{r}
@@ -37,10 +34,6 @@ plot(edf, main = paste("EDF for", covariate, "for Person", person_id),
 ```
 
 ```{r}
-#prova branching
-```
-
-```{r}
 # Esempio di calcolo della profondità della funzione per una covariata specifica
 covariate <- "energy"  # Sostituisci con la covariata desiderata
 
@@ -62,30 +55,60 @@ for (i in seq_along(edf_list)) {
 
 ```{r}
 # Esempio di calcolo della profondità della funzione per una covariata specifica
-covariate <- "popularity"  # Sostituisci con la covariata desiderata
+covariate <- "energy"  # Sostituisci con la covariata desiderata
+colonna = "Livello.di.educazione."
+
+grid <- seq(0, 1, length.out = 1000)
 
 # Creare una lista di EDF per tutte le persone
 edf_list <- lapply(unique(combined_data$id), function(person_id) {
   person_data <- combined_data[combined_data$id == person_id, ]
-  ecdf(person_data[[covariate]])
+  ecdf = ecdf(person_data[[covariate]])
+  val = ecdf(grid)
+  return(val)
 })
 
 # Definisci una palette di colori in base ai valori unici nella colonna di gruppo
-num_groups <- length(unique(combined_data$Lavori.))
+num_groups <- length(unique(combined_data$Livello.di.educazione))
 color_palette <- rainbow(num_groups)
 
-unique_groups = unique(combined_data$Lavori.)
-print(unique_groups)
+unique_groups = unique(combined_data$Livello.di.educazione)
+indices_list <- list()
 
+
+for (group in unique_groups) {
+  indices <- which(questionario$Livello.di.educazione == group)
+  indices_list[[as.character(group)]] <- indices
+}
+
+
+{matrice_da_lista <- do.call(cbind, edf_list)}
+
+f_data = fData(grid, t(matrice_da_lista))
+modified_band_depth <- MBD(Data = f_data)
+median_curve <- median_fData(fData = f_data, type = "MBD")
 
 plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
      main = "Empirical Distribution Functions (EDF)",
      xlab = "Data Values", ylab = "Probability")
 
+
 # Tracciare ogni EDF dalla lista con colore basato sulla colonna di gruppo
 for (i in seq_along(edf_list)) {
-  group_value <- questionario$Lavori.[i + 1]
-  lines(edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)
+  group_value <- questionario$Livello.di.educazione[i + 1]
+  lines(grid, edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)
 }
 
+
+for (i in 1:num_groups) {
+  matrice_da_lista <- do.call(cbind, edf_list[indices_list[[i]]])
+  f_data = fData(grid, t(matrice_da_lista))
+  modified_band_depth <- MBD(Data = f_data)
+  median_curve <- median_fData(fData = f_data, type = "MBD")
+  lines(grid, median_curve$values, col = color_palette[i], lwd = 4)
+}
+
+
 ```
+
+\
