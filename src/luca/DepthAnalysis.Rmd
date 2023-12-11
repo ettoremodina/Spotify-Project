@@ -129,7 +129,7 @@ depth_covcov <- function(music_cov, survey_cov){
   unique_groups = unique(combined_data[,survey_cov])
   indices_list <- list()
   
-  
+  missed_covariates = c()
   for (group in unique_groups) {
     indices <- which(questionario[,survey_cov] == group)
     indices_list[[as.character(group)]] <- indices
@@ -160,20 +160,24 @@ depth_covcov <- function(music_cov, survey_cov){
       modified_band_depth <- MBD(Data = f_data)
       median_curve <- median_fData(fData = f_data, type = "MBD")
       lines(grid, median_curve$values, col = color_palette[i], lwd = 4)
-      legend("topright", legend = unique_groups, col = color_palette, lwd = 2)
+      legend("topleft", legend = unique_groups, col = color_palette, lwd = 2)
     }
   }else{
-    print(survey_cov)
+    missed_covariates = unique(c(missed_covariates,survey_cov))
   }
   
-  
+  print(missed_covariates)
 }
 ```
 
 ```{r,warning=FALSE}
+for(m in music_vars){
+  depth_covcov(m,"Quanti.libri.hai.letto.nell.ultimo.mese.")
+}
+```
 
-#depth_covcov("loudness","Livello.di.educazione")
 
+```{r,warning=FALSE}
 music_vars = colnames(data_numeric_cleaned)[1:13]
 survey_covs = colnames(questionario)[3:19]
 
