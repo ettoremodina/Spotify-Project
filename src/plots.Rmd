@@ -1,0 +1,63 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library(ggplot2)
+library(tidyr)
+data = readRDS("../data/data_numeric_cleaned2.RData")
+survey = readRDS("../data/Surveycleaned.RData")
+head(data)
+```
+```{r}
+# Crea un grafico a barre per la variabile categorica
+ggplot(survey, aes(x = importanza.musica)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Importanza della Musica",
+       x = "Livello di Importanza",
+       y = "Frequenza") +
+  theme_minimal()
+
+```
+```{r}
+ggplot(survey, aes(x = libri)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Importanza della Musica",
+       x = "numero",
+       y = "Frequenza") +
+  theme_minimal()
+
+```
+```{r}
+# Crea un boxplot per ogni variabile numerica
+ggplot(data, aes(y = popularity)) +
+  geom_boxplot(fill = "skyblue", color = "black", alpha = 0.7) +
+  labs(title = "Boxplot for Numeric Variables",
+       x = "Variabile",
+       y = "Valore") +
+  theme_minimal()
+
+
+data_numeric = data[1:10]
+boxplot(data_numeric, use.cols = TRUE, xlab = "Samples", ylab = "Frequency", outline=FALSE)
+
+
+data_numeric <- data[, c(2:10)]
+
+# Trasforma il dataframe in formato lungo
+data_long <- gather(data_numeric, key = "Variable", value = "Value")
+
+# Crea il boxplot
+ggplot(data_long, aes(x = Variable, y = Value,fill = Variable)) +
+  geom_boxplot(color = "black", alpha = 0.7) +
+  labs(title = "Boxplot for Numeric Variables",
+       x = "Variable",
+       y = "Value") +
+  scale_fill_brewer(palette = "Set3") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotazione etichette sull'asse x
+
+
+```
+
+
