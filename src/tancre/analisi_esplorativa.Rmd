@@ -1,0 +1,16 @@
+---
+title: "Analisi_esplorativa"
+output: html_document
+date: "2023-12-05"
+---
+
+```{r}
+filtered_list = readRDS("../../data/    .RData")
+names(filtered_list)
+dataset_list[[1]]
+combined_list <- do.call(rbind, filtered_list)
+```
+```{r}
+barplot(table(combined_list$genre))
+```
+
