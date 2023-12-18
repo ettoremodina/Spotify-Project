@@ -1,0 +1,155 @@
+---
+title: 'Permutation'
+author: "Alessandra Pescina"
+date: "2023-11-22"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+```
+
+
+## Loading numeric and survey data
+```{r}
+survey_data<-readRDS("../../data/Surveycleaned.RData")
+numeric_data<-readRDS("../../data/data_numeric_cleaned2.RData")
+```
+
+
+```{r}
+perm_t_test=function(x,y,iter=1e3){
+  
+  T0=abs(mean(x)-mean(y))  # define the test statistic
+  T_stat=numeric(iter) # a vector to store the values of each iteration
+  x_pooled=c(x,y) # pooled sample
+  n=length(x_pooled)
+  n1=length(x)
+  
+  for(perm in 1:iter){ # loop for conditional MC
+    # permutation:
+    permutation <- sample(1:n)
+    x_perm <- x_pooled[permutation]
+    x1_perm <- x_perm[1:n1]
+    x2_perm <- x_perm[(n1+1):n]
+    # test statistic:
+    T_stat[perm] <- abs(mean(x1_perm) - mean(x2_perm))
+    
+  }
+  
+  # p-value
+  p_val <- sum(T_stat>=T0)/iter
+  return(p_val)
+}
+```
+
+## Permutation Test each num_cov by sex
+
+```{r}
+cat1<-survey_data$id[survey_data$sesso=="Maschio"]
+cat2<-survey_data$id[survey_data$sesso=="Femmina"]
+
+```
+
+
+
+```{r}
+set.seed(53)
+
+my_perm<-function(cat1,cat2){
+cols<-colnames(numeric_data)
+res<-{ }
+
+for (j in 1:12){
+  p_value<-{ } 
+
+  for (i in 1:100){
+
+    cov1 <- numeric_data %>%
+    filter(id %in% cat1) %>%
+    group_by(id) %>%
+    slice_sample(n = 1, method = "geom", prob = 0.1) %>%
+    pull(cols[j])
+
+
+    cov2 <- numeric_data %>%
+    filter(id %in% cat2) %>%
+    group_by(id) %>%
+    slice_sample(n = 1, method = "geom", prob = 0.1) %>%
+    pull(cols[j])
+
+
+    p_value[i]<-perm_t_test(cov1,cov2)
+
+}
+
+  res[j]<-sum(p_value)/100
+}
+return (res)
+}
+```
+
+```{r}
+set.seed(53)
+
+my_perm <- function(cat1, cat2) {
+  cols <- colnames(numeric_data)
+  res <- vector("numeric", length = 12)
+
+  for (j in 1:12) {
+    p_value <- numeric(100)
+
+    for (i in 1:100) {
+      # Extract random indices based on geometric distribution
+      indices1 <- sample(1:length(cat1), 1, prob = dgeom(1:length(cat1), prob = 0.1), replace = TRUE)
+      indices2 <- sample(1:length(cat2), 1, prob = dgeom(1:length(cat2), prob = 0.1), replace = TRUE)
+
+      cov1 <- numeric_data %>%
+        filter(id == cat1[indices1]) %>%
+        pull(cols[j])
+
+      cov2 <- numeric_data %>%
+        filter(id == cat2[indices2]) %>%
+        pull(cols[j])
+
+      p_value[i] <- perm_t_test(cov1, cov2)
+    }
+
+    res[j] <- mean(p_value)
+  }
+
+  return(res)
+}
+
+```
+
+```{r}
+res_sex<-my_perm(cat1,cat2)
+```
+
+## Permutation Test each num_cov by field of study
+```{r}
+test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
+survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
+temp<-survey_data$id[!is.na(survey_data$campo.studi)]
+selected_campostudi <- survey_data$campo.studi[!is.na(survey_data$campo.studi)]
+cat1<-temp[selected_campostudi =="STEM (Science, Technology, Engineering, Mathematics)"]
+cat2<-temp[selected_campostudi =="Others"]
+```
+
+```{r}
+res_campo.studi<-my_perm(cat1,cat2)
+```
+
+## Permutation Test each num_cov by instrument
+
+```{r}
+cat1<-survey_data$id[survey_data$strumento=="Si"]
+cat2<-survey_data$id[survey_data$strumento=="No"]
+
+```
+
+```{r}
+res_instrument<-my_perm(cat1,cat2)
+```
+
