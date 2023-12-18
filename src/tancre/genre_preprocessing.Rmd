@@ -1,0 +1,130 @@
+---
+title: "Preporcessin_genre"
+output: html_document
+date: "2023-12-03"
+---
+3
+#importo il dataset
+
+```{r}
+
+dataset_list = readRDS("../../data/data_list.RData")
+names(dataset_list)
+
+#clean dataset
+n_row <- numeric(length(dataset_list ))
+
+for (i in seq_along(dataset_list )) {
+  n_row[i] <- nrow(dataset_list [[i]])
+}
+
+hist(n_row,main = "before")
+# Function to filter out data frames with wrong nrow and crop the one too long
+filter_nrow <- function(df) {
+  nrow(df) > 5
+}
+
+
+filtered_list <- Filter(filter_nrow, dataset_list)
+filtered_list[[26]] <- filtered_list[[26]][1:101, ]
+dataset_list<- filtered_list
+
+n_row <- numeric(length(dataset_list ))
+for (i in seq_along(dataset_list )) {
+  n_row[i] <- nrow(dataset_list [[i]])
+}
+hist(n_row, main = "after")
+```
+
+
+
+
+#Funzioni per  riassumere i generi
+```{r}
+#FUNZIONE PER TRASFORMSARE IL SINGOLO GENERE
+transform_genre <- function(old_g){
+  #divido il genre in parole
+  worlds <- unlist(strsplit(old_g, " "))
+  
+  #per ognuno dei nuovi generi creo un vettore di parole che assegno a quel genere. Alcuni generi non sono riuscito a categorizzarli (previa, fluxwork,       #metropopolis, meme, bossbeat, comic, concurso de talentos argentino), in questi casi gli ho trattati come missing data.
+  pop <- c("indie", "pop", "Indie", "Pop", "hyperpop", "mellow", "britpop", "folk-pop", "boy", "dreamo", "europop", "show", "romantic", "austropop", "bubblegum", "cartoni", "group", "electropop", "afropop", "beat", "austindie", "standards", "broadway", "musical", "tontipop","etherpop", "cover","nederpop","c86", "alley", "sophisti-pop")
+  
+  rock <- c("rock", "alternative", "rock-and-roll", "beatlesque", "madchester", "punk", "alt", "revival", "shoegaze", "grunge", "j-rock", "bubblegrunge","emo")
+  
+  electronic <- c("techno", "wave", "electropowerpop", "afrofuturism", "electro", "disco", "edm", "dembow", "tech", "psytrance","afrobeat", "touch", "tekk", "chillwave","vapor", "cubaton", "house", "electronic", "afrobeats", "indietronica", "downtempo", "brostep", "room", "fi", "lo-fi", "ambient", "ai", "afroswing", "acidcore", "soundtrack", "ambient", "experimental", "dance", "electronica", "folktronica", "eurodance", "aussietronica", "psych","basshall", "neo-psychedelic", "covertronica", "easy", "electra", "hi-nrg", "balearic","bass", "speedrun", "video", "dub", "chiptune", "moombahton", "lounge", "weirdcore", "dancehall", "vogue")
+  
+  hiphop <- c("rap", "trap", "hip", "drill", "urbano", "reggaeton", "phonk", "grime", "plugg", "neoperreo")
+  
+  country <- c("country", "tejano")
+  
+  jazz <- c("jazz", "blues", "bebop", "bossa", "americana", "melancholia", "post-bop")
+  
+  classical <- c("classical", "orchestra", "chamber", "baroque", "violin")
+  
+  folk <- c("folk", "cantautorato", "autore", "d'autore", "singer-songwriter", "neomelodici", "cantautora", "musica", "anime", "brasileiro", "tuareg", "sebene", "chicha", "bajki", "cumbia", "bachata", "cha-cha-cha", "cantautor", "mariachi", "bolero", "christian", "ccm", "canzone", "celtic", "chanson", "cappella", "canadian", "native", "mambo", "stomp", "mpb", "flamenco", "ska", "calypso")
+  
+  soul <- c("soul", "R&B", "funk", "r&b", "reggae", "groove", "funky", "charango", "motown", "souldies", "storm", "afro-funk")
+  
+  metal <- c("metal", "metalcore", "deathcore", "slayer", "djent")
+  
+  missing <- c("previa", "fluxwork", "metropopolis", "meme", "bossbeat", "comic", "concurso")
+  
+  #l'output della funzione è il nuvo genere
+  if (is.na(old_g)){
+    return ("missing")
+  }
+  if (any(!is.na(match(worlds, pop)))){
+    return ("pop")}
+  if (any(!is.na(match(worlds, rock)))){
+    return ("rock")}
+  if (any(!is.na(match(worlds, electronic)))){
+    return ("electronic")}
+  if (any(!is.na(match(worlds, hiphop)))){
+    return ("hiphop")}
+  if (any(!is.na(match(worlds, country)))){
+    return ("country")}
+  if (any(!is.na(match(worlds, jazz)))){
+    return ("jazz")}
+  if (any(!is.na(match(worlds, classical)))){
+    return ("classical")}
+  if (any(!is.na(match(worlds, folk)))){
+    return ("folk")}
+  if (any(!is.na(match(worlds, soul)))){
+    return ("soul")}
+  if (any(!is.na(match(worlds, metal)))){
+    return ("metal")}
+  if (any(!is.na(match(worlds, missing)))){
+    return ("missing")
+  }
+  return (old_g)
+}
+
+#FUNZIONE PER TRASFORMARE IL GENERE DI TUTTA LA PLAYLIST
+transform_playlist <- function(genre) {
+  #matching_indices <- c()
+  for (i in 1:dim(genre)[1]) {
+    new_g <- transform_genre(genre[i,])
+##Printo il genere se non l'ho cambiato (ovvero se non sono riuscito ad assegnarloa  nessun nuovo genere)
+    #if (!is.na(genre[i,])){
+      #if (genre[i,] == new_g) {
+        #matching_indices <- c(matching_indices, i)
+      #}
+    #}
+   genre[i,] <- new_g
+  }
+  #print (genre[matching_indices,])
+  return(unlist(genre))
+}
+```
+
+##Aggiorno il dataset
+```{r}
+for (i in 1:69){
+  old_g <- filtered_list[[i]]["genre_1"]
+  filtered_list[[i]] <- filtered_list[[i]][, 1:21]
+  filtered_list[[i]]$genre <- transform_playlist(old_g)
+  
+}
+```
+
+
