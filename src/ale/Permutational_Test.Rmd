@@ -52,7 +52,6 @@ cat2<-survey_data$id[survey_data$sesso=="Femmina"]
 ```
 
 
-
 ```{r}
 set.seed(53)
 
@@ -138,7 +137,7 @@ cat2<-temp[selected_campostudi =="Others"]
 ```
 
 ```{r}
-res_campo.studi<-my_perm(cat1,cat2)
+res_campo.studi<-my_perm(cat1,cat2) #pvalue year 0.059
 ```
 
 ## Permutation Test each num_cov by instrument
@@ -150,6 +149,53 @@ cat2<-survey_data$id[survey_data$strumento=="No"]
 ```
 
 ```{r}
-res_instrument<-my_perm(cat1,cat2)
+res_instrument<-my_perm(cat1,cat2) #pvalue year 0.029
+```
+
+## Permutation Test each num_cov by country
+```{r}
+test<-survey_data$stato!="Italia"         
+survey_data$stato<-ifelse(test,"Others","Italia")
+temp<-survey_data$id[!is.na(survey_data$stato)]
+selected_stato <- survey_data$stato[!is.na(survey_data$stato)]
+cat1<-temp[selected_stato =="Italia"]
+cat2<-temp[selected_stato =="Others"]
+```
+
+```{r}
+res_country<-my_perm(cat1,cat2)
+res_country #pvalue popolarità 0.087, danceability 0.066, energy 0.054, year 0.096 
+#pvalue così buoni forse causati da campione piccolo di others
+```
+
+## Permutation Test each num_cov by number of books
+
+```{r}
+test<-survey_data$libri!="0"         
+survey_data$libri<-ifelse(test,"1+","0")
+temp<-survey_data$id[!is.na(survey_data$libri)]
+selected_libri <- survey_data$libri[!is.na(survey_data$libri)]
+cat1<-temp[selected_libri =="0"]
+cat2<-temp[selected_libri =="1+"]
+```
+
+```{r}
+res_books<-my_perm(cat1,cat2)
+res_books #tutti i pvalue alti, ha senso non ci siano differenze
+```
+## Permutation Test each num_cov by abroad
+
+```{r}
+test<-survey_data$estero!="No"         
+survey_data$estero<-ifelse(test,"Si","No")
+temp<-survey_data$id[!is.na(survey_data$estero)]
+selected_estero <- survey_data$estero[!is.na(survey_data$estero)]
+cat1<-temp[selected_estero =="No"]
+cat2<-temp[selected_estero =="Si"]
+```
+
+```{r}
+res_abroad<-my_perm(cat1,cat2)
+res_abroad #pvalue 0.094 energy, 0.098 year
 ```
 
