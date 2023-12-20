@@ -1,29 +1,286 @@
 ---
-title: "Permutation"
+title: 'Permutation'
+author: "Alessandra Pescina"
+date: "2023-11-22"
 output: html_document
-date: "2023-12-18"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+library(dplyr)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+## Loading numeric and survey data
+```{r}
+survey_data<-readRDS("../../data/Surveycleaned.RData")
+numeric_data<-readRDS("../../data/data_numeric_cleaned2.RData")
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+#Pertutaion test function
+perm_t_test=function(x,y,iter=1e3){
+  
+  T0=abs(mean(x)-mean(y))  # define the test statistic
+  T_stat=numeric(iter) # a vector to store the values of each iteration
+  x_pooled=c(x,y) # pooled sample
+  n=length(x_pooled)
+  n1=length(x)
+  
+  for(perm in 1:iter){ # loop for conditional MC
+    # permutation:
+    permutation <- sample(1:n)
+    x_perm <- x_pooled[permutation]
+    x1_perm <- x_perm[1:n1]
+    x2_perm <- x_perm[(n1+1):n]
+    # test statistic:
+    T_stat[perm] <- abs(mean(x1_perm) - mean(x2_perm))
+    
+  }
+  
+  # p-value
+  p_val <- sum(T_stat>=T0)/iter
+  return(p_val)
+}
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+#Permutation test on all the 12 covariates with extraction
+set.seed(53)
+
+my_perm <- function(cat1, cat2) {
+  cols <- colnames(numeric_data)
+  res <- vector("numeric", length = 12)
+
+  for (j in 1:12) {
+    p_value <- numeric(100)
+
+    for (i in 1:100) {
+      # Extract random indices based on geometric distribution
+      indices1 <- sample(1:length(cat1), 1, prob = dgeom(1:length(cat1), prob = 0.1), replace = TRUE)
+      indices2 <- sample(1:length(cat2), 1, prob = dgeom(1:length(cat2), prob = 0.1), replace = TRUE)
+
+      cov1 <- numeric_data %>%
+        filter(id == cat1[indices1]) %>%
+        pull(cols[j])
+
+      cov2 <- numeric_data %>%
+        filter(id == cat2[indices2]) %>%
+        pull(cols[j])
+
+      p_value[i] <- perm_t_test(cov1, cov2)
+    }
+
+    res[j] <- mean(p_value)
+  }
+
+  return(res)
+}
+
+```
+
+
+
+
+
+```{r}
+#Non parametric one way anova function
+one_way_anova <- function(x, cat, iter=1e-3){
+  T_stat <- numeric(iter) 
+  n <- dim(x)
+  fit <- aov(weight ~ feed)
+  T0 <- summary(fit)[[1]][1,4]
+  for(perm in 1:iter){
+    # Permutation:
+    permutation <- sample(1:n)
+    x_perm <- x[permutation]
+    fit_perm <- aov(x_perm ~ cat)
+  
+    # Test statistic:
+    T_stat[perm] <- summary(fit_perm)[[1]][1,4]
+  }
+  p_val <- sum(T_stat>=T0)/iter
+  return (p_val)
+} 
+
+```
+
+```{r}
+#One way anova on all 12 covariates with extraction
+set.seed(53)
+my_one_way <- function(cat){
+  res <- vector("numeric", length = 12)
+  for (j in 1:12) {
+    p_value <- numeric(100)
+
+    for (i in 1:100) {
+      # Extract random indices based on geometric distribution
+      indices<- sample(1:nrows(numeric_data), 1, prob = dgeom(1:nrows(numeric_data), prob = 0.1), replace = TRUE)
+
+      cov <- numeric_data %>%
+        filter(id == cat[indices]) %>%
+        pull(cols[j])
+      
+      p_value[i] <- one_way_anova(cov,cat)
+    }
+
+    res[j] <- mean(p_value)
+  }
+}
+
+```
+
+
+## Permutation Test each num_cov by sex
+
+```{r}
+cat1<-survey_data$id[survey_data$sesso=="Maschio"]
+cat2<-survey_data$id[survey_data$sesso=="Femmina"]
+
+```
+
+```{r}
+res_sex<-my_perm(cat1,cat2)
+res_sex
+```
+
+## Permutation Test each num_cov by field of study
+```{r}
+test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
+survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
+temp<-survey_data$id[!is.na(survey_data$campo.studi)]
+selected_campostudi <- survey_data$campo.studi[!is.na(survey_data$campo.studi)]
+cat1<-temp[selected_campostudi =="STEM (Science, Technology, Engineering, Mathematics)"]
+cat2<-temp[selected_campostudi =="Others"]
+```
+
+```{r}
+res_campo.studi<-my_perm(cat1,cat2) #pvalue year 0.059
+```
+
+## Permutation Test each num_cov by instrument
+
+```{r}
+cat1<-survey_data$id[survey_data$strumento=="Si"]
+cat2<-survey_data$id[survey_data$strumento=="No"]
+
+```
+
+```{r}
+res_instrument<-my_perm(cat1,cat2) #pvalue year 0.029
+```
+
+## Permutation Test each num_cov by country
+```{r}
+test<-survey_data$stato!="Italia"         
+survey_data$stato<-ifelse(test,"Others","Italia")
+temp<-survey_data$id[!is.na(survey_data$stato)]
+selected_stato <- survey_data$stato[!is.na(survey_data$stato)]
+cat1<-temp[selected_stato =="Italia"]
+cat2<-temp[selected_stato =="Others"]
+```
+
+```{r}
+res_country<-my_perm(cat1,cat2)
+res_country #pvalue popolarità 0.087, danceability 0.066, energy 0.054, year 0.096 
+#pvalue così buoni forse causati da campione piccolo di others
+```
+
+## Permutation Test each num_cov by number of books
+
+```{r}
+test<-survey_data$libri!="0"         
+survey_data$libri<-ifelse(test,"1+","0")
+temp<-survey_data$id[!is.na(survey_data$libri)]
+selected_libri <- survey_data$libri[!is.na(survey_data$libri)]
+cat1<-temp[selected_libri =="0"]
+cat2<-temp[selected_libri =="1+"]
+```
+
+```{r}
+res_books<-my_perm(cat1,cat2)
+res_books #tutti i pvalue alti, ha senso non ci siano differenze
+```
+## Permutation Test each num_cov by abroad
+
+```{r}
+test<-survey_data$estero!="No"         
+survey_data$estero<-ifelse(test,"Si","No")
+temp<-survey_data$id[!is.na(survey_data$estero)]
+selected_estero <- survey_data$estero[!is.na(survey_data$estero)]
+cat1<-temp[selected_estero =="No"]
+cat2<-temp[selected_estero =="Si"]
+```
+
+```{r}
+res_abroad<-my_perm(cat1,cat2)
+res_abroad #pvalue 0.094 energy, 0.098 year
+```
+
+##exploraton other categories
+
+```{r}
+# Subset the data based on the selected indices
+selected_indices <- c(1,7:10,15,16)
+selected_data <- survey_data[, selected_indices]
+
+# Create bar plots for each selected variable
+
+for (i in seq_along(selected_indices)) {
+  x11()
+  barplot(table(selected_data[, i]), col = "lightblue",
+          main = colnames(selected_data)[i], xlab = "", ylab = "Frequency")
+}
+
+#conclusioni: -età under over (o 22.5 o 23.5), -lavoro anova (e poi si può fare pure si o no), -importanza musica boh, -genere anova (magari escludendo generi con bassa numerosità), -coem ascoli musica boh (non mi convince molto come categoria su cui lavortare), - regione anova. Ho escluso a priori concerti e politica, possiamo pensare se metetrli o no
+```
+
+
+## Permutation Test each num_cov by age
+
+```{r}
+# Count values below 22.5 in the 'age' column
+values_below_22.5 <- sum(survey_data$età < 22.5, na.rm = TRUE)
+values_below_22.5
+
+# Count missing data in the 'age' column
+missing_data_age <- sum(is.na(survey_data$età))
+missing_data_age
+
+```
+```{r}
+test<-survey_data$età < 22.5         
+survey_data$età<-ifelse(test,"Under22.5","Over22.5")
+temp<-survey_data$id[!is.na(survey_data$età)]
+selected_età <- survey_data$età[!is.na(survey_data$età)]
+cat1<-temp[selected_età =="Under22.5"]
+cat2<-temp[selected_età =="Over22.5"]
+```
+```{r}
+res_età<-my_perm(cat1,cat2)
+res_età #pvalue tutti alti
+```
+## One way ANOVA each num_cov by job
+```{r}
+cat <- survey_data[7]
+```
+
+```{r}
+res_lavoro <- my_one_way(cat)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
