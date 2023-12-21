@@ -53,7 +53,6 @@ cat2<-survey_data$id[survey_data$sesso=="Femmina"]
 
 
 ```{r}
-set.seed(53)
 
 my_perm<-function(cat1,cat2){
 cols<-colnames(numeric_data)
@@ -63,20 +62,24 @@ for (j in 1:12){
   p_value<-{ } 
 
   for (i in 1:100){
+     
+    selected_data_cat1 <- numeric_data %>%
+        filter(id %in% cat1)
 
-    cov1 <- numeric_data %>%
-    filter(id %in% cat1) %>%
-    group_by(id) %>%
-    slice_sample(n = 1, method = "geom", prob = 0.1) %>%
-    pull(cols[j])
+     cov1 <- selected_data_cat1 %>%
+        group_by(id) %>%
+        sample_n(1, weight = dgeom(1:n(), prob = 0.3), replace = TRUE) %>%
+        pull(!!cols[j])
 
+     
+      selected_data_cat2 <- numeric_data %>%
+        filter(id %in% cat2)
 
-    cov2 <- numeric_data %>%
-    filter(id %in% cat2) %>%
-    group_by(id) %>%
-    slice_sample(n = 1, method = "geom", prob = 0.1) %>%
-    pull(cols[j])
-
+    
+      cov2 <- selected_data_cat2 %>%
+        group_by(id) %>%
+        sample_n(1, weight = dgeom(1:n(), prob = 0.3), replace = TRUE) %>%
+        pull(!!cols[j])
 
     p_value[i]<-perm_t_test(cov1,cov2)
 
@@ -86,47 +89,17 @@ for (j in 1:12){
 }
 return (res)
 }
-```
-
-```{r}
-set.seed(53)
-
-my_perm <- function(cat1, cat2) {
-  cols <- colnames(numeric_data)
-  res <- vector("numeric", length = 12)
-
-  for (j in 1:12) {
-    p_value <- numeric(100)
-
-    for (i in 1:100) {
-      # Extract random indices based on geometric distribution
-      indices1 <- sample(1:length(cat1), 1, prob = dgeom(1:length(cat1), prob = 0.1), replace = TRUE)
-      indices2 <- sample(1:length(cat2), 1, prob = dgeom(1:length(cat2), prob = 0.1), replace = TRUE)
-
-      cov1 <- numeric_data %>%
-        filter(id == cat1[indices1]) %>%
-        pull(cols[j])
-
-      cov2 <- numeric_data %>%
-        filter(id == cat2[indices2]) %>%
-        pull(cols[j])
-
-      p_value[i] <- perm_t_test(cov1, cov2)
-    }
-
-    res[j] <- mean(p_value)
-  }
-
-  return(res)
-}
 
 ```
+
 
 ```{r}
 res_sex<-my_perm(cat1,cat2)
+res_sex
 ```
 
 ## Permutation Test each num_cov by field of study
+
 ```{r}
 test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
 survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
@@ -137,7 +110,8 @@ cat2<-temp[selected_campostudi =="Others"]
 ```
 
 ```{r}
-res_campo.studi<-my_perm(cat1,cat2) #pvalue year 0.059
+res_campo.studi<-my_perm(cat1,cat2) 
+res_campo.studi
 ```
 
 ## Permutation Test each num_cov by instrument
@@ -150,9 +124,11 @@ cat2<-survey_data$id[survey_data$strumento=="No"]
 
 ```{r}
 res_instrument<-my_perm(cat1,cat2) #pvalue year 0.029
+res_instrument
 ```
 
 ## Permutation Test each num_cov by country
+
 ```{r}
 test<-survey_data$stato!="Italia"         
 survey_data$stato<-ifelse(test,"Others","Italia")
@@ -183,6 +159,7 @@ cat2<-temp[selected_libri =="1+"]
 res_books<-my_perm(cat1,cat2)
 res_books #tutti i pvalue alti, ha senso non ci siano differenze
 ```
+
 ## Permutation Test each num_cov by abroad
 
 ```{r}
@@ -197,5 +174,294 @@ cat2<-temp[selected_estero =="Si"]
 ```{r}
 res_abroad<-my_perm(cat1,cat2)
 res_abroad #pvalue 0.094 energy, 0.098 year
+```
+
+## Permutation Test each num_cov by age
+
+```{r}
+# Count values below 22.5 in the 'age' column
+values_below_22.5 <- sum(survey_data$età < 22.5, na.rm = TRUE)
+values_below_22.5
+
+# Count missing data in the 'age' column
+missing_data_age <- sum(is.na(survey_data$età))
+missing_data_age
+
+```
+
+```{r}
+test<-survey_data$età < 22.5         
+survey_data$età<-ifelse(test,"Under22.5","Over22.5")
+temp<-survey_data$id[!is.na(survey_data$età)]
+selected_età <- survey_data$età[!is.na(survey_data$età)]
+cat1<-temp[selected_età =="Under22.5"]
+cat2<-temp[selected_età =="Over22.5"]
+```
+
+```{r}
+res_age<-my_perm(cat1,cat2)
+
+```
+
+## Mega Permutation
+
+```{r}
+my_perm_mega<-function(cat1,cat2){
+cols<-colnames(numeric_data)
+res<-{ }
+
+for (j in 1:12){
+
+     
+    selected_data_cat1 <- numeric_data %>%
+        filter(id %in% cat1)
+
+     cov1 <- selected_data_cat1[,j]
+
+     
+      selected_data_cat2 <- numeric_data %>%
+        filter(id %in% cat2)
+
+    
+      cov2 <- selected_data_cat2[,j]
+      
+      res[j]<-perm_t_test(cov1,cov2)
+
+}
+return (res)
+}
+```
+
+```{r}
+res_sex<-my_perm_mega(cat1,cat2)
+res_sex
+```
+## Media Permutation
+
+```{r}
+my_perm_median<-function(cat1,cat2){
+cols<-colnames(numeric_data)
+res<-{ }
+
+for (j in 1:12){
+     
+    selected_data_cat1 <- numeric_data %>%
+        filter(id %in% cat1)
+
+     cov1 <- selected_data_cat1 %>%
+        group_by(id) %>%
+        summarize(mean_col_j = median(!!sym(cols[j]))) %>%
+        pull()
+
+  
+
+     
+      selected_data_cat2 <- numeric_data %>%
+        filter(id %in% cat2)
+
+    
+      cov2 <- selected_data_cat2 %>%
+        group_by(id) %>%
+        summarize(mean_col_j = median(!!sym(cols[j]))) %>%
+        pull()
+
+      
+    res[j]<-perm_t_test(cov1,cov2)
+
+}
+return (res)
+}
+```
+
+## Permutation Test each num_cov by sex
+
+reject H0: pop=0.015,  liveness=0.019, year=0.09   
+```{r}
+res_sex<-my_perm_median(cat1,cat2)
+res_sex
+```
+
+## Permutation Test each num_cov by field of study
+
+```{r}
+test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
+survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
+temp<-survey_data$id[!is.na(survey_data$campo.studi)]
+selected_campostudi <- survey_data$campo.studi[!is.na(survey_data$campo.studi)]
+cat1<-temp[selected_campostudi =="STEM (Science, Technology, Engineering, Mathematics)"]
+cat2<-temp[selected_campostudi =="Others"]
+```
+
+rejecting H0: never
+```{r}
+res_campo.studi<-my_perm_median(cat1,cat2) 
+res_campo.studi
+```
+
+## Permutation Test each num_cov by instrument
+
+```{r}
+cat1<-survey_data$id[survey_data$strumento=="Si"]
+cat2<-survey_data$id[survey_data$strumento=="No"]
+
+```
+
+rejecting H0: energy=0.054, liveness=0.059, loudness=0.051
+```{r}
+res_instrument<-my_perm_median(cat1,cat2) #pvalue year 0.029
+res_instrument
+```
+
+## Permutation Test each num_cov by country (not balanced)
+
+```{r}
+test<-survey_data$stato!="Italia"         
+survey_data$stato<-ifelse(test,"Others","Italia")
+temp<-survey_data$id[!is.na(survey_data$stato)]
+selected_stato <- survey_data$stato[!is.na(survey_data$stato)]
+cat1<-temp[selected_stato =="Italia"]
+cat2<-temp[selected_stato =="Others"]
+```
+
+rejecting H0: acusticness=0.094, energy=0.069
+```{r}
+res_country<-my_perm_median(cat1,cat2)
+res_country 
+```
+
+## Permutation Test each num_cov by number of books
+
+```{r}
+test<-survey_data$libri!="0"         
+survey_data$libri<-ifelse(test,"1+","0")
+temp<-survey_data$id[!is.na(survey_data$libri)]
+selected_libri <- survey_data$libri[!is.na(survey_data$libri)]
+cat1<-temp[selected_libri =="0"]
+cat2<-temp[selected_libri =="1+"]
+```
+
+rejecting H0: danceability=0.026, speechness=0.043
+```{r}
+res_books<-my_perm_median(cat1,cat2)
+res_books
+```
+
+## Permutation Test each num_cov by abroad 
+
+```{r}
+test<-survey_data$estero!="No"         
+survey_data$estero<-ifelse(test,"Si","No")
+temp<-survey_data$id[!is.na(survey_data$estero)]
+selected_estero <- survey_data$estero[!is.na(survey_data$estero)]
+cat1<-temp[selected_estero =="No"]
+cat2<-temp[selected_estero =="Si"]
+```
+
+rejecting H0: acousticness=0.025, energy=0.002, instr=0.037, liveness=0.036,  loudness=0.017, speechiness=0.1
+```{r}
+res_abroad<-my_perm_median(cat1,cat2)
+res_abroad
+```
+
+## Permutation Test each num_cov by age
+
+```{r}
+# Count values below 22.5 in the 'age' column
+values_below_22.5 <- sum(survey_data$età < 22.5, na.rm = TRUE)
+values_below_22.5
+
+# Count missing data in the 'age' column
+missing_data_age <- sum(is.na(survey_data$età))
+missing_data_age
+
+```
+
+```{r}
+test<-survey_data$età < 22.5         
+survey_data$età<-ifelse(test,"Under22.5","Over22.5")
+temp<-survey_data$id[!is.na(survey_data$età)]
+selected_età <- survey_data$età[!is.na(survey_data$età)]
+cat1<-temp[selected_età =="Under22.5"]
+cat2<-temp[selected_età =="Over22.5"]
+```
+
+rejecting HO: acousticness=0.009, energy=0.024, loudness=0.012
+```{r}
+res_age<-my_perm_median(cat1,cat2)
+res_age
+```
+
+## Anova
+lavoro, importanza.musica (not balanced), genere (va bilanciato), come.ascolti.musica, concerti (da bilanciare),regione (da bilanciare), abitanti
+
+```{r}
+#Non parametric one way anova function
+one_way_anova <- function(x, cat, iter=1000){
+  T_stat <- numeric(iter) 
+  n <- length(x)
+  fit <- aov(x ~ cat)
+  T0 <- summary(fit)[[1]][1,4]
+ 
+  
+  for(perm in 1:iter){
+    # Permutation:
+    permutation <- sample(1:n)
+    x_perm <- x[permutation]
+    fit_perm <- aov(x_perm ~ cat)
+  
+    # Test statistic:
+    T_stat[perm] <- summary(fit_perm)[[1]][1,4]
+  }
+  p_val <- sum(T_stat>=T0)/iter
+  return (p_val)
+} 
+
+```
+
+
+
+```{r}
+#One way anova on all 12 covariates with extraction
+
+my_one_way <- function(cat){
+  res <- vector("numeric", length = 12)
+  for (j in 1:12) {
+    #missing
+    res[j] <- one_way_anova(unlist(median_data[,j]), cat)
+  }
+  return(res)
+}
+
+```
+
+
+```{r}
+median_data <- numeric_data %>%
+        group_by(id) %>%
+        summarise(across(everything(), median))
+     
+```
+
+```{r}
+id_col<-median_data$id
+median_data<-median_data[,-1]
+median_data$id<-id_col
+
+```
+
+
+## Anova Permutation test for Work
+
+```{r}
+res_lavoro<-my_one_way(survey_data$lavoro)
+res_lavoro
+```
+
+```{r}
+t1<-median_data$liveness
+t2<-survey_data$lavoro
+fit<-aov(unlist(t1) ~ t2)
+T0 <- summary(fit)[[1]][1,4]
+ one_way_anova(unlist(t1), t2)
 ```
 
