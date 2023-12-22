@@ -1,0 +1,49 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
+survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
+temp<-survey_data$id[!is.na(survey_data$campo.studi)]
+selected_campostudi <- survey_data$campo.studi[!is.na(survey_data$campo.studi)]
+cat1<-temp[selected_campostudi =="STEM (Science, Technology, Engineering, Mathematics)"]
+cat2<-temp[selected_campostudi =="Others"]
+
+
+
+test<-survey_data$stato!="Italia"         
+survey_data$stato<-ifelse(test,"Others","Italia")
+temp<-survey_data$id[!is.na(survey_data$stato)]
+selected_stato <- survey_data$stato[!is.na(survey_data$stato)]
+cat1<-temp[selected_stato =="Italia"]
+cat2<-temp[selected_stato =="Others"]
+
+
+
+test<-survey_data$libri!="0"         
+survey_data$libri<-ifelse(test,"1+","0")
+temp<-survey_data$id[!is.na(survey_data$libri)]
+selected_libri <- survey_data$libri[!is.na(survey_data$libri)]
+cat1<-temp[selected_libri =="0"]
+cat2<-temp[selected_libri =="1+"]
+
+
+
+
+test<-survey_data$estero!="No"         
+survey_data$estero<-ifelse(test,"Si","No")
+temp<-survey_data$id[!is.na(survey_data$estero)]
+selected_estero <- survey_data$estero[!is.na(survey_data$estero)]
+cat1<-temp[selected_estero =="No"]
+cat2<-temp[selected_estero =="Si"]
+
+
+
+test<-survey_data$etÃ  < 22.5         
+survey_data$etÃ <-ifelse(test,"Under22.5","Over22.5")
+temp<-survey_data$id[!is.na(survey_data$etÃ )]
+selected_etÃ  <- survey_data$etÃ [!is.na(survey_data$etÃ )]
+cat1<-temp[selected_etÃ  =="Under22.5"]
+cat2<-temp[selected_etÃ  =="Over22.5"]
+```
