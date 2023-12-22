@@ -57,7 +57,7 @@ my_perm <- function(cat1, cat2) {
 
     for (i in 1:100) {
       # Extract random indices based on geometric distribution
-      indices1 <- sample(1:length(cat1), 1, prob = dgeom(1:length(cat1), prob = 0.1), replace = TRUE)
+      indices1 <- sample(1, prob = dgeom(1:length(cat1), prob = 0.1), replace = TRUE)
       indices2 <- sample(1:length(cat2), 1, prob = dgeom(1:length(cat2), prob = 0.1), replace = TRUE)
 
       cov1 <- numeric_data %>%
@@ -88,7 +88,7 @@ my_perm <- function(cat1, cat2) {
 one_way_anova <- function(x, cat, iter=1e-3){
   T_stat <- numeric(iter) 
   n <- dim(x)
-  fit <- aov(weight ~ feed)
+  fit <- aov(x ~ cat)
   T0 <- summary(fit)[[1]][1,4]
   for(perm in 1:iter){
     # Permutation:
@@ -107,24 +107,11 @@ one_way_anova <- function(x, cat, iter=1e-3){
 
 ```{r}
 #One way anova on all 12 covariates with extraction
-set.seed(53)
 my_one_way <- function(cat){
   res <- vector("numeric", length = 12)
   for (j in 1:12) {
-    p_value <- numeric(100)
-
-    for (i in 1:100) {
-      # Extract random indices based on geometric distribution
-      indices<- sample(1:nrows(numeric_data), 1, prob = dgeom(1:nrows(numeric_data), prob = 0.1), replace = TRUE)
-
-      cov <- numeric_data %>%
-        filter(id == cat[indices]) %>%
-        pull(cols[j])
-      
-      p_value[i] <- one_way_anova(cov,cat)
-    }
-
-    res[j] <- mean(p_value)
+    #missing
+    res <- one_way_anova(median_data[,j], cat)
   }
 }
 
@@ -221,7 +208,7 @@ res_abroad #pvalue 0.094 energy, 0.098 year
 
 ```{r}
 # Subset the data based on the selected indices
-selected_indices <- c(1,7:10,15,16)
+selected_indices <- c(1,11,2)
 selected_data <- survey_data[, selected_indices]
 
 # Create bar plots for each selected variable
