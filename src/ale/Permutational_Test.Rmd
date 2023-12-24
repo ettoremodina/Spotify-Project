@@ -5,7 +5,7 @@ date: "2023-11-22"
 output: html_document
 ---
 
-```{r}
+```{r, eval=FALSE}
 library(dplyr)
 set.seed(53)
 ```
@@ -44,13 +44,7 @@ perm_t_test=function(x,y,iter=1e3){
 }
 ```
 
-## Permutation Test each num_cov by sex
-
-```{r}
-cat1<-survey_data$id[survey_data$sesso=="Maschio"]
-cat2<-survey_data$id[survey_data$sesso=="Femmina"]
-
-```
+## Test by geometric sample DO NOT USE
 
 
 ```{r}
@@ -94,117 +88,7 @@ return (res)
 ```
 
 
-```{r}
-res_sex<-my_perm(cat1,cat2)
-res_sex
-```
-
-## Permutation Test each num_cov by field of study
-
-```{r}
-test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
-survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
-temp<-survey_data$id[!is.na(survey_data$campo.studi)]
-selected_campostudi <- survey_data$campo.studi[!is.na(survey_data$campo.studi)]
-cat1<-temp[selected_campostudi =="STEM (Science, Technology, Engineering, Mathematics)"]
-cat2<-temp[selected_campostudi =="Others"]
-```
-
-```{r}
-res_campo.studi<-my_perm(cat1,cat2) 
-res_campo.studi
-```
-
-## Permutation Test each num_cov by instrument
-
-```{r}
-cat1<-survey_data$id[survey_data$strumento=="Si"]
-cat2<-survey_data$id[survey_data$strumento=="No"]
-
-```
-
-```{r}
-res_instrument<-my_perm(cat1,cat2) #pvalue year 0.029
-res_instrument
-```
-
-## Permutation Test each num_cov by country
-
-```{r}
-test<-survey_data$stato!="Italia"         
-survey_data$stato<-ifelse(test,"Others","Italia")
-temp<-survey_data$id[!is.na(survey_data$stato)]
-selected_stato <- survey_data$stato[!is.na(survey_data$stato)]
-cat1<-temp[selected_stato =="Italia"]
-cat2<-temp[selected_stato =="Others"]
-```
-
-```{r}
-res_country<-my_perm(cat1,cat2)
-res_country #pvalue popolarità 0.087, danceability 0.066, energy 0.054, year 0.096 
-#pvalue così buoni forse causati da campione piccolo di others
-```
-
-## Permutation Test each num_cov by number of books
-
-```{r}
-test<-survey_data$libri!="0"         
-survey_data$libri<-ifelse(test,"1+","0")
-temp<-survey_data$id[!is.na(survey_data$libri)]
-selected_libri <- survey_data$libri[!is.na(survey_data$libri)]
-cat1<-temp[selected_libri =="0"]
-cat2<-temp[selected_libri =="1+"]
-```
-
-```{r}
-res_books<-my_perm(cat1,cat2)
-res_books #tutti i pvalue alti, ha senso non ci siano differenze
-```
-
-## Permutation Test each num_cov by abroad
-
-```{r}
-test<-survey_data$estero!="No"         
-survey_data$estero<-ifelse(test,"Si","No")
-temp<-survey_data$id[!is.na(survey_data$estero)]
-selected_estero <- survey_data$estero[!is.na(survey_data$estero)]
-cat1<-temp[selected_estero =="No"]
-cat2<-temp[selected_estero =="Si"]
-```
-
-```{r}
-res_abroad<-my_perm(cat1,cat2)
-res_abroad #pvalue 0.094 energy, 0.098 year
-```
-
-## Permutation Test each num_cov by age
-
-```{r}
-# Count values below 22.5 in the 'age' column
-values_below_22.5 <- sum(survey_data$età < 22.5, na.rm = TRUE)
-values_below_22.5
-
-# Count missing data in the 'age' column
-missing_data_age <- sum(is.na(survey_data$età))
-missing_data_age
-
-```
-
-```{r}
-test<-survey_data$età < 22.5         
-survey_data$età<-ifelse(test,"Under22.5","Over22.5")
-temp<-survey_data$id[!is.na(survey_data$età)]
-selected_età <- survey_data$età[!is.na(survey_data$età)]
-cat1<-temp[selected_età =="Under22.5"]
-cat2<-temp[selected_età =="Over22.5"]
-```
-
-```{r}
-res_age<-my_perm(cat1,cat2)
-
-```
-
-## Mega Permutation
+## Mega Permutation, this useful only if we prove independence, DO NOT USE
 
 ```{r}
 my_perm_mega<-function(cat1,cat2){
@@ -233,11 +117,7 @@ return (res)
 }
 ```
 
-```{r}
-res_sex<-my_perm_mega(cat1,cat2)
-res_sex
-```
-## Media Permutation
+## Media Permutation, OFFICIAL ONE
 
 ```{r}
 my_perm_median<-function(cat1,cat2){
@@ -274,15 +154,22 @@ return (res)
 }
 ```
 
-## Permutation Test each num_cov by sex
+### Permutation Test each num_cov by sex
 
-reject H0: pop=0.015,  liveness=0.019, year=0.09   
+
+```{r}
+cat1<-survey_data$id[survey_data$sesso=="Maschio"]
+cat2<-survey_data$id[survey_data$sesso=="Femmina"]
+
+```
+
+ 
 ```{r}
 res_sex<-my_perm_median(cat1,cat2)
 res_sex
 ```
 
-## Permutation Test each num_cov by field of study
+### Permutation Test each num_cov by field of study
 
 ```{r}
 test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
@@ -293,13 +180,13 @@ cat1<-temp[selected_campostudi =="STEM (Science, Technology, Engineering, Mathem
 cat2<-temp[selected_campostudi =="Others"]
 ```
 
-rejecting H0: never
+
 ```{r}
-res_campo.studi<-my_perm_median(cat1,cat2) 
-res_campo.studi
+res_fieldofstudy<-my_perm_median(cat1,cat2) 
+res_fieldofstudy
 ```
 
-## Permutation Test each num_cov by instrument
+### Permutation Test each num_cov by instrument
 
 ```{r}
 cat1<-survey_data$id[survey_data$strumento=="Si"]
@@ -307,13 +194,13 @@ cat2<-survey_data$id[survey_data$strumento=="No"]
 
 ```
 
-rejecting H0: energy=0.054, liveness=0.059, loudness=0.051
+
 ```{r}
 res_instrument<-my_perm_median(cat1,cat2) #pvalue year 0.029
 res_instrument
 ```
 
-## Permutation Test each num_cov by country (not balanced)
+### Permutation Test each num_cov by country (not balanced)
 
 ```{r}
 test<-survey_data$stato!="Italia"         
@@ -324,13 +211,13 @@ cat1<-temp[selected_stato =="Italia"]
 cat2<-temp[selected_stato =="Others"]
 ```
 
-rejecting H0: acusticness=0.094, energy=0.069
+
 ```{r}
 res_country<-my_perm_median(cat1,cat2)
 res_country 
 ```
 
-## Permutation Test each num_cov by number of books
+### Permutation Test each num_cov by number of books
 
 ```{r}
 test<-survey_data$libri!="0"         
@@ -341,13 +228,13 @@ cat1<-temp[selected_libri =="0"]
 cat2<-temp[selected_libri =="1+"]
 ```
 
-rejecting H0: danceability=0.026, speechness=0.043
+
 ```{r}
 res_books<-my_perm_median(cat1,cat2)
 res_books
 ```
 
-## Permutation Test each num_cov by abroad 
+### Permutation Test each num_cov by abroad 
 
 ```{r}
 test<-survey_data$estero!="No"         
@@ -358,18 +245,18 @@ cat1<-temp[selected_estero =="No"]
 cat2<-temp[selected_estero =="Si"]
 ```
 
-rejecting H0: acousticness=0.025, energy=0.002, instr=0.037, liveness=0.036,  loudness=0.017, speechiness=0.1
+
 ```{r}
 res_abroad<-my_perm_median(cat1,cat2)
 res_abroad
 ```
 
-## Permutation Test each num_cov by age
+### Permutation Test each num_cov by age
 
 ```{r}
 # Count values below 22.5 in the 'age' column
-values_below_22.5 <- sum(survey_data$età < 22.5, na.rm = TRUE)
-values_below_22.5
+values_below_23 <- sum(survey_data$età < 23, na.rm = TRUE)
+values_below_23
 
 # Count missing data in the 'age' column
 missing_data_age <- sum(is.na(survey_data$età))
@@ -378,22 +265,22 @@ missing_data_age
 ```
 
 ```{r}
-test<-survey_data$età < 22.5         
-survey_data$età<-ifelse(test,"Under22.5","Over22.5")
+test<-survey_data$età < 23        
+survey_data$età<-ifelse(test,"Under23","Over23")
 temp<-survey_data$id[!is.na(survey_data$età)]
 selected_età <- survey_data$età[!is.na(survey_data$età)]
-cat1<-temp[selected_età =="Under22.5"]
-cat2<-temp[selected_età =="Over22.5"]
+cat1<-temp[selected_età =="Under23"]
+cat2<-temp[selected_età =="Over23"]
 ```
 
-rejecting HO: acousticness=0.009, energy=0.024, loudness=0.012
+
 ```{r}
 res_age<-my_perm_median(cat1,cat2)
 res_age
 ```
 
 
-## Permutation Test each num_cov by region
+### Permutation Test each num_cov by region
 
 ```{r}
 test<-survey_data$regione!="nord"         
@@ -403,20 +290,44 @@ selected_regione <- survey_data$regione[!is.na(survey_data$regione)]
 cat1<-temp[selected_regione =="nord"]
 cat2<-temp[selected_regione =="centro-sud"]
 ```
-rejecting H0: liveness=0.066
+
+
 ```{r}
 res_region<-my_perm_median(cat1,cat2)
 res_region
 ```
 
+Let's bind the results in a dataframe
+```{r}
+res_perm<-rbind(res_sex,res_fieldofstudy, res_age, res_books, res_abroad, res_country,
+                res_instrument, res_region)
+cnames<-colnames(numeric_data[,-13])
+colnames(res_perm)<-cnames
+```
+
+Let's assess if the category are balanced as well
+
+country and region might give problems..
+
+```{r}
+selected_indices <- c(2,4,1,6,13,5,12,15)
+selected_data <- survey_data[, selected_indices]
+
+
+for (i in seq_along(selected_indices)) {
+
+  barplot(table(selected_data[, i]), col = "lightblue",
+          main = colnames(selected_data)[i], xlab = "", ylab = "Frequency")
+}
+
+```
 
 
 ## Anova
-lavoro, importanza.musica (not balanced), genere (va bilanciato), come.ascolti.musica, concerti (da bilanciare),regione (da bilanciare), abitanti
 
 ```{r}
 #Non parametric one way anova function
-one_way_anova <- function(x, cat, iter=1000){
+one_way_anova <- function(x, cat, iter=1e3){
   T_stat <- numeric(iter) 
   n <- length(x)
   fit <- aov(x ~ cat)
@@ -470,32 +381,31 @@ median_data$id<-id_col
 ```
 
 
-## Anova Permutation test for Work 
-rejecting H0: popularity=0.090, acousticness=0.023, energy=0.047, loudness=0.060, tempo=0.038
+### Anova Permutation test for Work 
 
 ```{r}
-res_lavoro<-my_one_way(survey_data$lavoro)
-res_lavoro
+res_work<-my_one_way(survey_data$lavoro)
+res_work
 ```
 
 
-## Anova Permutation test for Importance of music
-rejecting H0: popularity=0.097. Unbalanced data
+### Anova Permutation test for Importance of music
+
 
 ```{r}
-res_importanza.musica<-my_one_way(survey_data$importanza.musica)
-res_importanza.musica
+res_importance.music<-my_one_way(survey_data$importanza.musica)
+res_importance.music
 ```
 
-##Anova Permutiation test for How do you listen to music
-rejecting H0: none
+### Anova Permutiation test for How do you listen to music
+
 
 ```{r}
-res_come.ascolti<-my_one_way(survey_data$come.ascolti.musica)
-res_come.ascolti
+res_how.listen<-my_one_way(survey_data$come.ascolti.musica)
+res_how.listen
 ```
 
-##Anova Permutation test for Number of concerts
+### Anova Permutation test for Number of concerts
 
 ```{r}
 # Define the breakpoints for the categories
@@ -504,13 +414,14 @@ breakpoints <- c(-Inf, 1, 3, Inf)
 # Create a new categorical column based on the numeric_column
 survey_data$concerti <- cut(survey_data$concerti, breaks = breakpoints, labels = c("<=1", "(1,3]", ">3"), include.lowest = TRUE)
 ```
+
 rejecting H0: none. Possible to change the division of the data
 ```{r}
-res_concerti<-my_one_way(survey_data$concerti)
-res_concerti
+res_concerts<-my_one_way(survey_data$concerti)
+res_concerts
 ```
 
-##Anova Permutation for Number of inhabitants
+### Anova Permutation for Number of inhabitants
 
 ```{r}
 table(survey_data$abitanti.citta)
@@ -525,19 +436,105 @@ survey_data <- survey_data %>%
   )
 table(survey_data$abitanti.citta)
 ```
-rejecting H0: none
 ```{r}
-res_abitanti<-my_one_way(survey_data$abitanti.citta)
-res_abitanti
+
+survey_data <- survey_data %>%
+  mutate(abitanti.citta= case_when(
+    abitanti.citta %in% c("Meno di 1000 abitanti", "Tra 1.000 e 10.000 abitanti") ~ "Meno di 100.000 abitanti",
+    abitanti.citta == "Tra 100.000 e 500.000 abitanti" ~ "Tra 100.000 e 500.000 abitanti",
+    abitanti.citta == "Più di 500 000 abitanti" ~ "Più di 500 000 abitanti",
+    TRUE ~ abitanti.citta  
+  ))
+table(survey_data$abitanti.citta)
 ```
 
 
+```{r}
+res_inhabitants<-my_one_way(survey_data$abitanti.citta)
+res_inhabitants
+```
+### Anova Permutation for Genre
+
+We consider only people in the most listened genres, since it doesn't make sense compare other genres with to few people (hiphop,pop,rock)
+
+```{r}
+genre_counts<-table(survey_data$genere)
+selected_genres <- names(genre_counts[genre_counts > 10])
+
+survey_data$genere[!(survey_data$genere %in% selected_genres)] <- NA
+
+table(survey_data$genere)
+```
+
+```{r}
+res_genre<-my_one_way(survey_data$genere)
+res_genre
+```
+
+Let's bind results
+```{r}
+res_anova<-rbind(res_work,res_importance.music, res_how.listen, res_concerts, res_inhabitants, res_genre)
+cnames<-colnames(numeric_data[,-13])
+colnames(res_anova)<-cnames
+```
+
+
+```{r}
+res<-rbind(res_perm,res_anova)
+```
+
+If we wanna use importanza.musica we need to rearrange somehow
+```{r}
+selected_indices <- c(7,8,10,11,16,9)
+selected_data <- survey_data[, selected_indices]
+
+
+for (i in seq_along(selected_indices)) {
+
+  barplot(table(selected_data[, i]), col = "lightblue",
+          main = colnames(selected_data)[i], xlab = "", ylab = "Frequency",cex.names = 0.7, las=2)
+}
+
+```
+
+
+## Results 
+
+Raga help non riesco a farlo stampare nell'ordine corretto,
+volevo colorare di rosso i pvalue delle categorie significative con alpha=0.05
+
+```{r}
+library(kableExtra)
+# Assuming res is your matrix
+threshold <- 0.05
+condition <- ifelse(res< threshold, "red", "black")
 
 
 
+# Convert the matrix to a data frame
+df_res <- as.data.frame(res)
+
+# Apply the color condition to the data frame
+colored_df_res <- df_res
+colored_df_res[] <- lapply(df_res[], function(x) cell_spec(x, color = condition))
+
+# Display the colored data frame using kableExtra
+kable(colored_df_res, escape = FALSE) %>%
+  kable_styling()
 
 
+```
 
+```{r}
+reduced<-survey_data[,-c(3,14)]
+```
+
+```{r}
+saveRDS(res,"../../data/pvalues_cat.RData")
+saveRDS(reduced,"../../data/survey_reduced.RData")
+
+```
+ 
 
 
 
