@@ -832,4 +832,40 @@ year:
 count0.05
 colnames(res)
 ```
+## Cluster by Kmode (da rivedere)
+
+```{r}
+library(klaR)
+colSums(is.na(survey_data))
+k_data<-survey_data[,-c(3,8,13,15)]
+k_data<-as.data.frame(lapply(k_data, as.factor))
+res_clust<-kmodes(k_data, 4, iter.max = 15, weighted = FALSE, fast = TRUE)
+```
+
+```{r}
+
+cost <- numeric(length = 10)
+silhouette_scores <- numeric(length = 10)
+
+for (i in 2:10) {
+  kmodes_model <- kmodes(k_data, i, iter.max = 15, weighted = FALSE, fast = TRUE)
+  cost[i] <- kmodes_model$withindiff
+
+}
+
+plot(2:10, cost[2:10], type = "b", pch = 19, frame = FALSE, 
+     xlab = "Number of Clusters", ylab = "Cost")
+```
+```{r}
+library(ggplot2)
+
+k_data$cluster <- as.factor(res_clust$cluster)
+table(k_data$cluster)
+
+ggplot(k_data, aes(x = sesso, y = lavoro, color = cluster)) +
+  geom_point() +
+  labs(title = "Cluster Plot")
+```
+
+
 
