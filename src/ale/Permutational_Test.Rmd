@@ -862,7 +862,8 @@ library(ggplot2)
 k_data$cluster <- as.factor(res_clust$cluster)
 table(k_data$cluster)
 
-ggplot(k_data, aes(x = sesso, y = lavoro, color = cluster)) +
+
+ggplot(k_data, aes(x = sesso, y = libri, color = cluster)) +
   geom_point() +
   labs(title = "Cluster Plot")
 ```
