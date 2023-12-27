@@ -40,7 +40,9 @@ survey_data$concerti<-ifelse(test,"more than 5","less than 5")
 ######### 
 survey_data$regione[is.na(survey_data$regione)] = "missing"
 ######### TO DO
-survey_data$abitanti.citta[survey_data$abitanti.citta=="Meno di 1000 abitanti"] = "Tra 10.000 e 100.000"      
+survey_data$abitanti.citta[survey_data$abitanti.citta=="Meno di 1000 abitanti"] = "Tra 10.000 e 100.000"
+# Rimuovi livelli vuoti
+survey_data$abitanti.citta <- droplevels(survey_data$abitanti.citta)
 
 
 ```
@@ -96,148 +98,84 @@ music_cov = music_vars[[ii]]
 survey_cov =  survey_covs[[jj]]
 survey_cov = "concerti"
 music_cov = "popularity"
-grid <- seq(0, 1, length.out = 1000)
-
-# Creare una lista di EDF per tutte le persone
-edf_list <- lapply(unique(combined_data$id), function(person_id) {
-  ecdf <- ecdf(combined_data[combined_data$id == person_id,music_cov ])
-  val = ecdf(grid)
-  return(val)
-})
-
-
-# Definisci una palette di colori in base ai valori unici nella colonna di gruppo
-unique_groups = levels(as.factor(combined_data[,survey_cov]))
-num_groups <- length(unique_groups)
-color_palette <- rainbow(num_groups)
-indices_list <- list()
-
-matrice_da_lista_all <- do.call(cbind, edf_list)
-f_data_all = fData(grid, t(matrice_da_lista_all))
-
-
-
-# covariate su cui il codice non funziona
-missed_covariates = c()
-for (group in unique_groups) {
-  indices <- which(survey_data[,survey_cov] == group)
-  indices_list[[as.character(group)]] <- indices
-}
-
-# all groups have at least 2 person 
-if(all(lapply(indices_list, length)>1)){
-  matrice_da_lista <- do.call(cbind, edf_list)
-
-  f_data = fData(grid, t(matrice_da_lista))
-  modified_band_depth <- MBD(Data = f_data)
-  median_curve <- median_fData(fData = f_data, type = "MBD")
-  
-  plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
-       main = paste0(c("Empirical Distribution Functions (EDF) ",music_cov,"-",survey_cov)),
-       xlab = "Data Values", ylab = "Probability")
-  
-  
-  # Tracciare ogni EDF dalla lista con colore basato sulla colonna di gruppo
-  for (i in seq_along(edf_list)) {
-    group_value <- survey_data[i + 1,survey_cov]
-    lines(grid, edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)
-  }
-  
-  for (i in 1:num_groups) {
-    matrice_da_lista <- do.call(cbind, edf_list[indices_list[[i]]])
-    f_data = fData(grid, t(matrice_da_lista))
-    modified_band_depth <- MBD(Data = f_data)
-    median_curve <- median_fData(fData = f_data, type = "MBD")
-    lines(grid, median_curve$values, col = color_palette[i], lwd = 4)
-    legend("topleft", legend = unique_groups, col = color_palette, lwd = 2)
-    #relative depth function
-    
-    relative_BD = BD_relative(median_curve, f_data_all)
-    print(relative_BD)
-    
-  }
-}else{
-  missed_covariates = unique(c(missed_covariates,survey_cov))
-}
-
-print(missed_covariates)
 ```
 
-
-# depth function
+# auxiliarry functions
 ```{r}
 grid <- seq(0, 1, length.out = 1000)
-depth_covcov <- function(music_cov, survey_cov){ 
-  plot_bool = 1 
-  
-# Creare una lista di EDF per tutte le persone
-edf_list <- lapply(unique(combined_data$id), function(person_id) {
+create_edf_list <- function(music_cov){
+  edf_list <-  lapply(unique(combined_data$id), function(person_id) {
     ecdf <- ecdf(combined_data[combined_data$id == person_id,music_cov ])
     val = ecdf(grid)
     return(val)
   })
+  return(edf_list)
+}
+
+create_indices_list <- function(unique_groups,survey_cov,median_curve_list){
+  indices_list <- list()
+  for (group in unique_groups) {
+    indices <- which(survey_data[,survey_cov] == group)
+    indices_list[[as.character(group)]] <- indices
+  }
+  return(indices_list)
+}
+
+plot_ecdf <- function(music_cov,survey_cov,edf_list,color_palette,median_curve_list){
+  unique_groups = levels(as.factor(combined_data[,survey_cov]))
+  plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+  main = paste0(c("Empirical Distribution Functions (EDF) ",music_cov,"-",survey_cov)),
+  xlab = "Data Values", ylab = "Probability")
   
+  lapply(seq_along(edf_list), function(i) {
+    group_value <- survey_data[i + 1, survey_cov]
+    lines(grid, edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)
+  })
+  
+  # Utilizza lapply e sapply per evitare il secondo ciclo for
+  sapply(seq_along(unique_groups), function(i) {
+    lines(grid, median_curve_list[[i]]$values, col = color_palette[i], lwd = 4)
+  })
+  legend("topleft", legend = unique_groups, col = color_palette, lwd = 2)
+}
+```
+
+# depth function
+```{r}
+depth_covcov <- function(music_cov, survey_cov){ 
+  # Creare una lista di EDF per tutte le persone
+  edf_list <- create_edf_list(music_cov)
+  matrice_da_lista_all <- do.call(cbind, edf_list)
+  f_data_all = fData(grid, t(matrice_da_lista_all))
   
   # Definisci una palette di colori in base ai valori unici nella colonna di gruppo
   unique_groups = levels(as.factor(combined_data[,survey_cov]))
   num_groups <- length(unique_groups)
   color_palette <- rainbow(num_groups)
-  indices_list <- list()
+  indices_list <- create_indices_list(unique_groups,survey_cov)  
+
   
-  matrice_da_lista_all <- do.call(cbind, edf_list)
-  f_data_all = fData(grid, t(matrice_da_lista_all))
+  median_curve_list <- list()
+  relative_BD_list <- list()
   
+  for (i in 1:num_groups) {
+    matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
+    f_data = fData(grid, t(matrice_da_lista_i))
+    median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
   
-  
-  # covariate su cui il codice non funziona
-  missed_covariates = c()
-  for (group in unique_groups) {
-    indices <- which(survey_data[,survey_cov] == group)
-    indices_list[[as.character(group)]] <- indices
+    #relative depth function
+    relative_BD_list[[i]] = BD_relative(median_curve_list[[i]], f_data_all)
+    
   }
   
-  # all groups have at least 2 person 
-  if(all(lapply(indices_list, length)>1)){
-    matrice_da_lista <- do.call(cbind, edf_list)
-  
-    f_data = fData(grid, t(matrice_da_lista))
-    modified_band_depth <- MBD(Data = f_data)
-    median_curve <- median_fData(fData = f_data, type = "MBD")
-    if(plot_bool)
-      plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
-         main = paste0(c("Empirical Distribution Functions (EDF) ",music_cov,"-",survey_cov)),
-         xlab = "Data Values", ylab = "Probability")
-    
-    
-    # Tracciare ogni EDF dalla lista con colore basato sulla colonna di gruppo
-    for (i in seq_along(edf_list)) {
-      group_value <- survey_data[i + 1,survey_cov]
-      if(plot_bool)
-        lines(grid, edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)
-    }
-    
-    for (i in 1:num_groups) {
-      matrice_da_lista <- do.call(cbind, edf_list[indices_list[[i]]])
-      f_data = fData(grid, t(matrice_da_lista))
-      modified_band_depth <- MBD(Data = f_data)
-      median_curve <- median_fData(fData = f_data, type = "MBD")
-      if(plot_bool){
-        lines(grid, median_curve$values, col = color_palette[i], lwd = 4)
-        legend("topleft", legend = unique_groups, col = color_palette, lwd = 2)
-      }
-      
-      #relative depth function
-      
-      relative_BD = BD_relative(median_curve, f_data_all)
-      #print(relative_BD)
-      
-    }
-  }else{
-    missed_covariates = unique(c(missed_covariates,survey_cov))
-  }
-  
-  return (missed_covariates)
+  print(relative_BD_list)
+  plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+
 }
+```
+
+```{r}
+depth_covcov("popularity","libri")
 ```
 
 # covariata persona fissata

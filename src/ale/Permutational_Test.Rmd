@@ -871,3 +871,7 @@ ggplot(k_data, aes(x = sesso, y = libri, color = cluster)) +
 
 
 
+```{r}
+
+```
+
