@@ -164,11 +164,13 @@ depth_covcov <- function(music_cov, survey_cov){
     median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
   
     #relative depth function
-    relative_BD_list[[i]] = BD_relative(median_curve_list[[i]], f_data_all)
+    relative_BD_result <- BD_relative(median_curve_list[[i]], f_data_all)
     
+    # Memorizza il risultato insieme al nome del gruppo
+    relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
   }
-  
-  print(relative_BD_list)
+  for (i in 1:num_groups) 
+    print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
   plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
 
 }
@@ -190,10 +192,12 @@ for(m in music_vars){
 music_vars = colnames(data_numeric_cleaned)[1:12]
 music_vars = music_vars[!(music_vars %in% c("year","duration"))]
 survey_covs = colnames(survey_data)[1:16]
-missed_vars = c()
+survey_covs = survey_covs[!(survey_covs %in% c("genere"))]
 for(m in music_vars){
+  print(music_cov)
   for (s in survey_covs){
-    missed_vars = c(missed_vars,depth_covcov(m,s))
+    print(survey_cov)
+    depth_covcov(m,s)
   }
 }
 print(unique(missed_vars))
