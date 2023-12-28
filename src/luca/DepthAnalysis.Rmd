@@ -2,6 +2,7 @@
 library(hexbin)
 library(ggplot2)
 library(roahd)
+library("fdatest")
 ```
 
 # load and preprocess the data
@@ -96,13 +97,52 @@ ii = 8
 jj = 1
 music_cov = music_vars[[ii]]
 survey_cov =  survey_covs[[jj]]
-survey_cov = "concerti"
+survey_cov = "abitanti.citta"
 music_cov = "popularity"
+# Creare una lista di EDF per tutte le persone
+edf_list <- create_edf_list(music_cov)
+matrice_da_lista_all <- do.call(cbind, edf_list)
+f_data_all = fData(grid, t(matrice_da_lista_all))
+
+# Definisci una palette di colori in base ai valori unici nella colonna di gruppo
+unique_groups = levels(as.factor(combined_data[,survey_cov]))
+num_groups <- length(unique_groups)
+color_palette <- rainbow(num_groups)
+indices_list <- create_indices_list(unique_groups,survey_cov)  
+
+
+factor_aov_vect <- create_factors(indices_list)
+response = t(matrice_da_lista_all)
+resutl_aov = IWTaov(response ~factor_aov_vect)
+pval = summary(resutl_aov)$factors[[1]]
+
+if(pval<0.05)
+  print(paste("found match", music_cov, survey_cov))
+
+
+median_curve_list <- list()
+relative_BD_list <- list()
+
+for (i in 1:num_groups) {
+  matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
+  f_data = fData(grid, t(matrice_da_lista_i))
+  median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
+
+  #relative depth function
+  relative_BD_result <- BD_relative(median_curve_list[[i]], f_data_all)
+  
+  # Memorizza il risultato insieme al nome del gruppo
+  relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
+}
+for (i in 1:num_groups)
+  print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
+plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+
 ```
 
 # auxiliarry functions
 ```{r}
-grid <- seq(0, 1, length.out = 1000)
+grid <- seq(0, 1, length.out = 50)
 create_edf_list <- function(music_cov){
   edf_list <-  lapply(unique(combined_data$id), function(person_id) {
     ecdf <- ecdf(combined_data[combined_data$id == person_id,music_cov ])
@@ -138,46 +178,69 @@ plot_ecdf <- function(music_cov,survey_cov,edf_list,color_palette,median_curve_l
   })
   legend("topleft", legend = unique_groups, col = color_palette, lwd = 2)
 }
+
+
+create_factors <- function(indices_list){
+  length_list = length(unlist(indices_list))
+  return_vect <- rep(0,length_list)
+  for( g in 2:length(names(indices_list))){
+    sub_group = indices_list[[g]]
+    for(i in 1:length(sub_group))
+      return_vect[sub_group[i]] = g-1
+  }
+  return(return_vect)
+}
 ```
 
 # depth function
 ```{r}
 depth_covcov <- function(music_cov, survey_cov){ 
   # Creare una lista di EDF per tutte le persone
-  edf_list <- create_edf_list(music_cov)
-  matrice_da_lista_all <- do.call(cbind, edf_list)
-  f_data_all = fData(grid, t(matrice_da_lista_all))
-  
-  # Definisci una palette di colori in base ai valori unici nella colonna di gruppo
-  unique_groups = levels(as.factor(combined_data[,survey_cov]))
-  num_groups <- length(unique_groups)
-  color_palette <- rainbow(num_groups)
-  indices_list <- create_indices_list(unique_groups,survey_cov)  
+edf_list <- create_edf_list(music_cov)
+matrice_da_lista_all <- do.call(cbind, edf_list)
+f_data_all = fData(grid, t(matrice_da_lista_all))
 
-  
-  median_curve_list <- list()
-  relative_BD_list <- list()
-  
-  for (i in 1:num_groups) {
-    matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
-    f_data = fData(grid, t(matrice_da_lista_i))
-    median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
-  
-    #relative depth function
-    relative_BD_result <- BD_relative(median_curve_list[[i]], f_data_all)
-    
-    # Memorizza il risultato insieme al nome del gruppo
-    relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
-  }
-  for (i in 1:num_groups) 
-    print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
-  plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+# Definisci una palette di colori in base ai valori unici nella colonna di gruppo
+unique_groups = levels(as.factor(combined_data[,survey_cov]))
+num_groups <- length(unique_groups)
+color_palette <- rainbow(num_groups)
+indices_list <- create_indices_list(unique_groups,survey_cov)  
+
+
+factor_aov_vect <- create_factors(indices_list)
+response = t(matrice_da_lista_all)
+resutl_aov = IWTaov(response ~factor_aov_vect)
+pval = summary(resutl_aov)$factors[[1]]
+
+if(pval<0.05)
+  return(c(music_cov,survey_cov))
+else
+  return(0)
+
+
+# median_curve_list <- list()
+# relative_BD_list <- list()
+
+# for (i in 1:num_groups) {
+#   matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
+#   f_data = fData(grid, t(matrice_da_lista_i))
+#   median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
+# 
+#   #relative depth function
+#   relative_BD_result <- BD_relative(median_curve_list[[i]], f_data_all)
+#   
+#   # Memorizza il risultato insieme al nome del gruppo
+#   relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
+# }
+# for (i in 1:num_groups)
+#   print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
+#plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
 
 }
 ```
 
 ```{r}
-depth_covcov("popularity","libri")
+depth_covcov("popularity","abitanti.citta"  )
 ```
 
 # covariata persona fissata
@@ -193,11 +256,16 @@ music_vars = colnames(data_numeric_cleaned)[1:12]
 music_vars = music_vars[!(music_vars %in% c("year","duration"))]
 survey_covs = colnames(survey_data)[1:16]
 survey_covs = survey_covs[!(survey_covs %in% c("genere"))]
+
+results_aov = list()
+k = 1
 for(m in music_vars){
-  print(music_cov)
+  #print(music_cov)
   for (s in survey_covs){
-    print(survey_cov)
+    #print(survey_cov)
     depth_covcov(m,s)
+    results_aov[[k]] = depth_covcov(m,s)
+    k = k+1
   }
 }
 print(unique(missed_vars))
@@ -208,5 +276,54 @@ for (i in unique(missed_vars)){
   print("------")
 }
 ```
+
+
+```{r}
+ITPaovbspline(
+  formula,
+  order = 2,
+  nknots = dim(model.response(model.frame(formula)))[2],
+  B = 1000,
+  method = "residuals"
+)
+
+ITPimage(ITP.result, alpha = 0.05, abscissa.range = c(0, 1), nlevel = 20)
+
+
+```
+
+
+
+```{r}
+gruppi_lista <- list(
+  malati = c(2, 5, 6, 7, 9, 13, 15, 17, 18, 20, 23, 27, 29, 30, 33, 34, 35, 36, 40, 41, 52, 54, 55, 56, 60, 63, 64, 69),
+  sani = c(1, 3, 4, 8, 10, 11, 12, 14, 16, 19, 21, 22, 24, 25, 26, 28, 31, 32, 37, 38, 39, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 53, 57, 58, 59, 61, 62, 65, 66, 67, 68)
+)
+
+```
+
+
+
+
+```{r}
+data(NASAtemp)
+limit = 10
+temperature <- rbind(NASAtemp$milan[,1:limit],NASAtemp$paris[,1:limit])
+groups <- c(rep(0,22),rep(1,22))
+
+# Performing the IWT
+IWT.result <- IWTaov(temperature ~ groups,B=1000)
+
+# Summary of the ITP results
+summary(IWT.result)
+
+# Plot of the IWT results
+
+plot(IWT.result)
+
+```
+
+
+
 
 
