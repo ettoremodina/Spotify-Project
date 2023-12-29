@@ -108,59 +108,6 @@ for (i in seq_along(edf_list)) {
 }
 ```
 
-# funzione "esternata" for debugging
-
-```{r}
-music_vars = colnames(data_numeric_cleaned)[1:13]
-survey_covs = colnames(survey_data)[3:19]
-
-ii = 8
-jj = 1
-music_cov = music_vars[[ii]]
-survey_cov =  survey_covs[[jj]]
-survey_cov = "abitanti.citta"
-music_cov = "popularity"
-# Creare una lista di EDF per tutte le persone
-edf_list <- create_edf_list(music_cov)
-matrice_da_lista_all <- do.call(cbind, edf_list)
-f_data_all = fData(grid, t(matrice_da_lista_all))
-
-# Definisci una palette di colori in base ai valori unici nella colonna di gruppo
-unique_groups = levels(as.factor(combined_data[,survey_cov]))
-num_groups <- length(unique_groups)
-color_palette <- rainbow(num_groups)
-indices_list <- create_indices_list(unique_groups,survey_cov)  
-
-
-factor_aov_vect <- create_factors(indices_list)
-response = t(matrice_da_lista_all)
-resutl_aov = IWTaov(response ~factor_aov_vect)
-pval = summary(resutl_aov)$factors[[1]]
-
-if(pval<0.05)
-  print(paste("found match", music_cov, survey_cov))
-
-
-median_curve_list <- list()
-relative_BD_list <- list()
-
-for (i in 1:num_groups) {
-  matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
-  f_data = fData(grid, t(matrice_da_lista_i))
-  median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
-
-  #relative depth function
-  relative_BD_result <- BD_relative(median_curve_list[[i]], f_data_all)
-  
-  # Memorizza il risultato insieme al nome del gruppo
-  relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
-}
-for (i in 1:num_groups)
-  print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
-plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
-
-```
-
 # auxiliarry functions
 
 ```{r}
@@ -212,13 +159,36 @@ create_factors <- function(indices_list){
   }
   return(return_vect)
 }
+
+
+# Funzione per creare un vettore di pesi esponenziali
+create_exponential_weights <- function(n, alpha) {
+  weights <- exp(-alpha * seq(0, n-1))
+  return(weights)
+}
+
+# Calcola il numero di osservazioni
+n <- nrow(person_data)
+
+# Calcola i pesi esponenziali
+alpha <- 0.1  # Puoi regolare il valore di alpha
+weights_ecdf <- create_exponential_weights(n, alpha)
+
+
 ```
 
-# depth function
-
+# funzione "esternata" for debugging
 ```{r}
-depth_covcov <- function(music_cov, survey_cov){ 
-  # Creare una lista di EDF per tutte le persone
+music_vars = colnames(data_numeric_cleaned)[1:13]
+survey_covs = colnames(survey_data)[3:19]
+
+ii = 8
+jj = 1
+music_cov = music_vars[[ii]]
+survey_cov =  survey_covs[[jj]]
+survey_cov = "abitanti.citta"
+music_cov = "popularity"
+# Creare una lista di EDF per tutte le persone
 edf_list <- create_edf_list(music_cov)
 matrice_da_lista_all <- do.call(cbind, edf_list)
 f_data_all = fData(grid, t(matrice_da_lista_all))
@@ -236,9 +206,56 @@ resutl_aov = IWTaov(response ~factor_aov_vect)
 pval = summary(resutl_aov)$factors[[1]]
 
 if(pval<0.05)
-  return(c(music_cov,survey_cov))
-else
-  return(0)
+  print(paste("found match", music_cov, survey_cov))
+
+
+median_curve_list <- list()
+relative_BD_list <- list()
+
+for (i in 1:num_groups) {
+  matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
+  f_data = fData(grid, t(matrice_da_lista_i))
+  median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
+
+  #relative depth function
+  relative_BD_result <- BD_relative(median_curve_list[[i]], f_data_all)
+  
+  # Memorizza il risultato insieme al nome del gruppo
+  relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
+}
+for (i in 1:num_groups)
+  print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
+plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+
+```
+
+# depth function
+
+```{r}
+depth_covcov <- function(music_cov, survey_cov){ 
+  
+  # Creare una lista di EDF per tutte le persone
+  edf_list <- create_edf_list(music_cov)
+  matrice_da_lista_all <- do.call(cbind, edf_list)
+  response = t(matrice_da_lista_all)
+  f_data_all = fData(grid, response)
+  
+  # Definisci una palette di colori in base ai valori unici nella colonna di gruppo
+  unique_groups = levels(as.factor(combined_data[,survey_cov]))
+  num_groups <- length(unique_groups)
+  color_palette <- rainbow(num_groups)
+  indices_list <- create_indices_list(unique_groups,survey_cov)  
+  
+  factor_aov_vect <- create_factors(indices_list)
+  
+  resutl_aov = IWTaov(response ~ factor_aov_vect)
+  pval = summary(resutl_aov)$factors[[1]]
+  
+  
+  if(pval<0.05)
+    return(c(music_cov,survey_cov))
+  else
+    return(0)
 
 
 # median_curve_list <- list()
@@ -293,7 +310,7 @@ for(m in music_vars){
     k = k+1
   }
 }
-print(unique(missed_vars))
+print(results_aov)
 ```
 
 ```{r}
