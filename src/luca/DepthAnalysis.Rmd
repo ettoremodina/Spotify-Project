@@ -74,7 +74,7 @@ create_exponential_weights <- function(n, alpha) {
 n <- nrow(person_data)
 
 # Calcola i pesi esponenziali
-alpha <- 0.1  # Puoi regolare il valore di alpha
+alpha <- 0.99  # Puoi regolare il valore di alpha
 weights_ecdf <- create_exponential_weights(n, alpha)
 
 # Calcola l'EDF per la covariata specifica
@@ -171,7 +171,7 @@ create_exponential_weights <- function(n, alpha) {
 n <- nrow(person_data)
 
 # Calcola i pesi esponenziali
-alpha <- 0.1  # Puoi regolare il valore di alpha
+alpha <- 0.99  # Puoi regolare il valore di alpha
 weights_ecdf <- create_exponential_weights(n, alpha)
 
 
@@ -225,7 +225,7 @@ for (i in 1:num_groups) {
 }
 for (i in 1:num_groups)
   print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
-plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+#plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
 
 ```
 
@@ -246,41 +246,41 @@ depth_covcov <- function(music_cov, survey_cov){
   color_palette <- rainbow(num_groups)
   indices_list <- create_indices_list(unique_groups,survey_cov)  
   
-  factor_aov_vect <- create_factors(indices_list)
-  
-  resutl_aov = IWTaov(response ~ factor_aov_vect)
-  pval = summary(resutl_aov)$factors[[1]]
-  
-  
-  if(pval<0.05)
-    return(c(music_cov,survey_cov))
-  else
-    return(0)
+  # factor_aov_vect <- create_factors(indices_list)
+  # 
+  # resutl_aov = IWTaov(response ~ factor_aov_vect)
+  # pval = summary(resutl_aov)$factors[[1]]
+  # 
+  # 
+  # if(pval<0.05)
+  #   return(c(music_cov,survey_cov))
+  # else
+  #   return(0)
 
 
-# median_curve_list <- list()
-# relative_BD_list <- list()
+ median_curve_list <- list()
+ relative_BD_list <- list()
 
-# for (i in 1:num_groups) {
-#   matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
-#   f_data = fData(grid, t(matrice_da_lista_i))
-#   median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
-# 
-#   #relative depth function
-#   relative_BD_result <- BD_relative(median_curve_list[[i]], f_data_all)
-#   
-#   # Memorizza il risultato insieme al nome del gruppo
-#   relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
-# }
-# for (i in 1:num_groups)
-#   print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
-#plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+ for (i in 1:num_groups) {
+   matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
+   f_data = fData(grid, t(matrice_da_lista_i))
+   median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
+
+   #relative depth function
+   relative_BD_result <- MBD_relative(median_curve_list[[i]], f_data_all)
+
+   # Memorizza il risultato insieme al nome del gruppo
+   relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
+ }
+ for (i in 1:num_groups)
+   print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
+plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
 
 }
 ```
-
+https://www.rdocumentation.org/packages/roahd/versions/1.4
 ```{r}
-depth_covcov("popularity","abitanti.citta"  )
+depth_covcov("popularity","abitanti.citta")
 ```
 
 # covariata persona fissata
@@ -359,3 +359,5 @@ summary(IWT.result)
 plot(IWT.result)
 
 ```
+
+
