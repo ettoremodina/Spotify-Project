@@ -174,6 +174,11 @@ n <- nrow(person_data)
 alpha <- 0.99  # Puoi regolare il valore di alpha
 weights_ecdf <- create_exponential_weights(n, alpha)
 
+music_vars = colnames(data_numeric_cleaned)[1:12]
+music_vars = music_vars[!(music_vars %in% c("year","duration"))]
+survey_covs = colnames(survey_data)[1:16]
+survey_covs = survey_covs[!(survey_covs %in% c("genere"))]
+
 
 ```
 
@@ -229,8 +234,71 @@ for (i in 1:num_groups)
 
 ```
 
-# depth function
+# IWT
+<https://rdrr.io/github/alessiapini/fdatest/>
+```{r}
+IWT_covcov <- function(music_cov, survey_cov){ 
+  
+  # Creare una lista di EDF per tutte le persone
+  edf_list <- create_edf_list(music_cov)
+  matrice_da_lista_all <- do.call(cbind, edf_list)
+  response = t(matrice_da_lista_all)
+  #f_data_all = fData(grid, response)
+  
+  # Definisci una palette di colori in base ai valori unici nella colonna di gruppo
+  unique_groups = levels(as.factor(combined_data[,survey_cov]))
 
+  indices_list <- create_indices_list(unique_groups,survey_cov)  
+  
+  factor_vect <- create_factors(indices_list)
+  
+  if(length(unique_groups)>2){
+      result_test = IWTaov(response ~ factor_vect)
+      pval = summary(result_test)$factors[[1]]
+    if(pval<0.05){
+      IWTimage(result_test)
+      return(paste(c(music_cov,"--",survey_cov)))
+    }
+      
+      
+  }else{
+    data1 = response[indices_list[[1]],]
+    data2 = response[indices_list[[2]],]
+    result_test = IWT2(data1, data2, mu = 0)
+    
+    if(min(result_test$adjusted_pval)<0.05){
+      IWTimage(result_test,abscissa_range=c(0,12))
+      return(return(paste(c(music_cov,"--",survey_cov))))
+    }
+  }
+    
+}
+```
+
+
+
+
+```{r}
+val = IWT_covcov("popularity","abitanti.citta")
+```
+
+
+```{r}
+results_IWT = list()
+k = 1
+for(m in music_vars){
+  print(music_cov)
+  for (s in survey_covs){
+    print(survey_cov)
+    results_IWT[[k]] = IWT_covcov(m,s)
+    k = k+1
+  }
+}
+print(results_aov)
+```
+
+
+# depth function
 ```{r}
 depth_covcov <- function(music_cov, survey_cov){ 
   
@@ -246,35 +314,24 @@ depth_covcov <- function(music_cov, survey_cov){
   color_palette <- rainbow(num_groups)
   indices_list <- create_indices_list(unique_groups,survey_cov)  
   
-  # factor_aov_vect <- create_factors(indices_list)
-  # 
-  # resutl_aov = IWTaov(response ~ factor_aov_vect)
-  # pval = summary(resutl_aov)$factors[[1]]
-  # 
-  # 
-  # if(pval<0.05)
-  #   return(c(music_cov,survey_cov))
-  # else
-  #   return(0)
-
-
- median_curve_list <- list()
- relative_BD_list <- list()
-
- for (i in 1:num_groups) {
+  
+  median_curve_list <- list()
+  relative_BD_list <- list()
+  
+  for (i in 1:num_groups) {
    matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
    f_data = fData(grid, t(matrice_da_lista_i))
    median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
-
+  
    #relative depth function
    relative_BD_result <- MBD_relative(median_curve_list[[i]], f_data_all)
-
+  
    # Memorizza il risultato insieme al nome del gruppo
    relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
- }
- for (i in 1:num_groups)
-   print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
-plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+  }
+  for (i in 1:num_groups)
+    print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
+  plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
 
 }
 ```
@@ -284,40 +341,23 @@ depth_covcov("popularity","abitanti.citta")
 ```
 
 # covariata persona fissata
-
 ```{r,warning=FALSE}
 for(m in music_vars){
+  print(m)
   depth_covcov(m,"libri")
 }
 ```
 
 # all music all survey covs
-
 ```{r,warning=FALSE}
-music_vars = colnames(data_numeric_cleaned)[1:12]
-music_vars = music_vars[!(music_vars %in% c("year","duration"))]
-survey_covs = colnames(survey_data)[1:16]
-survey_covs = survey_covs[!(survey_covs %in% c("genere"))]
-
-results_aov = list()
-k = 1
 for(m in music_vars){
-  #print(music_cov)
+  print(paste("------MUSIC COVARIATE:",m))
   for (s in survey_covs){
-    #print(survey_cov)
+    print(paste("**SURVEY COVARIATE:",s))
     depth_covcov(m,s)
-    results_aov[[k]] = depth_covcov(m,s)
-    k = k+1
   }
 }
-print(results_aov)
-```
 
-```{r}
-for (i in unique(missed_vars)){
-  print(table(survey_data[,i]))
-  print("------")
-}
 ```
 
 ```{r}
@@ -334,30 +374,20 @@ ITPimage(ITP.result, alpha = 0.05, abscissa.range = c(0, 1), nlevel = 20)
 
 ```
 
-```{r}
-gruppi_lista <- list(
-  malati = c(2, 5, 6, 7, 9, 13, 15, 17, 18, 20, 23, 27, 29, 30, 33, 34, 35, 36, 40, 41, 52, 54, 55, 56, 60, 63, 64, 69),
-  sani = c(1, 3, 4, 8, 10, 11, 12, 14, 16, 19, 21, 22, 24, 25, 26, 28, 31, 32, 37, 38, 39, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 53, 57, 58, 59, 61, 62, 65, 66, 67, 68)
-)
-
-```
 
 ```{r}
+# Importing the NASA temperatures data set
 data(NASAtemp)
-limit = 10
-temperature <- rbind(NASAtemp$milan[,1:limit],NASAtemp$paris[,1:limit])
-groups <- c(rep(0,22),rep(1,22))
+# Performing the IWT for two populations 
+IWT.result <- IWT2(NASAtemp$milan,NASAtemp$paris)
 
-# Performing the IWT
-IWT.result <- IWTaov(temperature ~ groups,B=1000)
+# Plotting the results of the IWT
+IWTimage(IWT.result,abscissa_range=c(0,12))
 
-# Summary of the ITP results
-summary(IWT.result)
-
-# Plot of the IWT results
-
-plot(IWT.result)
-
+# Selecting the significant components for the radius at 5\% level
+which(IWT.result$corrected.pval < 0.05)
 ```
+
+
 
 
