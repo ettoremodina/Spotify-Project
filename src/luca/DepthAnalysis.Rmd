@@ -239,6 +239,8 @@ for (i in 1:num_groups)
 ```{r}
 IWT_covcov <- function(music_cov, survey_cov){ 
   
+  soglia_pvalue = 0.05
+  
   # Creare una lista di EDF per tutte le persone
   edf_list <- create_edf_list(music_cov)
   matrice_da_lista_all <- do.call(cbind, edf_list)
@@ -255,7 +257,7 @@ IWT_covcov <- function(music_cov, survey_cov){
   if(length(unique_groups)>2){
       result_test = IWTaov(response ~ factor_vect)
       pval = summary(result_test)$factors[[1]]
-    if(pval<0.05){
+    if(pval<soglia_pvalue){
       IWTimage(result_test)
       return(paste(c(music_cov,"--",survey_cov)))
     }
@@ -266,9 +268,9 @@ IWT_covcov <- function(music_cov, survey_cov){
     data2 = response[indices_list[[2]],]
     result_test = IWT2(data1, data2, mu = 0)
     
-    if(min(result_test$adjusted_pval)<0.05){
+    if(min(result_test$adjusted_pval)<soglia_pvalue){
       IWTimage(result_test,abscissa_range=c(0,12))
-      return(return(paste(c(music_cov,"--",survey_cov))))
+      return(paste(c(music_cov,"--",survey_cov)))
     }
   }
     
@@ -279,22 +281,22 @@ IWT_covcov <- function(music_cov, survey_cov){
 
 
 ```{r}
-val = IWT_covcov("popularity","abitanti.citta")
+val = IWT_covcov("liveness","educazione")
 ```
 
 
 ```{r}
 results_IWT = list()
 k = 1
-for(m in music_vars){
-  print(music_cov)
-  for (s in survey_covs){
-    print(survey_cov)
+for(m in music_vars[1:7]){
+  print(m)
+  for (s in survey_covs[1:10]){
+    print(s)
     results_IWT[[k]] = IWT_covcov(m,s)
     k = k+1
   }
 }
-print(results_aov)
+print(results_IWT)
 ```
 
 
@@ -390,4 +392,8 @@ which(IWT.result$corrected.pval < 0.05)
 
 
 
+
+```{r}
+table(survey_data$educazione)
+```
 
