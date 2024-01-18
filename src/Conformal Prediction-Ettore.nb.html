@@ -1754,36 +1754,667 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShnZ3Bsb3QyKVxuYGBgIn0= -->
-<pre class="r"><code>library(ggplot2)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShoZXhiaW4pXG5saWJyYXJ5KGdncGxvdDIpXG5saWJyYXJ5KHJvYWhkKVxubGlicmFyeShzcGF0c3RhdC5nZW9tKVxuYGBgIn0= -->
+<pre class="r"><code>library(hexbin)
+library(ggplot2)
+library(roahd)
+library(spatstat.geom)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ2FyaWNhbWVudG8gZGVsIHBhY2NoZXR0byByaWNoaWVzdG86IHNwYXRzdGF0LmRhdGFcbnNwYXRzdGF0Lmdlb20gMy4yLTdcbiJ9 -->
+<pre><code>Caricamento del pacchetto richiesto: spatstat.data
+spatstat.geom 3.2-7</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cikgXG5saWJyYXJ5KGdncGxvdDIpXG5saWJyYXJ5KGtuaXRyKVxubGlicmFyeShicm9vbSlcbmxpYnJhcnkodGlkeXIpXG5saWJyYXJ5KHByb2dyZXNzKVxubGlicmFyeShwYmFwcGx5KVxucGJvcHRpb25zKHR5cGU9J25vbmUnKVxubGlicmFyeShkYnNjYW4pXG5saWJyYXJ5KGdyaWRFeHRyYSlcbmBgYCJ9 -->
+<pre class="r"><code>library(dplyr) 
+library(ggplot2)
+library(knitr)
+library(broom)
+library(tidyr)
+library(progress)
+library(pbapply)
+pboptions(type=&#39;none&#39;)
+library(dbscan)
+library(gridExtra)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div id="load-datasets" class="section level1">
-<h1>Load Datasets</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MTAxLCJuY29sIjoyOCwic3VtbWFyeSI6W119LCJyZGYiOiJINHNJQUFBQUFBQUFCdTE5Q1hnYnhkbndSazdpM09TR1FBS2JCQklvQ2RpeWZFSEphblZac25WWnQ4MFJWdEpLV2t2YWxWZVNiYW1GY2hYNFdrckxWMXJLZlpUN0t1VStDaFdFbTBKREVnaDNEdWNPVUZwNjBBOUsvdG5abWZFUjJaRkQrUDcvZng3TTg3TFozWmwzM3Z1WVhVa2VVNmh1U21nS1JWRlYxSGhORlZVMUFmeVRtdUQzV1ZZMlVlQUtPQmxIamFjbUs4YytNR2dPK01kQ0FOTUI4UEFtUlduZ2JEQmFtUWxnSW9CcUFKTUFLQk1WN0ZNQlRFUHpaZ0E0RE1CTUFMTUF6QWFnNEowTFlCNkErUUFPQjNBRWdBVUFqZ1J3RkZwM0VZQ2pBUndEZ0Fhd0dNQVNBRXNCSEF2Z09BRExBQ3dIY0R5QUV3QjhEOENKQUZZQVdBbmdKQUFuQTZnQlVBdEFDNkFPZ0E1QVBZQUdBSTBBZ0FDb1pnQ25BRGdWd1BjQm5BWmdGUUFHZ0I0QUM4QUF3QWpBQk1BTXdBS2dCWUFWZ0ExQUs0QTJBSFlBRGdCT0FDNEFiZ0R0QUR3QXZBQjhBUHdBQWdDQ0FFSUFPZ0IwQWpnZHdCa0F6Z1J3Rm9EVkFNNEd3QUVJQTRnQWlDS2R6SVJIVldtVFdoSUNGNGtJRWpxdk5zaENqeEFWME9sRXF5VExrb3pPNWdXNFdJd1RJL21VUkx0NW1mYnk2WXlNTVUzejl1U2xISmZqc3BFRXZyYkV6dm85WnBabVRiVFY1WFI1ekE3NitCalA1VTZpalZ3cWtzL2x1QlBReU9rc25lWkVpZWJnQVYyYzZxSWRBdTBINUJHQ0Rtc1JwQjVPRk9nZ0o0cGNHQzgwd2VRM0dHeVlKelltUzFFaFIyNTYrRENmd2plOWZodnQ4SHZ3NE5sR0tjM1RJcDlLOFhTRUU0dVNLQ0N6WEdnUnhFaGl6VjIwVXhJVk9yeDhKZ09HQ2RtSVJDZ2NaOGVpOFVveWtFV1d3d3c2dVVJT016Zko2UEt3ZHB2VGpNNW5lVE44c2NpbEJkcVdvbzE1aWNod29vblA1bVRNNjNGZVY0c1RFTXY2ZkRhTTFzNERZaXhjWHFTWDBTYVp5NUkxSnJKaVZPWTVmTlpJWi9OMEkxYU5nVFYwMEMwdWs0bDFPTkcxeFE2WGw3VVpDZUlXVHVBQVRpTW5wMmlEelBYd0dQSHNGcHVIZGJyb2xiUTYwRmJFQXBwc2tJQjQwZ0l2NG5Wc1RxL2ZiZmF3QnBzZDh6ckR2anlmeWdscGpoYWxIRkhKVkZjc1Jqc0tnSk1JMFpKUmlJdVk5U25BUG9TWUpJc0M1bWk2T1p2bFpaNU9DV0dlU09oa08wdDdmUjV6QzB1YnpIYmE0dkg3ZkdhZkMvTVVTUWhBWVJKZ3k4RkZ1VFIvQWlKOEpaaG1aSjJkTHFlWmRyb0FBcGJlZXVQNTlGOGV2L3g0b0Z2YVlHZWRSaGVZNVdYdERoZVd3eFJ2UkpMQ0Jkb2tEWmhuQkt4QXkxSTJpd21heFFManpBbjB5YlJOakFwOFRpWit4UUt6U2VVd04vT2Nab2ZaUzRTdnJraFdjbkJ5UEFHNEpNT25tNlFlbnZZS3RJRkxwVGhpUldhdjEwVzdqRWJXYTNNNVdTTHl5VTRwbStOU2NTSzdJMDAyczlIbXNOblpnRXZSdU1JazY3R1pmV2FpWkFlWEJpcENsdTRHUm9EblRqYXhkdnR5MXU1ejRhRk9vUEFjVDV1QVIyVDRpTUNsc0FhclRYbWVCbnBEcHd2c1hKSUhmcHBOQ0dJOHA4aFZ5cWY0SGs2T0lqWE1Ed0JNQXMzU0FUNnFxQmFFRk9CdmQ2THBSOWh0QnJPSDZOSWlnOEFqMVdvYk1NbVQyU3h0eXluNHNkaUFrYm85TG9QZDdDREJqSmZqWEJycjREQmpRb0FhaXdLbENWbDhlYWFGbHdIdkxOMlNCN1J4eEJsbmdPR2NMQ21NMnZNaWxzZFNoNWwyMFhZejdiQ1prUkhaR0ZXa0xXeG5wOWx1SjBLZDBNcHpJcUhPbXdEaUFFeEU4YnBUN0VDT1Fqd3VFS3VmREFUUFNRcUo2TUwzTEVDclRuWS9HYXlnalJKZkJCYmF4dWU0TkRkWUtsNGVlRms2UE1BRkNERVpXVWlEMEpvZUNEUkgyWUd5OHlDUzB0NGNjQkZPWWRJZ1MxeTBseXNnN1J6bjViTlppZWJwcUN6RlNWaHJ5YSs1RTZ6YndxZUJkUXBGdk93MFZ3NzZ1RGVTenhMN2RBMW96OEZIUkJMck5UWnNTOU1NVWpyTURRMzYxVll3QTFnL2lkZkFudzFtRWpzbmdRUWxaUWRFTkRFZ3BRWjAxbUFHQVZyS0xjL1NYa21NZzVobGthVTB2Y1NjenlRa1dlQ1cwS3hJV3czQWFXUUJ5SjFMZ2FBdUN6elcwUXdXaUZjR1hQVHc4UlJKaVZNTnFUeHQ1Rk1nTk9ObFZySkFiVEFIRmlWNnVVUjc4NUlJa2hmT2JVQTNLNERRcGVoSnRLK2pGa2VkQnB1ZGJyRzVQSXFaMnRaY1RmczhOcS9QREFPWHcrVTBFVm14Z0NMZ1g4dUdDbTBpOEUwbDc2aTQ1bTI5OUFiYTdncVlCK3NGRDEza1NpMEhDcFZ6QlpLTXBFSVJaQ1E1SW1YeG9DT01OaU1MU0JqSUFFTmo1R3dMeUVzQ2JWSUNEbTBVY3JrMU4yRTNjb08wQStPcVFWRHNrVVM0Tk5BRDhaTTVKZzdVRWZ4Z21lQ2xqL1puY2xJdlNHTjVNVWtpb0p3SEFnU0JqeEE0eXliMjhESzRHT1VGT2laSUpPaFBNa29nL29nNXZERE5wa0JrVGdHQnNaSHVQTEZVdDlkbWRObGRMVGJNMGJGT3FVY0FiT0FCbnFTVUZsYlFaaVhKZ01rK1Bwb24wcDdtRUpTQ0lKN25aV0picyswOHJZU0VIcEMybFdBbVp6bUVHUVN3YkU0QVlkKzA5YnlyWFZGZ0dUQWU3RWZCZkNkdzFtd09sQlNEU1NCckt0NHZTb0FZQjRuY3h6cGRJS1BSWHFQZnd3NWs2bUlSbGl2RGFKNElvaEZyWW9jVmVPT1ZRZ1NyeU1FbDBwSVV4ZkhKeVhyYjJMSW5CbERLSkhCSUFWcVJ1UWhITGt6ekNFQXRMUnlJUGNScmgweGY0QVlSUHcvaUd1M2pRRnlJQ0NEV1JGSThSMVM0SDhxSmFnWXNoMnd5RVNQbVNMR2xzdk1tcWttTnlBT1ExOFBpWXNXeDVqYVJ6eVlGc2R3aWs3QlFTUmdWSWtrUTlwTjhPWWtNbVZydDQwVHduMURSekFOS1pnSTBpYkw4VEcvTkF5c0RsaWVBY2hhSHh3bm1RVFhTRUxvR2kyay9vc1k3V0tPNVVwb0dZNW9PY2xDQ2JnZkRjd09KZjNMY3hqb2RnRmgySlAwT1JqSERCTW9iWHFSTnk5bTBNQkEraG9weG1FRU1sc29RTG1mNFpENnEwT3dlWEczTnRJT1lESG9SOEg5cGNJVlNsdm9EOGovVENPcDZVSjhZWlQ0TjJvTkI2WHFZWlU2ekFyWUxZT1ZDaXVTVXNhbS9MSUZEZER5NVZlbC9RQ2xkMW1LbStMZzhLRmtNVW9HczcwbUEyaEVMMlpLUGd2Nk1LeXZrL1MxM2lEbTVVcW5DQVFReXhGQ0NJSUlLU2xGWGtFamVMSyt0VWExbENvajJIS2l0Wks0d2t0Z25rN3FvelB4cEppQWRVWWpRRm9Fd3RoK0c0ZUdIQjIzdVNGSVplM0FiRXJDR3VQUUVtT0sva1hGTXdxVVlybGJBNmtuYUk0bFpDVWU2NlE0QnRPUWdZU2g5M2VpV050aFlwem1GZUNKSGUwSElGQXRseVIrRGpxc0R2TWpMZVdLVlEweDZ1SWdINldkb01sdmdGK2t3RjFFU3JJbFA1ZnQ0Mmd6NmZFRVNjUTRjdG4weHdXTTJtTzNsVHFxVjR0Umc5NlBUdVU2WGJRVW9xRHl1RlhTTDNVYURmb2ZzRUV4dUI5V0xHT0ZsbkVablFFU1lCTHowQ0RzVG8yRXVVMWtPSVhMNFhzWFFXcmZNN0VsZXQ5bG90Skw2ZXRSZGlYaytjQWtFaStoeUFkUzhLMm1BSEhUMzVlalF1TnJ3djBMYThnSWNNcjdjZnNQQXpNT01Wak50YzRFR2ltWnRmaDlaa2JYYTJNV1lOeDhic3RFbWp5MWc5bUNwbDkxSXFJWkprV3dpVkFOdlVQWm9TUENvYUJ0aGdMWXFsOEZjanA2aGtwL200ZU9nVlFRZFdGckNPSVkxK0tPcEhTTlRDNU5GVHJPTlZuZDZuS0NoOTRQMllNMmxTa2ZnYW1FZFdKR1Y5L3BsSkRkRU56TkN3T21CeVNqTi9vQVlqMk9WNWhBUXpQVkl3Q1RNb0tiT2dlcmZBWXRhMEJERnVOd0ErN01NbkZqa0JQcDR1NUpodzZrOGNRRzFaNGlDbm1HNXRaQVppQ3BjbkhqK1JKK0g5VHR3VnBrT015Wm8xNnhTUHN1UGJpQkhEY05PZ3pJMER2TzhURFlvaDFDbWxOTWdWcHhRM2pZbXV4SXI2QUFJbmFQWTNKZzcrREkrT1dCY0ZmYm1jMEZ2N3VPVmRwVTJnZGJIS0tVR2VwK2hwalBiSzRpZ08wL3p5bzZHYjgzRE1wOGJWY3VWR0NVS0pHMUNsRzZUcFY0U1dJWjI0VE9BMUlHa2FhK2lBckpYTk1YTEt4ZEJNNC9wSGRhUEgxOVpPNDQxOW0zMTQvdEZwUEoyT3daeERZdTdrNTA4NkYxVHdGVEtCWk1SL1dlaTJqTmo3bEdiakhiWjhPUksyK0poQVJyMGZybWNSQlJUWGR0RWd6d2xqR0pKbGZhMnVNamc0a0lFOUs3NXJFQUtURTFEMDM3Q251R3cyZTFtcDlQbWQ5QUd2L0ljQkQwcnF0NE1ZTWN3MkE3ZzZXSG4yd2Y5ZS9oeCtMVWR3ODYzSVJnOFhqbnZIellXajlreURHODVuTnZST0l4bjNhQXhlRDJNY3pDKzdjTnc0L2tmakxEMnRqSmorb2VONmFlRzB0by9hTjVXQUpzRzRScDhIOU8vSFkxRFk0WlVYeE85SUZpSmNYd1dCS1VqNlVPSDNSdnRqTTNuOG1sY20xYW5oV3gycEp1alRSeDE1R2lrRFowM2RHVGxMQjNzdk1xeEhQUUsrWFI2WUdUbFVxcDh2V0U0SzE1dlZCMGRKSmJSZUIrVjZvUFY3ZEFWaHB3TkhWbTU1RWV6NjRQRldUbnZoMFl1Qit1M0IyMTFGY3R6VlAwZEVwK3VYR09WUzdBczFRT3ZWZENVK21xQjhqcUM4cnFDOHZxQkh2MWJlVFZCZWYzQWdPN1hVT3FyQ3NvWTVUVUU1WFVHNWJXR1ZuUTBvem1ub1hQbDlZWHZvWG5ONkxxeWx2SmF3b25vK3RFSXp5cTBqcksyOGpxRkR2MWJ1WGNLQWozQ3I3eGVzUXpoT0JYTmJVWnJyVVo0OGFzVVdvU3JEdUUxb1Btbm9UbVlEaGJSWEkvR0thOWduRUNwcjBZc1EzelBRWHhqR1p3NGlIYUY5K1ZvWFVWMkxRaS9JcjhBV21NcHd0dUVvQUdOV1lIdU55QWVsTmRXZUdiekViL00vYUhyUjh3SDkwNnFYYmE3d0Z5M09mL1AveXpleDNUKzVJVm5tYlZybVkzWFA3aHlSbUE4czJuS2FabmZicHpDM0xkNDMwbldYWGN3UDMydmZjRWIxYXVaV3o5N3g3UjJ6bDNNVm5qN05LYmYrNjgzM3AxL0NYUExBL1R6MTk3V3oreThEVjVoMXNKVEgvTjJZTHl5SXZQaUpTZHFwdG1lWkRiLzUvTkh6VGUveHR4d3cxR1RydEhrbWVnWGoxemFuL2dyVTBMalgzZHRPalhhdVloNTg4dWRxWjhhZjgxRWwzM2QvWk9MTnpJM25mTGx1Yi9ZZHhYeklrVFh4ZHh1dnZuVjBvV3ptWkpDUmVaVzVtYkl5QkxteldXNyt6Yjg1Ky9NSjVDOGJ1YXhpNTliZHQ3MU5xYTAvV3oydnhydHpITi92VXZCekx3VzdWd0lSTUE4ZmZLUk56N1Q4d3B6WjJwSll2S0dYekVQSGZHVjJ6ci9NK1lQWGVmKysvMGxiekpiRWpMZzdEcm1XWFRzcjROL2hKOXpvTGdXTUwrZHV2bWpkWmUrd1d4N3VEazBNK3hrMkhFUFZDVzZITXlhalZDUXpQMzNOQlFQKzhWVnpHYmx0bU05ODdvaWhsZWZaWGFCczNWL3ZadTUzZlAwOXh0bTZaaTNvUGdPWnhRbUFRWE1TMytCQ21HZS8xQWh0SmQ1ZjdaNDFjOWNtNWhkQ00rNm41OXgvRCtlK3puem05VVQvM21sSmNmc1VzaTg5blptRzJSdk9kR2JJbDN2di83TVpQWmRkV3pPKzNObS9hL09uM2pzaHljejI1WC9IM2tUOHpTaTUwa2dqWmNmYm1ZZVhQUEtwNjk5T1o5NWJ5RTBGT1paTkc0cjB2TmJVUHdTODFFOTg4TlBya2d3MTNibkwxLzhheSt6RjRybExHWVRPbjRDdFBINW94WWl2N2VSM2o1QS9EeTVwZVgrdWNVdHpMVkwxaW9hWXJhaTlmdC9mUFRqN1h0L1RNYXRRZlJpUE9mRkw2TzhXOTltbmtKNnhQSjhSUkhMdXI4Uis5dUM5THYxRGloSVpqMWFaenNrTzh1OGlmQnRBR2Z5QTR1WkhVRHJZQVR4bDkwSTMyYW9qcVhNaDVDc1k1aCt5RjQ5czZudFJRVXowNC9zZml1UzE3dDdGUVkrSnY2dzB3Z1pZTFlnKzk2RzdQRjloQWZUU2NaQk16VXgvVWlPRzArRmpESmJrYjQvVkthM3ZjUnNSbmE2OFllUUFlWURwUGM5U0MvYndhZ1g3L2lNMlk3c2FqdmlCeC83SWZrcm1jMlFpbk9ZUGNDWndaTE1abVNYMjVIK2Rpa0g4eTNNOWhtS1ErZVpuWXJXV3U1bnRpQS8yNDM4ZFMraWYrZlBJS1BNRG1Rdlc1SGZZZi9ZaHV4eE8rTHpQV1FIdTZEaC93K3pWUlVMc3hQeHZ3UHBEOHZwWGJUZVp1VC8ySTc3RVYxYkZTc0t6U1J5L0FqTjc0Zmg2a1JtQjRvamU2RTR6eUIranZYWGorTGZ1NUFzSzdNZHJmY1JzdC90MEV3TXpHNGsxNCtSdkhZaXYzMFh5ZjF0Sk04OXgwSkRKdnh0VjI3LzVRYm1YWFRzUjM2TjZkcUI2TmlKNk5pRHo3RWRJTHhia0I2M0lmMXR3ZnBTek9QRk81bmQwRzJPWXZZaVA4Rjg3a1J4ZnNlNTBPQ1puVmdPaUo2dGlFOHNkK3ozZTFHODM0Ymp1eG9IaWI5c3ExVUM4TmZFSDdCK2NUekdkdm9oaXB2dklMbjFQd29YWkhZanY5bUI4Z2FPQjFpZkg2RzR1d2ZaeHg1RTMrWUxGUUc2U1h6ZWp2Qi9qUExjRHNUUE5vWEw0LzlKNVAweHNoOGNOekgvbU0rUGtiNzI0cmlCN09CMUhGY1FuY1N1a0oxalA5cXVjRXUvd094RWZvYnAzNG40ZlEveGgvMWxJOUpEUDRvcmU4RnF3S09ZajFGOCtnaWE5MXptVXlBMXNCS3orVS9LMyt2TWJtU1BtTytkS08rOEF3UC9GMHcvT3QrSjdBREhOYnpPTG9SL043WkxoRzhuaWsrWS85MksrUDZ4aHRtMENSb2k4eW15MSszbytxZHEvR1MySUx2RC9yUWJpcU9WMllIMHVCWEpBZnNabHZ2N1NIK2ZvUGk4QmNjVkpGOGNwekYvSCtDNGhlV0s1UGd4aWpON3NIMGpmVzVHZm9IajVqYVVYM1lqZjkwR3hYOEMwNC9zZEF2UzN3NFVkM2RjQlJkZ3RpSStNUjg0em1INWI0TnErZ0d6R2Z2RGtWRFJ6SHVxM3JDL1VQK2YvcTM2NmliYlkxVU5INDk1M3RZZjFWMnhidTNMSTk3L3ZLMWhkZVAxWDQxNGYwZm1vdGM3bnJ5WWFiaHU2V08vV3JsMHJPc3oxUS9ldXVLYS8zNW14UHZCdmIrYnVUVHk0S3JQSC8zMUNiZjg0Z25HZlJtenFpcnp4Z0Q5bTk2KzhrLzNNQld2OThOOWU2dGJleGVOZUgvSmRVOCthbHYvWCtSY1k5ZCtWTGorQjJROUpHZm1ValVPVmJwdXBYK3JIdm1meEtubi9PN0NnNTYvSVJ5KzZlRjVSekh6emx3ZHVPUGVDMVk5K0EvMzB2dmZmMjNWSjFkc1daVjlkLzZJOHg3ZmQ1N1hmdUdwK0p6UlgzbkxFK3RmZTRHNVRJM1haYWFvK2VXNWxiQUFZZFlpUDhaMXd2T283c0gxMzhPdi9QZ3pTUUI1SDhYbnAzYkNRTXI4RWVYUFB5QS8zd2pEYjRoWmkveDBiYnVTZ0R5a0huNGQrZk1MS00rL2VoWXNySmdOcUI1OEZ2VWJlTjFYVVR3dkliNDJJTHJ1dTIwVzZGRCtSZGJGZUY1RmRjOUxLTTdqUGdqWDRSdFFuWVRYZWZUK2N3S3B2eC9EYkZERTFQY1c4eHdNeTQzTVk2anVlVUx6RWZYbVk0Y3pqNTdZdGZPdDJKK1p4MEZUYzhUM3JtWWVzbnh3WnVUU0dGTkNjdnNqaW0rL1c3eXl0L2JuTHpBUDNYSmQ3elhKZHBLUEhrTjExL09JVHl6Zkp4SGREend6L1pQakw5dkpQSTN5K2hvVVg5Y2pPZVArNmZHTE8xci8vdGs3ek1Pb1g4SDkxK05QdmpUenRSTldNNi9qK1NpK3IwZDRQa0R6bjdoYStidUd5UGRaRktleDNoNWJwVFJXVnpDL24vYmdyM1p2K1QzemdOS0ZaVTRsNjd5Sjhzb1Rjb3U1NlMvMVJKNTNYWGJ1OGNkTzdXT2VSUGtKMThOWWJ5VlVUMnhFZXNGNmV3M1ZOUTlmL3BQdWo0VDdtRWNoZTJZaXA2ZFFubnowWjVCREl1ZmJqck5NdWQxZXc3eUs4aEh1VjllaFBQNE15aWZEankrZ2Z1T2h0VCs4NkpFUFhtU2VSZlVSNWgvM1daaGZaT2ZZWDByTFZmc296VklWVlpwN0FxekhTdlBWT3IxMDdBWFFnVXIwMzZDZGw1YmJvSHhMQzlTNm9UVFBwQjZYcXZvdnphNkdDNWJtMkdIZFVhTFZmWURTNFVsSVYybThLcmpTRXRVdlMwZXBkVUJwRGxUY25hVTU5MEI2UzNQK0RQdWcwbncxbjVkb3RhNHB6WW5CdjlJVVZXNmxoYXE5bFJaOENoTnZhWmFxajlMY2wyQmRYcG92d0lLM3RGaXRtMG9MMWJxbGRMU2FqMHZ6NXNDNFdUcjhQaGczU2tlcDlVOXBwbHFYbG82WUJ3a3NMWGdFRmh5bEpkZEJleWdkSFlIK1hxSjNxK1Btb2VzelZmbVhwcXY3R0NVNkNPdVEwaFRWemtxTHYxTHBuby9vUDBLMTQ5SmtOUDY0WlNwL2kxWEZsdVlodVM1UTY1RFNyQnVndmt0SHFub3NMZkRCdnF0RWoxUGxkemlpWTI0SExLaEs4NitCRGx0YWZycks5NnpMVkxuUHZ4UGFhMG1EOEN4RitqeEczVThvTGZnK3ROZlN3cHRndkNrdDdJWUNLUzFVNDBqcGNHaVc2ZElpSGF5alNndlV2cTkwak9vSHBhbHFIMUZhY1NXaTcweVYvdmtJRDU0M1crM2JTOVZxL1YyYXF6YnlwZmxmd0Q2bHRQUTQyQWNUTzV5QjdIV21GVWFNMHRGeGxmNkY2b1pHYVVrVjlNdlNFV28vVlZxazltZWxvOVY0WFRycXI0aVBpMkJkV2xxa3hwWFNJdFUvUzR0bndNSzhkTVJQb09HV2xsd096MGwrZVlJL2NmMGFiZzV6OC9QYVY0TjNYTUxjN0R6MTlmbzdROHpkLy8zYkNkNWxSekNQRmcvN3hhK2Z1cHI0Lyswb0h1UHhONzV6M3owMytxOGxkZnhOS0o1Zjg4US9PaDVhZXc3ejI3dStWK1BYY21SLzY2YVZtNmNmMWQzRDNLQ0VyVk8rWk81Q2RmSVRxSTk3Skx2bm9maE4vMlp1UmZuc1RVV0s0bStZWjFCL2orTWlqcE1QM0IxOTdvdkdSNWk3NzMxMzF5ckQ2Y3dqbC96eXc2ditlU0x6eUN1TDV2Yi9ZVDF6KzF0L3Z2djFHeTVpYmtMN1FNOGlmTmRzV1BIOUd6NHVNYjlUdHBHeUZ6RDNQUGoxQytrenZtVHVmR25yQmZySHppTng5ellRZytiT25zaThqdXBpdk4vMlFPTDluOTdiUFoyNUZkVzlqOEZwT3BJbjdrZng3R2JkK0QydGw4MGorM2kveDNLKzRLNWZUdDI4aVhsRUllL0NiY3d0NE9yRnp5MW5icFRXSGZPM2JUOW5YdHdOQmNMY0M2UGdYT2F4M1lmOUc0UjB3c2RMcUkvQWNmcHVGTmZ2dUFOdUFKSjg5RExxODNDZWYxRFpIV3kva0xsWDJmV2JlRG56RklyditJanB1cy9XRHY0MWpjVHpoMUhmZ1BuOUxlcm5ia1o1NkJXa2o5ZlFQdFpMcUMvQis0M1lQbTRCM0YzK0U1bDVIdUY1SHUzUC9sN1pUdk04elR5STZoMmNQNTlBZmRuTHFDKzkrZlNna2dGSnZuN29VdjdLMzdsbU1JK0FwRi96ekF6bURpU1grNVZzVjlWQzlnR2ZSZnNhbUo3SFhtNDc4MCtSdjVLOGR6ZmNOc3d3YXhCZnVLNUI5UWIyRi8zcDQ2RWc5R2M5RGVPNFB2WWpHR0QxM0Rtd0w5T2ZMVUIvMUVjME1KN29ZMU9obitxajFaQmUvZXF2b1NIcmc2ZkEvbEh2R3cvamh2NzBKa2lJM292RzgxOUJ3ZWpQMWtOLzBudjNRYnIxa1ZWdzMwY2ZOVUpIMXdmT2gvdVNlbjhPK3J2ZWR4eVVvSjcvQjVTalBxWnVRT25QdUFER1hUMW5VdGM1L1NJWUgvVlJDdHFOL3F3TG9OejB3UXVVQlBTcFBuQVBsTHMrZUFuTVczcGVyNDczZnczN1dmMVpGSlNML3V6VG9GL3F6MVkzVVBSbmZRajNHL1JuN0lQNVFiLzZhUmhZOVdlTmd3clFCM3BnUHRDSFY4RzRDL2hUK1QrYmhmbENmOWFQVmZyOUo2bjNUejhYN2lQb0E2dWdBK25QdkFEYWpmNzA4MkE5cUQvN0F2VjZuSVY1V2M4L3JhN1Budy85VmMrZEQrT3dQclJMSFI5bG9SM3JmYStvOS8zN29LSHFnMm9kb3o5YjNSalUrOVg0cStlMndmcGNIL3dDK3BuZUc0VjJyQTlZWVJ6U2N6K0VBVTkvK2prd3J1czlmMVQ1N2hnSEF4dVFFM1E4L1JtZEt0MGRGOEg4b1ErZUIvZUI5RUVLeGoyOVh5MXM5TUVBakM5Nnp5TXdqK2pQWEtUU0h5aXA5SWZIUVlmUUIwc3EzdFY2ZGYzUUYrcDk3d3BWVDBHMXdBYjB3ZnBPMy9sSDZJRDYxV2pkTTlUR1FCLzZJM1FZZlFlbDhuUFdPTldPUXhxbFVQdEtIMzFXMVVmSC9iQWUwWjg5VHBXZjkydFlqK25QK0ZLMVYrOVhxaDRUajhQSVF3MDhHMU0rVHF4OHZGajV1TEVHOVRhVDBWSDVPTEx5VWVOSmcrNU5IVFIrSExxbVFlZVQwTDJwQ0JUY0U5QzFLWVBXR0k5ZzRxRDE4RWVkcHc3cnN6VFUvbjlUaDYyTlB4Nk5jVXhDK0RGdVBCN1RQbUVRajFNRzhZZHBIWWZ1YXdhTm5ZQ3VqMGRqSmcvQ1ZUMElOSU5vbm9qdVU0UG1UMExYSnc1YUI2K0JaVGI0NCtDakFWWEIvZUZqcUdIM0tHcC9YQ1BOR2V1MTRUakxuWSswN29GNEd3c3Q1WGdjQ3d5ZXArcEdzN3lScXBxOGg2cnFmSkhTWEgwbFZYWHBnNVRtcTQxVWxXY1JwWGttVGxVeE82aXFYNzVCYVQ0RjF2RGpFeW5OQ3d2QXRac3B6Uy8wbEVaOGw5SjhQcHNhLzZ0ektFMTZLcVhaY0NOVk5lNEtTclArT0VxanY0RFNXSG1BK3pXcXlqU1Awdnc5U0dsdXZvL1N4TStsTkpFNlNuTmRJNlY1RDZ5MUQxeGI5eEpWZGROS1N2UFV3NVRtNFJ1b3FvNlRLYzJaYmtwei94UktjNjZmcXByd0hLWDVqNWZTdkx3VTBIZ2pwYm5xV0txcStncHEvRmVmVUZVWGg2aXFIOHBVMVVkUFVsVVhYVVZwZm5ZSlZkVzJrUm9mbTBKVkxRTTBmdjRCVlhYWEVrcHpPVmp2MHRzcHpaZjlsT2FzTHlrTjl4QlYxYktMcXBvZG9Lcm0vcE1hUDI4clZYWHExd0J2bjhyYmw3c0FuQVRXL2cybHVmaDJxaXAwUGFXNTcwaEswMVlEZUxzTzRBYXllUFZaU3ZOeE5WWFYrRHBWNWRzSDVvVXB6YTF6cVBHSDI2aXFhOCtucW95ZlVWWEhYVWlOWHdTdVAvQURxb3FPVXByckFiOXY3cVEwQ3pvcHpTODlRQTZBdjhzQnI0NTN3Qml3cGtQNXlnVDBqQXp0L2VKbmwyK2laekdiVUsyMEdlMUJyMU9MQzJZVDJndDlCZFc0bjZJOW1yZGhLZzB6TDZPOUdQeXM3UjIwWjc4WjFYWjdVVTIxRWRVMi9iREUxekFiWUd0NEhQTVcyanZHejliV28rTUd2RmVPbmwxK2pHckFEOUNlTXE2SnRxTzk2ejFvYitaZFJPZFdSUDllaEc4ajRnTS9rOFBQeXA1SHo3aDNvVDJCdDlHZU1Ya1dpR3JCdDlDelFNelgrMmdQWkR2cUFmRGVOOTdqZndzOTg3dlZlL25uanE3NTVObkllNGd1L0F3QTl4YjRHZUYyVk9POWpaNGQ0R2Z5L2FnRzNZemtzQW50SWIyRTVObVBuaFY4aEdyMW5XZ3ZaQmVxVWQ5QStONUN6d1RYSWoydHczc3ZTSjZmSUx2QXovYlhvMmNoN3lBOTQzRjQ3MnNuZXRhTDEwZDc1dVRaRVg2MnV6a01jekx6SWRMbkhxU0g5ZmdkQlBRTTRBMzB6R0VkMm52QjYySzZkcUc5clUvUVh0OVd4QzkrSm9MMy9uR3ZoWjlWOWFObmFLL2haN2lvRjNyN2NTaFFacHNheUpnUFZMdWtCdkxNK0ZHZ2FvVHJFdzV5M3FHZTg3K0I3MURUTlpJTUI2OHpreHA0bFhSK25WVFBDaTNOcm5TaXZpV1lNampieklFSTI0enYxblk2V2pMTkRsOG9uR1BkUFpFMnJzWmZWL1RpdXcweGQ0c2gxZGZVbTJYN0VwSkpiRFQwQ3F3VjMyMnM5OWVJOVgySlRsOGRsOUpLeGpwYlE2M2NRdWJhdEUyOVlsalhKRGdDZ1ZqQjU0M3BVc2srZkxjbUdBLzBGR3JiK0ZSN1gwdERtOEdmVC9xQytKWHYrZlZwVnRmck1QbkRzV1pXNjZ6cEtSbzlUVFVlTXJjcmFRZ2tlVytEdmQ2WjYzR0wybVluYjJzalZBbjJ2TUZuYmZXR0hGb3JsMnF6V3JyTlp2eXBxdm02ZUorbjRPcmtZNW5tZWpiVWFlR0t1V2pPUmRabFk5M2htQ3ZOUnEzV3ZralNWeE5Pc3FraTRhalZhWFBGZTdJdWIzdHZwQkJJV2owWmQ5aEI1anJxdkIxZDVsU3dxeTFscXV1S3U1eVdYbDB2bWVzV2kwS3Z0dDJWbFRzQ3JWMDlvVXhuVTZ5VGFLSEIzT3JrQ20wNVkwMnpvOFlpTkxvTHVzYnN3Tnphbk5zamVHcGpYYTVBVTN0WHppdUlUZmpGNy9uYTFyQnNzYlNiZTJxczhXQ25tQTF4SGJxZVJpSU5xNlBZSk5Xa0cxbHZlNTB0YlhISEVrRmZCNW5iMTZxTkY3WE5qcmk3aG1YdGJEellhc3dSTFRTS0hrdlc1Z3R3WG10UzBscDZ0UzJSUWoyeG5EcmU2dzNZZXBzN3dvRjByZGZ1N092T1Jic0dkR1R5ZHV0aTJyaHNhM1hKWEc4NkZrcktIcUlGclZuYldBd1czSGE1cTFzYnJXc0t1NHpha0Vnd0Y0TFdkcDJvWXoxMlU2ekRsL2RwblFuUlNlNjJwdXR5M2Ntd3RTMFdTc1Y2dVlMWlV0ZVVJT3U2dmJVV2l6RnREeVQ4QlpzaDNlQm9aT01DdVd2TDgwYVdhMlREYVp2UkhFMjdNb2FDcTVaZ0ZwMTlVYjQ5MUN4WStMeVVkVVFzWnQ0VUpWcW9TMGM3ZFA2YXRoNHg3RWo2elpGR2k5WFpST2I2YXVwa2QyL0szdVFNSkdzTE5xNlBOelg1aVcySU5ZRklieWhaaVBlbFJXMncyOVBSRTNVUXF1cmFUWFk1MWM0S1JWMjhwYjdMRWNyV3VXb2paRzYrT1J4cmRQVllkQjF0cVdMYTRxcHorVGxpVjdwV0xtT0xONXZFNW1DWExSZTJ0QWFzZGt1ZTJGVSsxTm9oR3JPaGdyYW52cVpRRXpPWnpVS0EzSFUzK0ZLV2NKTTVZTldLeGxCZEtoL0lkQWJKdXVHZXJGTnNqT25TTlE2Zk1lOXZUem82VzRqbDFOUVhuVG1qd3hPTkpidTV2dGIyV0xJNW1hd2grczJGZEdhMnU4R1JiWStJa1VCTWRwcHJ6VzVDYzdzaDVJakhURzNwZEVEdU1IZmJqRFozWCtzQVZiRnNYNzViNk5aNkU4VnNuOWpYWUtxMzZRaFZYQU5yS0FZUzNmRkFtNjIyS0hLMjVod25EMWhkc2JsWTZOUDIxaFU3Y3A2MmhrS21MdEJtSWxScDQ5YjY5bmg5VjMxbjBkSm81enlOVGpuWlJhZ0srZTNPc0QyZXFIVUpybnlISSt4MnBRdkU2clJjc29lUEJPMXl1NkU5VVdUbGZDSFFMaENhRzNXZUROZnVpalEwTjZlYzZaQ082K2tOU1ZyQ2tkelk0ZFVhdS9NMW5EZlFGZXRzOGxydEJwYXMyMkpwc0xPdHJqNnByZFdsTGZhR2JHRnRuTWk1b1ZWczdwWXljakx2aldVOXdjYWN6NU4wRVEwMjJqdjh0a3pHYWszbTIzaGJJUmJzOVp0N3VnWjBWQ2g0ZTF0cVphTm9OTmEzZDNmWm15TzFBMW93OVNTN0dsb1RDYlpXYXc3VjFNZDhqUVV0eVJyYVhpSHJqSGR3dXBwUWE3SFphNDAydWMwaE05RkNpOGZ2U0xyYy9tQ3gyTzMwR1R6T1dIZE9ON0J1SjhlNTZrSyt6dlo2dWRmZ2JPRnpIUTVDczliZmFpbDJGNVArQnQ1UThEWGtvb0pXc01jSXZ6bGR5RmRuYVcrSkdock5YZDA5TVpaTE9FbldxUE1IODBGalk1ZmZxT05NcVdKSE51TkpONUVvMnBocmpmQ0pYS1l6bEF4Mk5WdjdYQUUrNWF3bi9KcU5OZG9tYjA4dVpkVFdDOVoyYjR2V1pTTlJ0RkZzcm10dXJxdTMrcHQ3Njl2cTdOWldTMmVBNUJSZFRUSEp0N0YxVm8renlWbVVHcEpocDh1WUlmcTFtRmx6VzFlZzNkNlo5L0xoR2ludDcrUEozY1plWTBKcmtSMDZkNkFqM3VnUzYzemV2aGk1MjVDeHMzeWRyT3ZzNUp4NW83blFrazI1amNRSDY3cHplUmRycStrb3hDU0RvemJiNk90SjZ4b0lWWUhhZGk3VUllVUQzVnB6TXRuVll2S0V0TVJpYTBLSnFLc2g0WGJZRFFXMlJrdzJXVUVaTUJCRmUzSUpYZDVSMVBabExHWVFvbk81b21BbG1PdTFmTFBWWXMzNVhUR3J6K3hyc01tUm9KOUU3L3BncTZ3Vnc2MWRXa045eWgycVM5YTM5dmxTaEtxK2Jqa0t3cjB2cVBQVmVMaTgyOTVURnh5dzlvYWtaQXJIMDdxbWROTGUyK1hPZW1VZlQ3U3ZDemNsMmptM3o5Rm9TV1JjTGpiWlp1aXFKM01iZTdUdW1wQkRyRGYwZFVwOGF6allGalpLQTNKdXRkazZ0SkxKYlVuNlBSME9vNzAxWDB3TVZFSFdjTGV2eGxqYkxLUTdkQUhXM2QzaU0zSWtYdFVZK0ZCZmw2c2hIYmViaW5GZEg5dmdUL0NrS3RES3NVQklWK3dLaURHL1M2NU4xdVg2MnB5a3p0RjFGTHlKYksxSlNIWUdEWUVHMWxzSElqeFpWNWMxMS9jV00rNm9MdHVVOUVWekFXTnRVMm9naWxvVFhvTk9aRnN6dG5xK0x4TVVPKzIxelFPMVdYdXp4NU1QV2FXV2hMOHRrUElYUGJWdGZ1S0RqUmF2dVVPc3RkdWIvWHlhNytEeklhUFZreWFZdmJtK1RGNXFNeGdha3QxTmdhSXA3MmNOZG5JMzNHWnFGeVJSMUFYYUluRm5XemlyOHdaRDVLN1kzZXV5ZGVieXdWUk5YeUFjNnhEc0RYNWlrN1gyN25vMjA1MndCZjJoWWtvdVdFTGF0Z1lTQ2V1MHJsUnZNTy9JZERhRWF6aW4xdFBwNGgya250UTJGMnRialZrSDIxZlBKVGgzblRYUVlNa1R5Nm0zeFpyVFJxM2Y0WmZTaVVZNUZ2Ym8rRENacS9ObmpNRUkxeHJOYXh0Y2ZmYmV2bWhkbUxNUW1oUEpqb1pXdnM3U0VYQWJqZlpPWjg3ZGxpQ1ZhcDB4WkxITFFWT3pYU3E0dzIxdW45ZWZiQ2QzZFRxZnE4L2kxN1pxMjdNMmE2L1UwOHo3NjBuK3JYUGF6VHBCYWpjM2NjRStxYlVycWJXMSs0ekVmNjE4VFh1ZktRbnlpY1BPRm1KV2UyUFMyazR3NTRWQXp1NHdhejNwbWxBTFNFZ09yY00rRUwyekdhMnBxVGRhNUF2Uk9qN1RWZThVVTNhQ1dXdDM2ZXJaT2xPMnpXUFJXdmg2YTI5dk1oa2FWdDBmSnVTNGxNQ0pkRUxJMEFuaURMUHdaUzZhVCtYb0RMa3hrMDlMdE14bGFEUkFPc0QxRWZDUGNIbW0rclYrUEIxZHp1VnpBNSt6SFFuNzlMRDZyV0cwb0h5RjI4RXRPVGJDUnhUTTJGYWRpaThQSUpnRGVhQmxLWktzVkxpSGlKaVIwSmNoY215SUQ0RjZwZ0dMNEtJVkVYR29wRFF0cG56WlZZU1RCWWw4T3JZc0oyTkZQRXNoTURlSVF1NGdiVzNFRzk5WVk5K3lOeHdTTVZZZDNESmpFOFNZZFpzb1pIZ1pES3RRY3BPelhKUk9TU3Rqd2lIVlV4a0RHTHNWelNFM1VqbGVGcm1jMEhPSWhUZzF6RWRsU1VvZnRKMk9pSG51SUpxVnl6Q2UvcTlZd0ZpTTdoQUY3a05nNTVNVUdXVWxVa01kSXNyR2RubnNCamRLc3Z5R0ZPSHlDTGpvUHZCWHpxL3dyVkdHakp6bEl5a3VteFVpZERtRXcxU2c4amdxdXJKMGpZV2ViNER6Z010Tkw1ZnJLcERrZ2VkOVEwSHRsMGNPQVY4SDh2UUthUHlHL0ZTUy9NZG1JdVhWTTRxM2pzakJ0MmZUaDM3SnNaWlNaVVpXSzlrZEdFbkZOalJNd2twUTdoRmtMc1ZYa09BckU4ckJCSWVSUEdRc2w2WmtwSjVUaGlTb2cwWlYxdThPdlpxbnljdkNJL1lRRlZoWnhlbGhMS1JQVjFnSGVVT290Tm9iU2ZPVkczRWw0WHRvcmh6cGlPVUswTVY1VWVyaHlmZUhIWVhSNWNVb3FHVmtDUndQWENzZFVMS2pvaTFQM1JUNGxVcUQ3WFNHUXEvSVphU1UrdTI1STQ4Zm5lOXlJOHRKWk96U0d5VlNqcnpvMUxTUXd2WXg3TmJvSEZmbVBjTnhISkRTQ2t4Z0REZ3JNOFZEbEk0cTFleVlBbEk1OVZSVUp4Mk1GNDZ1LzI5UGQvdG5oZjM5NzFCNDVCakN3Y0VGazFHWkhOa0h4MWg0SFhCMk9Yc3JHNy8zRitvbzZoM1pUVWFPSVVPWnJpdy9WQmFGUmdsamxVMGNld0EvVk1jeHVQYllpUjFSSG1WMFhYbnNIeE9LQ3ZrL1FMUTdpQVVPRFpadnB0YXh4cW5LZzhYQkcyNUYrZnpBSHZRTmpHOE1lV3dNUThkUW9ZeXN2TEVGcGUrT2xaVVZnNXVtLzlzMGZVdnhPNWVYaFc4N3B2dy95T0tZSXVwM3p2WGQ4YnZqVU5lcE5EaCs1enZmSGI4N0R2V2RpdHEwSVQ5dU8wSGswbndXdWROQ2RIRWNmamx0UWs3SURmd01JaWZuaEd5Ty9Hd0Fsd3JuMDZ1VitlaksrQUpQWGc2ZW1PVzVnVjlxbVFKcXpIeUtrNFVjZnExeEdoZVI0QzljaUh3V1k1d1c1Y1FJejRXRjFNQzRpY3JQcThUSkQvUUlZalluNTlPODh1TXVnMlpPU2drOS9KQnpLUjhkZEQ0MW0rSDVTRUlZZEdsQ2prOW5jTkZlbGVUeEV1UFRFdm1tK3FuUnZNd3BQOE95T28yblZmZHdLVjRrdjhzeEl5ZWsrZFZaSVM1eW9CZ2dYNXVmazdsSThpUUJ2ODFlSGVkRm1WOWRPL1JVTy9TMGJ1aXBidWhwL2REVGhxR25qY08wT2xtV2VrL0NtbFUrTzZRNWo0Si8vSEQxd3llc1NQMzQ0cFFvbCtOT2lzbUtaaW5xNjJGVHFxV01JaEl3U2FOOEErMkVZWlBIeWNNdUhKWVhGVXFpS3lPSnZKaGNxWHo3N1JScTROT2EwOUcvK1VIL1hxZ3VxY0ZoZnNLQU1jU0JEakh0S1c3ZzUyOW5BSTRod3ljcFgyR01meTRDK0VOdjlxU2NsQ00vTXpBbElxWHdGY2diOWZYL0FWTHNoMllMZWdBQSJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YV9udW1lcmljX2NsZWFuZWQgPSByZWFkUkRTKFwiLi4vZGF0YS9kYXRhX251bWVyaWNfY2xlYW5lZDIuUkRhdGFcIilcbnN1cnZleV9kYXRhID0gcmVhZFJEUyhcIi4uL2RhdGEvU3VydmV5Y2xlYW5lZC5SRGF0YVwiKVxudGVzdDwtc3VydmV5X2RhdGEkY2FtcG8uc3R1ZGkhPVwiU1RFTSAoU2NpZW5jZSwgVGVjaG5vbG9neSwgRW5naW5lZXJpbmcsIE1hdGhlbWF0aWNzKVwiICAgICAgICAgXG5zdXJ2ZXlfZGF0YSRjYW1wby5zdHVkaTwtaWZlbHNlKHRlc3QsXCJPdGhlcnNcIixcIlNURU0gKFNjaWVuY2UsIFRlY2hub2xvZ3ksIEVuZ2luZWVyaW5nLCBNYXRoZW1hdGljcylcIilcbnN1cnZleV9kYXRhJGNhbXBvLnN0dWRpW2lzLm5hKHN1cnZleV9kYXRhJGNhbXBvLnN0dWRpKV0gPSBcIm1pc3NpbmdcIlxuIyMjIyMjIyMjIyNcbnRlc3Q8LXN1cnZleV9kYXRhJHN0YXRvIT1cIkl0YWxpYVwiICAgICAgICAgXG5zdXJ2ZXlfZGF0YSRzdGF0bzwtaWZlbHNlKHRlc3QsXCJPdGhlcnNcIixcIkl0YWxpYVwiKVxuc3VydmV5X2RhdGEkc3RhdG9baXMubmEoc3VydmV5X2RhdGEkc3RhdG8pXSA9IFwibWlzc2luZ1wiXG4jIyMjIyMjIyMjI1xudGVzdDwtc3VydmV5X2RhdGEkbGlicmkhPVwiMFwiICAgICAgICAgXG5zdXJ2ZXlfZGF0YSRsaWJyaTwtaWZlbHNlKHRlc3QsXCIxK1wiLFwiMFwiKVxuc3VydmV5X2RhdGEkbGlicmlbaXMubmEoc3VydmV5X2RhdGEkbGlicmkpXSA9IFwibWlzc2luZ1wiXG4jIyMjIyMjIyMjXG50ZXN0PC1zdXJ2ZXlfZGF0YSRlc3Rlcm8hPVwiTm9cIiAgICAgICAgIFxuc3VydmV5X2RhdGEkZXN0ZXJvPC1pZmVsc2UodGVzdCxcIlNpXCIsXCJOb1wiKVxuc3VydmV5X2RhdGEkZXN0ZXJvW2lzLm5hKHN1cnZleV9kYXRhJGVzdGVybyldID0gXCJtaXNzaW5nXCJcbiMjIyMjIyMjIyNcbmNvbG5hbWVzKHN1cnZleV9kYXRhKVsxXSA9IFwiYWdlXCJcblxudGVzdDwtc3VydmV5X2RhdGEkYWdlIDwgMjIuNSAgICAgICAgIFxuc3VydmV5X2RhdGEkYWdlPC1pZmVsc2UodGVzdCxcIlVuZGVyMjIuNVwiLFwiT3ZlcjIyLjVcIilcbnN1cnZleV9kYXRhJGFnZVtpcy5uYShzdXJ2ZXlfZGF0YSRhZ2UpXSA9IFwibWlzc2luZ1wiXG4jIyMjIyMjIyMgVE8gRE9cbiMgdGVzdDwtc3VydmV5X2RhdGEkZ2VuZXJlIT1cIk5vXCIgICAgICAgICBcbiMgc3VydmV5X2RhdGEkZ2VuZXJlPC1pZmVsc2UodGVzdCxcIlNpXCIsXCJOb1wiKVxuIyBzdXJ2ZXlfZGF0YSRnZW5lcmVbaXMubmEoc3VydmV5X2RhdGEkZ2VuZXJlKV0gPSBcIm1pc3NpbmdcIlxuIyMjIyMjIyMjIFxudGVzdDwtc3VydmV5X2RhdGEkY29uY2VydGk+NSAgICAgICAgIFxuc3VydmV5X2RhdGEkY29uY2VydGk8LWlmZWxzZSh0ZXN0LFwibW9yZSB0aGFuIDVcIixcImxlc3MgdGhhbiA1XCIpXG4jIyMjIyMjIyMgXG5zdXJ2ZXlfZGF0YSRyZWdpb25lW2lzLm5hKHN1cnZleV9kYXRhJHJlZ2lvbmUpXSA9IFwibWlzc2luZ1wiXG4jIyMjIyMjIyMgVE8gRE9cbnN1cnZleV9kYXRhJGFiaXRhbnRpLmNpdHRhW3N1cnZleV9kYXRhJGFiaXRhbnRpLmNpdHRhPT1cIk1lbm8gZGkgMTAwMCBhYml0YW50aVwiXSA9IFwiVHJhIDEwLjAwMCBlIDEwMC4wMDBcIlxuIyBSaW11b3ZpIGxpdmVsbGkgdnVvdGlcbnN1cnZleV9kYXRhJGFiaXRhbnRpLmNpdHRhIDwtIGRyb3BsZXZlbHMoc3VydmV5X2RhdGEkYWJpdGFudGkuY2l0dGEpXG5cblxuYGBgIn0= -->
+<pre class="r"><code>data_numeric_cleaned = readRDS(&quot;../data/data_numeric_cleaned2.RData&quot;)
+survey_data = readRDS(&quot;../data/Surveycleaned.RData&quot;)
+test&lt;-survey_data$campo.studi!=&quot;STEM (Science, Technology, Engineering, Mathematics)&quot;         
+survey_data$campo.studi&lt;-ifelse(test,&quot;Others&quot;,&quot;STEM (Science, Technology, Engineering, Mathematics)&quot;)
+survey_data$campo.studi[is.na(survey_data$campo.studi)] = &quot;missing&quot;
+###########
+test&lt;-survey_data$stato!=&quot;Italia&quot;         
+survey_data$stato&lt;-ifelse(test,&quot;Others&quot;,&quot;Italia&quot;)
+survey_data$stato[is.na(survey_data$stato)] = &quot;missing&quot;
+###########
+test&lt;-survey_data$libri!=&quot;0&quot;         
+survey_data$libri&lt;-ifelse(test,&quot;1+&quot;,&quot;0&quot;)
+survey_data$libri[is.na(survey_data$libri)] = &quot;missing&quot;
+##########
+test&lt;-survey_data$estero!=&quot;No&quot;         
+survey_data$estero&lt;-ifelse(test,&quot;Si&quot;,&quot;No&quot;)
+survey_data$estero[is.na(survey_data$estero)] = &quot;missing&quot;
+##########
+colnames(survey_data)[1] = &quot;age&quot;
+
+test&lt;-survey_data$age &lt; 22.5         
+survey_data$age&lt;-ifelse(test,&quot;Under22.5&quot;,&quot;Over22.5&quot;)
+survey_data$age[is.na(survey_data$age)] = &quot;missing&quot;
+######### TO DO
+# test&lt;-survey_data$genere!=&quot;No&quot;         
+# survey_data$genere&lt;-ifelse(test,&quot;Si&quot;,&quot;No&quot;)
+# survey_data$genere[is.na(survey_data$genere)] = &quot;missing&quot;
+######### 
+test&lt;-survey_data$concerti&gt;5         
+survey_data$concerti&lt;-ifelse(test,&quot;more than 5&quot;,&quot;less than 5&quot;)
+######### 
+survey_data$regione[is.na(survey_data$regione)] = &quot;missing&quot;
+######### TO DO
+survey_data$abitanti.citta[survey_data$abitanti.citta==&quot;Meno di 1000 abitanti&quot;] = &quot;Tra 10.000 e 100.000&quot;
+# Rimuovi livelli vuoti
+survey_data$abitanti.citta &lt;- droplevels(survey_data$abitanti.citta)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="combine-the-data" class="section level1">
+<h1>combine the data</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6MjksInN1bW1hcnkiOnsiRGVzY3JpcHRpb24iOlsiZGYgWzYgw5cgMjldIl19fSwicmRmIjoiSDRzSUFBQUFBQUFBQnUxWGY0aFVSUngvN3EvYjI5UFRVa0t5c3lFaURMM3RUbDBxS21hRFZNUk9yYnRDSXNUWjkrWjJSOS9Pck8vTlc3MHJ6SWpvQjBoRWdVV0dTb1FKRWhJVkpoSGhtVVgwUThPUU1QVThOUkg3K1lkRkVkcDMzcjU1KzhPcmJrWHBueGFHbWZsKzUvUDlQZDk1ZS84OXkrYWtscVVNdzRnYXNValVpTVpoYWNRZjZKdmZlWnNCRk5pTU0ySkdxNXJYd3FISnNPaUFNUWxHSW1CTTdKcXp1R1N2bWJ0Z3lleEN4cE9aLzRKc0dPM0tJbnh3OFBpQ042YzhnazkrcG42ZjQrRnplNTU3ZU1hditFanB0VU9wdTFiakVjVWVQSTVQVnM2RnVPSHVtODZzUFhnZWZ4dmdOdTFJQW1VQXI4ajFmUFhMOWoveG9RL0tuN3g5K3pKOGJHWmsvTUxkeTBQY21hMmZmdmpFMVFJUFQzMUJ2ci95TVh5NDk3Y3Z2cm5tS1R5eWNjT1NZM2RZK0loU2YyNEluMWkwYjl0UHI3NFY0azdlL2N5dGkvYTlnVSs4TzA5SndLZDJMOC9nUjMvRVB5anl0cC94SVIvK2tNWnJuTkg4cjZJUGpPUWJOeXpGWDRMUTYzWWs4VWpNTnhqdjJZbjJ2dkw2Q2Z3eEdOZlovaURlZVdvRldIWnZpUHR1M2UrSGI5aC9DbjhmeE9kc1lPL1p3TS9Udmx1ZCtNejBYZmVkZmZMNkVQZk80NGtiajl3eURUKzcyUThjZmxwcFcvY0gzaExFVXlrREUzQkZmVitJKy9yNWdyTVRmWVFQKzJITzROUEhmSVB4Y0lBL0d0Zzlvckl4S1ZmTlF4RG5nMEhldEo5SGZmUGE4ZkJLNWNnQmZFQ0ozN3RKNDdLUi9iN0QyVlFsM3RrSi90U1JUU2gzcHUvS3RsZnFKWnU2MW5ja3hHMWU3d2MzdS9tbGY1bGYxSG1vdlRISkpXWHF6SjZkemx6MnZSR2RFTlRKdU5GSDNaVk8yTFJNYlRld0xoSlFXK2JUWXBGeG9yYzl4RFVMVERSZzQ2Wk5YQTBOQmZZVFV3b0hWdWRyVEltTVBwUzR5SVVHNWEydVY2SU9FdzVUR3hodEhtZmduY3ZrMEpZS0pucmhuN1RXQlhwdWI5KzhIalNqMTJTVW0zUVc2cU5tZ1F0YjVBZG1vWGs4enpnRlhUdy9DL1VRV2FCRklwbnAzdncvdGdsc2Zid1RDeVd4R2JsTXUzclprZTZabDdCcXJncWp1Z3JuZTdhTkpDdFNMWW9MelZwS0hGbGhqYUVhUSszUjBVZWQ5bGdnSVVWeU9lSkt3Z2QxUk9KRllVdHRRYXdrVEwyT3d5a3BtcklrT2Zxb3N5U2xuZlV2T1RPSnJVMmpOaldsSXpnenRUWDl3bDZsRlJaWXFTQkttck9TREE2R0RsQVpDbWtwTWhESzg4RTJXcXBDSEdGcVlURlhlSFpUbmpXVDRRdzBOUlZUVlBTVWY4aUZTa2VNd3l5bDZCZmNFbWkxUjlRRXFrd21FTEhCN1FCOFp3TzRMR3pLSllQN2dZb0VjY0ZSa1FIQUZoelNJNUJGZ000b1EzblBsYnF2WVllWjFERUZja3ZVZFVOUjNCTmxnaWl5Q1RJRmQ1bEZIWUU4UHJMK1pTSWxLNnN1aU1EYW9lMU45OEkyRy9RZ1dTQWNaYTQwYVV6UDBFVzlQN0pZQnpqU3k1cjJyd2JkeE9yU3FxY3FZK3Bpb1hJTytaYVU1MVVKOVFzSG1xTUkwdHphTzdRRFZXN3ZsV29YQ1JPS0w2ek5oc3NWNDhLeDlFVnpQYXNwSzhhU3ZGamc2TlNsYk9nOVpER1U2ZXBDWFRCSWpxbm14QUlOMC9vY2dyclRpa05SZDFkNmxDTlQvQ05kNFJsL0ZmQ21WM2lhbWVscWtEQUd0K28vWHpncFV2MzUwcUhUeW5Tb1V0Q1RQSnM0VEE0RWxQSEVGT3I2bWh6cVhOTXNBazhsMkdCWHp5VW9wMDVlN3lZeDdrckhLMEtHaUYyRFROcndVVk8zRjU1VnMyK0RyZ0R2TDZzaHhTVXRsc0lzbDRtdG5ta050endISG1UQmRkWUhLSEYwMWtsZUg0dTdxdFdFcmR6eVRESUlJTTF1TXdsb1NMdlNzMWlJa0NSOGVPSTJ5em1hazdCSldZUlZkeFVEcE9NL1dlbEtKOVBIOGlvZVdzTmtVeFJwdXRJOVdmM0JKTFE3YUloaE1iVHF1SWt3c0s2a29jSmtTVURRcS9BV2grWnJYR25YaFpFMm1aU2tJZm10amxpVDFnV2dpajJ5M3ZCL2liK3BvNVJGSkVuM08wUzkraGZWVW9zb3FkaURzSWo2Znh4dkFJOXpHZ2dUUGE2VVc1MW13ZU9yT3VjcUJUVTNiRUl3SjJyV0hSV1ZNVzFZdkZwdDZzc3NUQkRKVWYzS3RvT1R2by9wRW55M1NlMEpVTjIwRk5YWE9BWEowSlJLVnozL0YwVWUwNVVXRUFBQSJ9 -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["X"],"name":[1],"type":["int"],"align":["right"]},{"label":["title"],"name":[2],"type":["chr"],"align":["left"]},{"label":["artists"],"name":[3],"type":["chr"],"align":["left"]},{"label":["album_name"],"name":[4],"type":["chr"],"align":["left"]},{"label":["year"],"name":[5],"type":["int"],"align":["right"]},{"label":["season"],"name":[6],"type":["chr"],"align":["left"]},{"label":["popularity"],"name":[7],"type":["int"],"align":["right"]},{"label":["acousticness"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["danceability"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["energy"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["instrumentalness"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["liveness"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["loudness"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["speechiness"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["tempo"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["key"],"name":[16],"type":["int"],"align":["right"]},{"label":["mode"],"name":[17],"type":["int"],"align":["right"]},{"label":["duration_ms"],"name":[18],"type":["int"],"align":["right"]},{"label":["valence"],"name":[19],"type":["dbl"],"align":["right"]},{"label":["time_signature"],"name":[20],"type":["int"],"align":["right"]},{"label":["track.id"],"name":[21],"type":["chr"],"align":["left"]},{"label":["genre_1"],"name":[22],"type":["chr"],"align":["left"]},{"label":["genre_2"],"name":[23],"type":["chr"],"align":["left"]},{"label":["genre_3"],"name":[24],"type":["chr"],"align":["left"]},{"label":["genre_4"],"name":[25],"type":["chr"],"align":["left"]},{"label":["genre_5"],"name":[26],"type":["chr"],"align":["left"]},{"label":["genre_6"],"name":[27],"type":["chr"],"align":["left"]},{"label":["genre_7"],"name":[28],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"Ghiaccio","3":"Nayt","4":"Un bacio (Deluxe Edition)","5":"2016","6":"Spring","7":"32","8":"0.503000","9":"0.792","10":"0.631","11":"0.00e+00","12":"0.1420","13":"-11.908","14":"0.0992","15":"108.076","16":"10","17":"1","18":"141111","19":"0.8050","20":"4","21":"3o5AiG9Omh5GWlBNKEVcA9","22":"italian hip hop","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"2","2":"Brividi","3":"Mahmood","4":"Brividi","5":"2022","6":"Winter","7":"65","8":"0.448000","9":"0.523","10":"0.614","11":"0.00e+00","12":"0.2540","13":"-4.435","14":"0.0347","15":"122.962","16":"7","17":"1","18":"199146","19":"0.3420","20":"4","21":"1ZMGp9MTXbtAPvcKa0U3zS","22":"italian adult pop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"3","2":"Horror","3":"NASKA","4":"REBEL","5":"2022","6":"Spring","7":"53","8":"0.028200","9":"0.455","10":"0.677","11":"0.00e+00","12":"0.5640","13":"-5.041","14":"0.0338","15":"179.981","16":"4","17":"1","18":"219846","19":"0.2660","20":"4","21":"6fPGBlx8wsAxhoDn7BwiAH","22":"emo rap italiano","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"4","2":"Vaffanculo Per Sempre","3":"NASKA","4":"REBEL","5":"2022","6":"Spring","7":"46","8":"0.001620","9":"0.594","10":"0.920","11":"0.00e+00","12":"0.1590","13":"-5.566","14":"0.0519","15":"139.929","16":"2","17":"1","18":"170388","19":"0.4920","20":"4","21":"75U0n5xhZT3al2oC3I61rG","22":"emo rap italiano","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"5","2":"Svuotatasche","3":"Bresh","4":"ORO BLU","5":"2022","6":"Spring","7":"59","8":"0.369000","9":"0.489","10":"0.367","11":"0.00e+00","12":"0.1980","13":"-10.254","14":"0.0878","15":"131.302","16":"0","17":"1","18":"231602","19":"0.5240","20":"4","21":"6I28wnb48iMVVfyTSf4lkx","22":"italian hip hop","23":"italian pop","24":"rap genovese","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"6","2":"LAUREA AD HONOREM (feat. Calcutta)","3":"Marracash","4":"NOI, LORO, GLI ALTRI","5":"2021","6":"Autumn","7":"64","8":"0.485000","9":"0.614","10":"0.464","11":"0.00e+00","12":"0.0812","13":"-8.473","14":"0.0803","15":"152.092","16":"9","17":"1","18":"195799","19":"0.2930","20":"4","21":"0WgVvy1KelQxG6KBUukTWI","22":"italian hip hop","23":"italian pop","24":"italian underground hip hop","25":"rap napoletano","26":"NA","27":"NA","28":"NA"},{"1":"7","2":"A mano a mano","3":"Rino Gaetano","4":"Q Concert","5":"1981","6":"missing","7":"46","8":"0.056900","9":"0.566","10":"0.376","11":"0.00e+00","12":"0.4740","13":"-11.643","14":"0.0443","15":"176.366","16":"0","17":"1","18":"217629","19":"0.4860","20":"4","21":"5mA4wMDUbf9A2N0vzCR80R","22":"canzone d'autore","23":"classic italian pop","24":"italian adult pop","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"8","2":"O Mi Uccidi","3":"NASKA","4":"REBEL (Deluxe)","5":"2022","6":"Autumn","7":"55","8":"0.013600","9":"0.405","10":"0.616","11":"0.00e+00","12":"0.1090","13":"-6.442","14":"0.0347","15":"160.219","16":"1","17":"1","18":"179815","19":"0.1990","20":"3","21":"0jkBVkeS6L5NtvPn29NeIK","22":"emo rap italiano","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"9","2":"Giovani Wannabe","3":"Pinguini Tattici Nucleari","4":"Giovani Wannabe","5":"2022","6":"Spring","7":"63","8":"0.040900","9":"0.739","10":"0.810","11":"0.00e+00","12":"0.1220","13":"-5.317","14":"0.0311","15":"127.972","16":"11","17":"0","18":"212966","19":"0.9480","20":"4","21":"7iLuBTHJSXM2HalKHFqEEy","22":"bergamo indie","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"10","2":"DUBBI","3":"Marracash","4":"NOI, LORO, GLI ALTRI","5":"2021","6":"Autumn","7":"66","8":"0.570000","9":"0.727","10":"0.698","11":"0.00e+00","12":"0.1100","13":"-9.676","14":"0.3650","15":"92.915","16":"8","17":"1","18":"234446","19":"0.3560","20":"4","21":"4gxRyOZefp95AXZFaztdtO","22":"italian hip hop","23":"italian pop","24":"italian underground hip hop","25":"rap napoletano","26":"NA","27":"NA","28":"NA"},{"1":"11","2":"Afrodite","3":"BLANCO","4":"Blu Celeste","5":"2021","6":"Autumn","7":"53","8":"0.604000","9":"0.541","10":"0.582","11":"0.00e+00","12":"0.3710","13":"-4.507","14":"0.0315","15":"80.066","16":"2","17":"1","18":"192000","19":"0.1890","20":"4","21":"5AfqbfOmAdHHxckT0bkAlz","22":"italian hip hop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"12","2":"Rebel","3":"NASKA","4":"REBEL","5":"2022","6":"Spring","7":"48","8":"0.036500","9":"0.653","10":"0.577","11":"0.00e+00","12":"0.2530","13":"-4.825","14":"0.0261","15":"108.883","16":"0","17":"1","18":"165163","19":"0.4550","20":"4","21":"6JNIOgvsOSQwcyVkHRpPbM","22":"emo rap italiano","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"13","2":"SUI MURI","3":"PSICOLOGI","4":"SUI MURI","5":"2021","6":"Winter","7":"56","8":"0.739000","9":"0.422","10":"0.477","11":"0.00e+00","12":"0.2550","13":"-8.120","14":"0.0384","15":"76.183","16":"11","17":"1","18":"181529","19":"0.3900","20":"4","21":"5M3SYjElWjKlD3jgONFw4w","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"14","2":"Come nelle canzoni","3":"Coez","4":"Volare","5":"2022","6":"Spring","7":"59","8":"0.252000","9":"0.537","10":"0.814","11":"0.00e+00","12":"0.1170","13":"-5.855","14":"0.2810","15":"175.878","16":"7","17":"1","18":"212897","19":"0.5050","20":"5","21":"6Pnziw2QOsrYVJjvXpZ8fZ","22":"italian adult pop","23":"italian pop","24":"rap napoletano","25":"rome indie","26":"NA","27":"NA","28":"NA"},{"1":"15","2":"Finché Non Mi Seppelliscono","3":"BLANCO","4":"Blu Celeste","5":"2021","6":"Autumn","7":"67","8":"0.349000","9":"0.727","10":"0.833","11":"0.00e+00","12":"0.2320","13":"-2.594","14":"0.0316","15":"130.024","16":"4","17":"1","18":"168000","19":"0.8600","20":"4","21":"16EJNayKtC09M0Fi7Py47s","22":"italian hip hop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"16","2":"L","3":"ARIETE","4":"SPECCHIO","5":"2022","6":"Winter","7":"50","8":"0.176000","9":"0.552","10":"0.516","11":"0.00e+00","12":"0.1710","13":"-9.024","14":"0.0301","15":"79.986","16":"1","17":"1","18":"159449","19":"0.3600","20":"4","21":"6P1tPRiR1fjOV8QjtSin8a","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"17","2":"Sorpresa (feat. Nayt)","3":"CanovA","4":"Sorpresa (feat. Nayt)","5":"2021","6":"Winter","7":"49","8":"0.531000","9":"0.599","10":"0.600","11":"0.00e+00","12":"0.2060","13":"-6.876","14":"0.0490","15":"153.942","16":"0","17":"0","18":"193298","19":"0.6190","20":"4","21":"2JbrFFQEv0HgWZnsXaY4v7","22":"italian pop","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"18","2":"CORALINE","3":"Måneskin","4":"Teatro d'ira - Vol. I","5":"2021","6":"Spring","7":"74","8":"0.029900","9":"0.363","10":"0.678","11":"0.00e+00","12":"0.3240","13":"-4.939","14":"0.0995","15":"162.124","16":"2","17":"0","18":"300413","19":"0.3210","20":"4","21":"7HMz8o0m7ASQ3ImFPfhWTY","22":"indie rock italiano","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"19","2":"Spezzami Il Cuore","3":"NASKA","4":"REBEL","5":"2022","6":"Spring","7":"49","8":"0.002560","9":"0.580","10":"0.896","11":"0.00e+00","12":"0.1340","13":"-4.917","14":"0.0838","15":"90.028","16":"4","17":"1","18":"158987","19":"0.3320","20":"4","21":"2xJ2gz29MgP0AALAgWJCtI","22":"emo rap italiano","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"20","2":"Destri","3":"Gazzelle","4":"OK","5":"2021","6":"Winter","7":"69","8":"0.126000","9":"0.459","10":"0.696","11":"0.00e+00","12":"0.1980","13":"-4.953","14":"0.0406","15":"85.819","16":"8","17":"1","18":"185503","19":"0.4220","20":"4","21":"7nRFsITVaSHko2Fw2Gcy59","22":"italian adult pop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"21","2":"SOGNI MATTI (feat. Leon Faun & Drast)","3":"Sick Luke","4":"X2","5":"2022","6":"Winter","7":"55","8":"0.229000","9":"0.513","10":"0.655","11":"0.00e+00","12":"0.2080","13":"-5.732","14":"0.2780","15":"80.589","16":"7","17":"1","18":"197009","19":"0.2970","20":"4","21":"3eSSVIw9YbVm1SLNxqtdjR","22":"italian hip hop","23":"trap italiana","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"22","2":"Andrea","3":"Bresh","4":"ORO BLU","5":"2022","6":"Spring","7":"61","8":"0.281000","9":"0.367","10":"0.596","11":"0.00e+00","12":"0.1250","13":"-8.040","14":"0.1180","15":"175.658","16":"11","17":"0","18":"185125","19":"0.3250","20":"3","21":"0DSq4f2grIJOrawmfXkrRy","22":"italian hip hop","23":"italian pop","24":"rap genovese","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"23","2":"7 su 7","3":"NASKA","4":"REBEL","5":"2022","6":"Spring","7":"49","8":"0.002460","9":"0.443","10":"0.895","11":"0.00e+00","12":"0.3180","13":"-4.850","14":"0.1980","15":"183.147","16":"11","17":"1","18":"147586","19":"0.8010","20":"4","21":"2E27zWyPLrjq2d38bOC2Xn","22":"emo rap italiano","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"24","2":"BABY GODDAMN","3":"Tananai","4":"BABY GODDAMN","5":"2021","6":"Spring","7":"62","8":"0.031700","9":"0.819","10":"0.764","11":"2.73e-05","12":"0.0579","13":"-3.311","14":"0.1000","15":"114.033","16":"10","17":"0","18":"149605","19":"0.8850","20":"4","21":"3yWHQ4n4ARLDfYTuT2NhnN","22":"italian pop","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"25","2":"MOSAICI (feat. Gaia & Carl Brave)","3":"Sick Luke","4":"X2","5":"2022","6":"Winter","7":"42","8":"0.172000","9":"0.673","10":"0.538","11":"0.00e+00","12":"0.1100","13":"-7.092","14":"0.0651","15":"138.141","16":"5","17":"0","18":"199115","19":"0.4520","20":"4","21":"3Jm3tqkbHKfXlfwayEF38h","22":"italian hip hop","23":"trap italiana","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"26","2":"GIRANO - feat. Izi","3":"Bresh","4":"CHE IO MI AIUTI","5":"2020","6":"Winter","7":"48","8":"0.043500","9":"0.684","10":"0.854","11":"0.00e+00","12":"0.2060","13":"-6.483","14":"0.0521","15":"110.072","16":"7","17":"0","18":"214037","19":"0.1350","20":"4","21":"0PS1FFCmLVhUyIBm6M7Agi","22":"italian hip hop","23":"italian pop","24":"rap genovese","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"27","2":"Bohémien","3":"Pinguini Tattici Nucleari","4":"AHIA!","5":"2020","6":"Winter","7":"57","8":"0.130000","9":"0.667","10":"0.893","11":"0.00e+00","12":"0.2100","13":"-4.356","14":"0.0841","15":"160.021","16":"10","17":"1","18":"193623","19":"0.6720","20":"4","21":"0IueCAa7AbmICEdmOpByO1","22":"bergamo indie","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"28","2":"INSUPERABILE","3":"Rkomi","4":"TAXI DRIVER","5":"2022","6":"Winter","7":"61","8":"0.034400","9":"0.667","10":"0.848","11":"0.00e+00","12":"0.1830","13":"-5.195","14":"0.0851","15":"122.035","16":"4","17":"0","18":"172461","19":"0.8400","20":"4","21":"3nNxdeQX9iFeuosMcFEeDd","22":"italian hip hop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"29","2":"L'ultima notte","3":"ARIETE","4":"L'ultima notte","5":"2021","6":"Spring","7":"65","8":"0.268000","9":"0.618","10":"0.687","11":"0.00e+00","12":"0.1260","13":"-5.603","14":"0.0446","15":"94.037","16":"2","17":"1","18":"157566","19":"0.3980","20":"4","21":"63mdY4U0KvnbMkUEc7FHN8","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"30","2":"Off My Face","3":"Justin Bieber","4":"Justice","5":"2021","6":"Spring","7":"78","8":"0.920000","9":"0.509","10":"0.228","11":"0.00e+00","12":"0.1040","13":"-8.680","14":"0.0332","15":"90.674","16":"4","17":"1","18":"156467","19":"0.5860","20":"4","21":"3T03rPwlL8NVk1yIaxeD8U","22":"canadian pop","23":"pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"31","2":"Cigni","3":"Ernia","4":"Gemelli","5":"2020","6":"Summer","7":"43","8":"0.091900","9":"0.839","10":"0.573","11":"8.82e-06","12":"0.3220","13":"-7.214","14":"0.1390","15":"94.123","16":"4","17":"0","18":"171063","19":"0.8440","20":"4","21":"5n0VcwXkygxmn2WqRYvdMi","22":"italian hip hop","23":"italian pop","24":"milan indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"32","2":"California","3":"NASKA","4":"California","5":"2019","6":"Autumn","7":"48","8":"0.132000","9":"0.502","10":"0.624","11":"0.00e+00","12":"0.1340","13":"-7.672","14":"0.0262","15":"170.019","16":"6","17":"1","18":"187058","19":"0.3610","20":"4","21":"3QDLrlQAiz4gG5jMXs3O1c","22":"emo rap italiano","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"33","2":"Essere liberi","3":"Coez","4":"Essere liberi","5":"2022","6":"Spring","7":"30","8":"0.148000","9":"0.671","10":"0.717","11":"0.00e+00","12":"0.0886","13":"-5.269","14":"0.0606","15":"87.981","16":"0","17":"1","18":"196525","19":"0.5800","20":"4","21":"5u9bf7OvF4YKlzmFO3OUaw","22":"italian adult pop","23":"italian pop","24":"rap napoletano","25":"rome indie","26":"NA","27":"NA","28":"NA"},{"1":"34","2":"LA STREGA DEL FRUTTETO (feat. chiello & Madame)","3":"Sick Luke","4":"X2","5":"2022","6":"Winter","7":"50","8":"0.214000","9":"0.776","10":"0.839","11":"0.00e+00","12":"0.3130","13":"-5.919","14":"0.0541","15":"120.014","16":"9","17":"1","18":"185031","19":"0.6710","20":"4","21":"4JapIg9Dn9WjItbFJVHLFu","22":"italian hip hop","23":"trap italiana","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"35","2":"LA CANZONE NOSTRA ⟁ ︎(con BLANCO & SALMO)","3":"MACE","4":"OBE","5":"2021","6":"Winter","7":"62","8":"0.114000","9":"0.658","10":"0.674","11":"1.84e-05","12":"0.1470","13":"-6.848","14":"0.0484","15":"129.914","16":"5","17":"0","18":"237613","19":"0.1640","20":"3","21":"1uXJYnCsXy2v50y0fDEEiV","22":"funk carioca","23":"italian hip hop","24":"italian pop","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"36","2":"Scooby Doo","3":"Pinguini Tattici Nucleari","4":"AHIA!","5":"2020","6":"Winter","7":"66","8":"0.047700","9":"0.740","10":"0.743","11":"0.00e+00","12":"0.0925","13":"-4.166","14":"0.1370","15":"135.071","16":"6","17":"1","18":"179124","19":"0.7730","20":"4","21":"1P6TlFb8EVH2nCX3luVpZW","22":"bergamo indie","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"37","2":"Occhi rossi","3":"Coez","4":"Volare","5":"2022","6":"Spring","7":"64","8":"0.074600","9":"0.545","10":"0.477","11":"0.00e+00","12":"0.0977","13":"-6.021","14":"0.0427","15":"123.465","16":"11","17":"1","18":"177310","19":"0.3530","20":"4","21":"5bvsNn7f4m0MTCuUQkMZGY","22":"italian adult pop","23":"italian pop","24":"rap napoletano","25":"rome indie","26":"NA","27":"NA","28":"NA"},{"1":"38","2":"Avanti / Indietro","3":"Frah Quintale","4":"Regardez moi","5":"2017","6":"Autumn","7":"40","8":"0.111000","9":"0.812","10":"0.741","11":"0.00e+00","12":"0.0866","13":"-6.427","14":"0.2310","15":"115.989","16":"0","17":"1","18":"219439","19":"0.7390","20":"4","21":"05zNtCMRdfkqaxJQfk9kk0","22":"italian hip hop","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"39","2":"Ascolta","3":"gIANMARIA","4":"Ascolta","5":"2021","6":"Summer","7":"52","8":"0.544000","9":"0.852","10":"0.416","11":"1.07e-05","12":"0.0939","13":"-9.306","14":"0.2680","15":"126.966","16":"0","17":"1","18":"154960","19":"0.7360","20":"4","21":"2tX4EAq6MsQcncVfrNE1EP","22":"emo trap italiana","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"40","2":"NEMESI (feat. BLANCO)","3":"Marracash","4":"NOI, LORO, GLI ALTRI","5":"2021","6":"Autumn","7":"64","8":"0.136000","9":"0.736","10":"0.736","11":"3.45e-04","12":"0.0753","13":"-7.597","14":"0.0641","15":"120.020","16":"0","17":"0","18":"175626","19":"0.3330","20":"4","21":"4QBXMgfDKmmVrYEqICIPxJ","22":"italian hip hop","23":"italian pop","24":"italian underground hip hop","25":"rap napoletano","26":"NA","27":"NA","28":"NA"},{"1":"41","2":"Margherita","3":"Coez","4":"Volare","5":"2022","6":"Spring","7":"50","8":"0.600000","9":"0.709","10":"0.365","11":"0.00e+00","12":"0.1270","13":"-8.457","14":"0.0400","15":"89.850","16":"2","17":"1","18":"163413","19":"0.5050","20":"4","21":"1Pfsxuqiq2Shzsxnx6D5I4","22":"italian adult pop","23":"italian pop","24":"rap napoletano","25":"rome indie","26":"NA","27":"NA","28":"NA"},{"1":"42","2":"Dove Si Balla","3":"Dargen D'Amico","4":"NEI SOGNI NESSUNO È MONOGAMO","5":"2022","6":"Spring","7":"58","8":"0.176000","9":"0.592","10":"0.603","11":"0.00e+00","12":"0.1230","13":"-5.403","14":"0.0933","15":"145.940","16":"0","17":"1","18":"198082","19":"0.4370","20":"4","21":"5a6ABzVhqgVKI1znaI9tar","22":"italian adult pop","23":"italian hip hop","24":"italian pop","25":"milan indie","26":"r&b italiano","27":"NA","28":"NA"},{"1":"43","2":"SESSO OCCASIONALE","3":"Tananai","4":"SESSO OCCASIONALE","5":"2022","6":"Winter","7":"58","8":"0.007250","9":"0.647","10":"0.857","11":"0.00e+00","12":"0.0608","13":"-4.230","14":"0.0654","15":"130.007","16":"0","17":"1","18":"195923","19":"0.6590","20":"4","21":"0Dz9zyx2w3zYtRK6yp3VKD","22":"italian pop","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"44","2":"Nostalgia","3":"BLANCO","4":"Nostalgia","5":"2022","6":"Summer","7":"64","8":"0.037200","9":"0.644","10":"0.904","11":"0.00e+00","12":"0.0767","13":"-3.749","14":"0.0605","15":"130.061","16":"0","17":"1","18":"182307","19":"0.5620","20":"4","21":"22gH5Qg5j5ZzF7LaR7Nrkj","22":"italian hip hop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"45","2":"DIECIMILAVOCI (con ARIETE)","3":"Rkomi","4":"TAXI DRIVER","5":"2021","6":"Autumn","7":"55","8":"0.647000","9":"0.677","10":"0.470","11":"0.00e+00","12":"0.4160","13":"-8.170","14":"0.0336","15":"122.089","16":"0","17":"0","18":"170399","19":"0.5250","20":"4","21":"4XULNbLgh1OiOuYMbPOmyN","22":"italian hip hop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"46","2":"Mamma Non Mi Parla","3":"NASKA","4":"REBEL","5":"2022","6":"Spring","7":"44","8":"0.000519","9":"0.420","10":"0.947","11":"0.00e+00","12":"0.0905","13":"-3.277","14":"0.1720","15":"84.720","16":"11","17":"1","18":"169764","19":"0.3340","20":"4","21":"2akvecWLrQBQhzAruyVQiJ","22":"emo rap italiano","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"47","2":"DALL'ALTO","3":"Tredici Pietro","4":"X Questa Notte","5":"2021","6":"Spring","7":"38","8":"0.155000","9":"0.768","10":"0.525","11":"4.52e-05","12":"0.1620","13":"-8.994","14":"0.0694","15":"109.979","16":"1","17":"1","18":"198545","19":"0.0397","20":"4","21":"74RpaQOc699lNmX4avwXo2","22":"italian hip hop","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"48","2":"Niente Di Speciale","3":"Lo Stato Sociale","4":"Amore, Lavoro E Altri Miti Da Sfatare","5":"2017","6":"Spring","7":"43","8":"0.059900","9":"0.564","10":"0.808","11":"0.00e+00","12":"0.1590","13":"-5.622","14":"0.0342","15":"88.969","16":"0","17":"1","18":"326893","19":"0.5820","20":"4","21":"1r7YS2Cqu0aSVjfZ8SHLBA","22":"italian adult pop","23":"italian alternative","24":"italian indie pop","25":"italian pop","26":"NA","27":"NA","28":"NA"},{"1":"49","2":"Due ali","3":"Frah Quintale","4":"Banzai (Lato blu)","5":"2020","6":"Summer","7":"59","8":"0.507000","9":"0.724","10":"0.678","11":"0.00e+00","12":"0.1030","13":"-6.104","14":"0.0852","15":"118.045","16":"2","17":"0","18":"231000","19":"0.4180","20":"4","21":"4GF6LAJOxoKJO2zwXIb2gY","22":"italian hip hop","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"50","2":"Lake Washington Boulevard","3":"Pinguini Tattici Nucleari","4":"Fuori dall'Hype","5":"2019","6":"Spring","7":"62","8":"0.234000","9":"0.708","10":"0.745","11":"0.00e+00","12":"0.0654","13":"-3.249","14":"0.0367","15":"110.003","16":"7","17":"1","18":"228466","19":"0.8080","20":"4","21":"6Jn9qoprkuSfsRW7tTRkOV","22":"bergamo indie","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"51","2":"Vieni A Vedere Perchè","3":"Cesare Cremonini","4":"Bagus","5":"2002","6":"Autumn","7":"57","8":"0.752000","9":"0.537","10":"0.387","11":"1.46e-03","12":"0.1150","13":"-10.575","14":"0.0307","15":"132.063","16":"8","17":"1","18":"253626","19":"0.2810","20":"4","21":"7LYUIppHHkuKeIyfWwUEvj","22":"italian adult pop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"52","2":"LIBERO (feat. Franco126)","3":"PSICOLOGI","4":"TRAUMA","5":"2022","6":"Spring","7":"42","8":"0.043600","9":"0.406","10":"0.620","11":"1.88e-05","12":"0.1510","13":"-8.885","14":"0.1790","15":"186.045","16":"5","17":"0","18":"230551","19":"0.4590","20":"4","21":"05yySwG1rCnCC5QqjL9c1P","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"53","2":"As It Was","3":"Harry Styles","4":"Harry's House","5":"2022","6":"Spring","7":"95","8":"0.342000","9":"0.520","10":"0.731","11":"1.01e-03","12":"0.3110","13":"-5.338","14":"0.0557","15":"173.930","16":"6","17":"0","18":"167303","19":"0.6620","20":"4","21":"4Dvkj6JhhA12EX05fT7y2e","22":"pop","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"54","2":"NO PROBLEM","3":"Bresh","4":"CHE IO MI AIUTI","5":"2020","6":"Winter","7":"48","8":"0.019000","9":"0.657","10":"0.792","11":"0.00e+00","12":"0.1110","13":"-6.466","14":"0.0934","15":"172.044","16":"8","17":"1","18":"216023","19":"0.3450","20":"4","21":"2wisNgYa40XJz9SHd8PEXE","22":"italian hip hop","23":"italian pop","24":"rap genovese","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"55","2":"Bergamo","3":"Pinguini Tattici Nucleari","4":"Fuori dall'Hype Ringo Starr","5":"2020","6":"Winter","7":"58","8":"0.187000","9":"0.615","10":"0.603","11":"9.00e-06","12":"0.0958","13":"-4.405","14":"0.0332","15":"140.051","16":"4","17":"1","18":"288266","19":"0.3490","20":"3","21":"5GRUMkOPUWzzqNTBRNfqt4","22":"bergamo indie","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"56","2":"Chicchi di riso","3":"Frah Quintale","4":"Banzai (Lato arancio)","5":"2021","6":"Summer","7":"59","8":"0.163000","9":"0.577","10":"0.779","11":"0.00e+00","12":"0.0790","13":"-6.726","14":"0.1800","15":"99.628","16":"0","17":"0","18":"206400","19":"0.6050","20":"4","21":"05ZaaO3XTZQ5rwBNGetYMV","22":"italian hip hop","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"57","2":"Ferma A Guardare","3":"Ernia","4":"Gemelli","5":"2020","6":"Summer","7":"50","8":"0.423000","9":"0.552","10":"0.788","11":"0.00e+00","12":"0.1480","13":"-6.333","14":"0.1100","15":"162.037","16":"9","17":"0","18":"193500","19":"0.5100","20":"4","21":"2UJFzqzkU6eByT6tdi2iLf","22":"italian hip hop","23":"italian pop","24":"milan indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"58","2":"Chiaro Di Luna","3":"Jovanotti","4":"Oh, Vita!","5":"2017","6":"Winter","7":"52","8":"0.757000","9":"0.479","10":"0.404","11":"0.00e+00","12":"0.0966","13":"-8.003","14":"0.0510","15":"83.147","16":"11","17":"0","18":"239906","19":"0.4950","20":"4","21":"6t4XT3FQGdB7EjqvfAahNx","22":"italian adult pop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"59","2":"ME O LE MIE CANZONI? (con GAZZELLE)","3":"Rkomi","4":"TAXI DRIVER","5":"2021","6":"Autumn","7":"51","8":"0.290000","9":"0.624","10":"0.719","11":"0.00e+00","12":"0.2300","13":"-5.903","14":"0.0462","15":"87.993","16":"1","17":"1","18":"167479","19":"0.1860","20":"4","21":"3UWuWC7jUC4aDlzYspRm8Z","22":"italian hip hop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"60","2":"Jeans","3":"Tauro Boys","4":"Jeans","5":"2021","6":"Spring","7":"40","8":"0.023800","9":"0.688","10":"0.848","11":"0.00e+00","12":"0.1560","13":"-5.087","14":"0.1110","15":"92.544","16":"11","17":"1","18":"166054","19":"0.6060","20":"4","21":"7tJcehtpZXkWj9HxOVelN5","22":"hyperpop italiano","23":"italian hip hop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"61","2":"Shakerando","3":"Rhove","4":"Shakerando","5":"2021","6":"Winter","7":"66","8":"0.764000","9":"0.855","10":"0.805","11":"7.08e-03","12":"0.3020","13":"-5.651","14":"0.1910","15":"135.009","16":"7","17":"0","18":"195555","19":"0.4690","20":"4","21":"4EC028SvtlC25iHQSG2OIa","22":"italian hip hop","23":"italian pop","24":"trap italiana","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"62","2":"Lentiggini","3":"Fudasca","4":"Lentiggini","5":"2021","6":"Autumn","7":"44","8":"0.636000","9":"0.544","10":"0.498","11":"0.00e+00","12":"0.4440","13":"-11.678","14":"0.2550","15":"87.568","16":"5","17":"1","18":"155387","19":"0.7320","20":"4","21":"7n939935HU9w5K3LHJFZVK","22":"sad lo-fi","23":"sad rap","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"63","2":"Paraocchi","3":"BLANCO","4":"Blu Celeste","5":"2021","6":"Autumn","7":"61","8":"0.013600","9":"0.566","10":"0.938","11":"0.00e+00","12":"0.1000","13":"-4.387","14":"0.0709","15":"143.126","16":"9","17":"1","18":"156083","19":"0.7530","20":"4","21":"40zkeKA3HRN8Nzo6kbNOCp","22":"italian hip hop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"64","2":"FALENA (feat. Franco126, Coez & Ketama126)","3":"Sick Luke","4":"X2","5":"2022","6":"Winter","7":"57","8":"0.161000","9":"0.595","10":"0.680","11":"0.00e+00","12":"0.1980","13":"-5.665","14":"0.0553","15":"95.890","16":"0","17":"0","18":"215016","19":"0.2350","20":"4","21":"1FEAEKjVQLZuSeb0omUxep","22":"italian hip hop","23":"trap italiana","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"65","2":"Settembre","3":"NASKA","4":"Settembre","5":"2020","6":"Autumn","7":"43","8":"0.004150","9":"0.395","10":"0.968","11":"1.42e-04","12":"0.1370","13":"-2.363","14":"0.1080","15":"77.565","16":"10","17":"1","18":"201302","19":"0.3290","20":"4","21":"7wCh2FrM4PVYg7On3TSxfp","22":"emo rap italiano","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"66","2":"Il primo amore","3":"Olly","4":"Il primo amore","5":"2019","6":"Spring","7":"48","8":"0.306000","9":"0.687","10":"0.547","11":"0.00e+00","12":"0.3710","13":"-9.884","14":"0.1080","15":"89.126","16":"8","17":"1","18":"201974","19":"0.2650","20":"4","21":"6pLAe3r4ZZaNuCEyGslPCW","22":"italian pop","23":"pop virale italiano","24":"rap genovese","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"67","2":"La Nuova Stella Di Broadway","3":"Cesare Cremonini","4":"La Teoria Dei Colori","5":"2012","6":"Winter","7":"65","8":"0.657000","9":"0.473","10":"0.566","11":"3.49e-05","12":"0.0908","13":"-7.984","14":"0.0342","15":"139.879","16":"2","17":"1","18":"267746","19":"0.2960","20":"4","21":"3qtuOAI0YyfoBM1s7Tvm46","22":"italian adult pop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"68","2":"Sesso e droga (feat. Guè & Gemitaiz)","3":"Coez","4":"Volare","5":"2022","6":"Spring","7":"49","8":"0.117000","9":"0.683","10":"0.784","11":"0.00e+00","12":"0.0666","13":"-6.309","14":"0.0572","15":"109.959","16":"5","17":"1","18":"211966","19":"0.2700","20":"4","21":"4V1QaXYouVq2EkkjGDRX2N","22":"italian adult pop","23":"italian pop","24":"rap napoletano","25":"rome indie","26":"NA","27":"NA","28":"NA"},{"1":"69","2":"Ottima Scusa","3":"Willie Peyote","4":"Sindrome di Tôret","5":"2017","6":"Autumn","7":"53","8":"0.104000","9":"0.809","10":"0.702","11":"2.73e-05","12":"0.0659","13":"-7.157","14":"0.1230","15":"74.989","16":"7","17":"1","18":"198520","19":"0.9340","20":"4","21":"0XhdO6hPMLByA0nk8HAiGN","22":"italian alternative","23":"italian indie pop","24":"italian pop","25":"rap napoletano","26":"turin indie","27":"NA","28":"NA"},{"1":"70","2":"ORO (feat. Mecna)","3":"Tredici Pietro","4":"X Questa Notte","5":"2021","6":"Spring","7":"40","8":"0.073300","9":"0.877","10":"0.579","11":"1.20e-02","12":"0.1480","13":"-7.111","14":"0.0815","15":"100.017","16":"1","17":"1","18":"168000","19":"0.2290","20":"4","21":"3vth4uMz2xpFEJOrttziH6","22":"italian hip hop","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"71","2":"IO","3":"Marracash","4":"NOI, LORO, GLI ALTRI","5":"2021","6":"Autumn","7":"60","8":"0.408000","9":"0.733","10":"0.595","11":"0.00e+00","12":"0.2690","13":"-7.170","14":"0.0400","15":"120.005","16":"9","17":"1","18":"195560","19":"0.3090","20":"4","21":"52e9HFHtUOfHTET6IrcWUy","22":"italian hip hop","23":"italian pop","24":"italian underground hip hop","25":"rap napoletano","26":"NA","27":"NA","28":"NA"},{"1":"72","2":"Bomba a mano","3":"Coez","4":"Volare","5":"2022","6":"Spring","7":"41","8":"0.133000","9":"0.399","10":"0.538","11":"0.00e+00","12":"0.0994","13":"-5.956","14":"0.0385","15":"113.420","16":"2","17":"1","18":"195374","19":"0.3780","20":"4","21":"5WJr2nbJj2B5lPX3k5JxTl","22":"italian adult pop","23":"italian pop","24":"rap napoletano","25":"rome indie","26":"NA","27":"NA","28":"NA"},{"1":"73","2":"Heather","3":"Conan Gray","4":"Kid Krow","5":"2020","6":"Spring","7":"88","8":"0.584000","9":"0.357","10":"0.425","11":"0.00e+00","12":"0.3220","13":"-7.301","14":"0.0333","15":"102.078","16":"5","17":"1","18":"198040","19":"0.2700","20":"3","21":"4xqrdfXkTW4T0RauPLv3WA","22":"bedroom pop","23":"pop","24":"pov: indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"74","2":"STO BENE","3":"PSICOLOGI","4":"STO BENE","5":"2020","6":"Winter","7":"38","8":"0.338000","9":"0.817","10":"0.914","11":"0.00e+00","12":"0.0499","13":"-6.264","14":"0.2000","15":"94.006","16":"9","17":"1","18":"165542","19":"0.1260","20":"4","21":"46koDbgm48mkLwjPsSrTef","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"75","2":"Brioschi","3":"Franco126","4":"Stanza Singola","5":"2019","6":"Winter","7":"56","8":"0.472000","9":"0.768","10":"0.562","11":"0.00e+00","12":"0.1020","13":"-7.790","14":"0.2150","15":"92.013","16":"5","17":"0","18":"219293","19":"0.7370","20":"4","21":"4b8hQaPTM7FhpOOAkKBj5A","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"76","2":"Volare","3":"Coez","4":"Senza mani","5":"2012","6":"Autumn","7":"19","8":"0.026800","9":"0.663","10":"0.874","11":"0.00e+00","12":"0.6670","13":"-3.426","14":"0.1840","15":"87.487","16":"1","17":"1","18":"175386","19":"0.6060","20":"4","21":"7v2P0XMn5BxZoeJbWKbCop","22":"italian adult pop","23":"italian pop","24":"rap napoletano","25":"rome indie","26":"NA","27":"NA","28":"NA"},{"1":"77","2":"Elliot's Song - From \"Euphoria\" An HBO Original Series","3":"Dominic Fike","4":"Elliot's Song (From \"Euphoria\" An HBO Original Series)","5":"2022","6":"Spring","7":"67","8":"0.849000","9":"0.394","10":"0.327","11":"0.00e+00","12":"0.1250","13":"-14.291","14":"0.1140","15":"93.358","16":"4","17":"1","18":"150320","19":"0.4110","20":"4","21":"7JIIY2oDPFkURYMCLJuzhe","22":"alternative pop rock","23":"pov: indie","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"78","2":"Ancora Sveglio","3":"PSICOLOGI","4":"Ancora Sveglio","5":"2019","6":"Autumn","7":"56","8":"0.487000","9":"0.596","10":"0.745","11":"0.00e+00","12":"0.1290","13":"-8.182","14":"0.3650","15":"74.836","16":"7","17":"1","18":"147612","19":"0.3670","20":"4","21":"3HbqT0C19imY4VAPqGTCa0","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"79","2":"Blu Celeste","3":"BLANCO","4":"Blu Celeste","5":"2021","6":"Autumn","7":"59","8":"0.921000","9":"0.688","10":"0.442","11":"0.00e+00","12":"0.3660","13":"-5.611","14":"0.0354","15":"116.463","16":"9","17":"1","18":"206379","19":"0.2520","20":"4","21":"0BeXxjO6mgLDzg4xA6UheO","22":"italian hip hop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"80","2":"Aggio Perzo 'o Suonno (feat. Coez, prod. TY1)","3":"Neffa","4":"Aggio Perzo 'o Suonno (feat. Coez, prod. TY1)","5":"2021","6":"Winter","7":"43","8":"0.136000","9":"0.691","10":"0.829","11":"0.00e+00","12":"0.1100","13":"-7.301","14":"0.1600","15":"91.003","16":"7","17":"0","18":"182977","19":"0.5120","20":"4","21":"2rfVX4zjVnfUOr1k3txKNG","22":"italian adult pop","23":"italian pop","24":"italian underground hip hop","25":"rap napoletano","26":"NA","27":"NA","28":"NA"},{"1":"81","2":"IL GIORNO PIÙ TRISTE DEL MONDO (feat. Ariete & Mecna)","3":"Sick Luke","4":"X2","5":"2022","6":"Winter","7":"50","8":"0.348000","9":"0.720","10":"0.736","11":"1.31e-06","12":"0.2160","13":"-4.646","14":"0.1570","15":"144.058","16":"5","17":"1","18":"191495","19":"0.4630","20":"4","21":"4YyShs1DikZWBV6AS3n2We","22":"italian hip hop","23":"trap italiana","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"82","2":"Nonono","3":"Pinguini Tattici Nucleari","4":"Fuori dall'Hype","5":"2019","6":"Spring","7":"62","8":"0.451000","9":"0.816","10":"0.897","11":"0.00e+00","12":"0.0803","13":"-2.909","14":"0.0682","15":"95.005","16":"7","17":"1","18":"210893","19":"0.8300","20":"4","21":"4sE5wzpPd4s8kTdtVC18lY","22":"bergamo indie","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"83","2":"∞ LOVE (feat. Guè)","3":"Marracash","4":"NOI, LORO, GLI ALTRI","5":"2021","6":"Autumn","7":"69","8":"0.105000","9":"0.726","10":"0.828","11":"0.00e+00","12":"0.0873","13":"-5.191","14":"0.0710","15":"125.002","16":"7","17":"0","18":"218367","19":"0.3070","20":"4","21":"0HhSB4nAJpI5expWnZL199","22":"italian hip hop","23":"italian pop","24":"italian underground hip hop","25":"rap napoletano","26":"NA","27":"NA","28":"NA"},{"1":"84","2":"Ol' Dirty (feat. Noyz Narcos)","3":"Coez","4":"Volare","5":"2022","6":"Spring","7":"39","8":"0.026500","9":"0.589","10":"0.729","11":"0.00e+00","12":"0.1620","13":"-5.743","14":"0.0790","15":"99.878","16":"7","17":"1","18":"168034","19":"0.2610","20":"4","21":"1Q9RRuXHoGhUKVlUzR1KUE","22":"italian adult pop","23":"italian pop","24":"rap napoletano","25":"rome indie","26":"NA","27":"NA","28":"NA"},{"1":"85","2":"CICATRICI (feat. Madame)","3":"ARIETE","4":"SPECCHIO","5":"2022","6":"Winter","7":"58","8":"0.582000","9":"0.542","10":"0.508","11":"0.00e+00","12":"0.1060","13":"-9.573","14":"0.1010","15":"76.697","16":"2","17":"0","18":"173075","19":"0.2380","20":"4","21":"7FSEYn1LL9UemeYeuXCHRm","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"86","2":"Fuori Dalla Città","3":"Mecna","4":"Neverland","5":"2019","6":"Autumn","7":"46","8":"0.610000","9":"0.634","10":"0.513","11":"0.00e+00","12":"0.0881","13":"-10.254","14":"0.1920","15":"95.116","16":"2","17":"1","18":"268105","19":"0.2890","20":"4","21":"0StxpuoKBB6kq8VzDuUABL","22":"italian hip hop","23":"r&b italiano","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"87","2":"Pastello Bianco","3":"Pinguini Tattici Nucleari","4":"AHIA!","5":"2020","6":"Winter","7":"71","8":"0.451000","9":"0.546","10":"0.652","11":"0.00e+00","12":"0.1230","13":"-3.852","14":"0.0339","15":"139.875","16":"0","17":"1","18":"236417","19":"0.3780","20":"4","21":"0bKDQionn4VKcgNKbs4SWX","22":"bergamo indie","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"88","2":"Amarena","3":"Frah Quintale","4":"Banzai (Lato blu)","5":"2020","6":"Summer","7":"57","8":"0.153000","9":"0.758","10":"0.798","11":"0.00e+00","12":"0.0413","13":"-4.071","14":"0.0905","15":"106.990","16":"6","17":"1","18":"214000","19":"0.9340","20":"4","21":"0nqwOIZtuWl0xVbfYiL6UW","22":"italian hip hop","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"89","2":"Davide (feat. Coez)","3":"Gemitaiz","4":"Davide","5":"2018","6":"Spring","7":"63","8":"0.136000","9":"0.797","10":"0.630","11":"4.86e-06","12":"0.2070","13":"-7.601","14":"0.0763","15":"126.006","16":"5","17":"1","18":"206211","19":"0.7610","20":"4","21":"1Lq5ApqhIWUXzlryFX2K6J","22":"italian hip hop","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"90","2":"Uptown Funk (feat. Bruno Mars)","3":"Mark Ronson","4":"Uptown Special","5":"2015","6":"Winter","7":"86","8":"0.008010","9":"0.856","10":"0.609","11":"8.15e-05","12":"0.0344","13":"-7.223","14":"0.0824","15":"114.988","16":"0","17":"1","18":"269666","19":"0.9280","20":"4","21":"32OlwWuMpZ6b0aN2RZOeMS","22":"pop soul","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"91","2":"Inverno dei fiori","3":"Michele Bravi","4":"Inverno dei fiori","5":"2022","6":"Winter","7":"48","8":"0.107000","9":"0.544","10":"0.549","11":"1.13e-06","12":"0.2860","13":"-9.006","14":"0.0450","15":"98.985","16":"5","17":"1","18":"176251","19":"0.5630","20":"4","21":"29z1JCsMAx5ahaP3HV6Ful","22":"italian adult pop","23":"italian pop","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"92","2":"Contento","3":"Frah Quintale","4":"Contento","5":"2020","6":"Spring","7":"35","8":"0.234000","9":"0.738","10":"0.705","11":"1.41e-05","12":"0.1210","13":"-6.036","14":"0.0589","15":"100.001","16":"1","17":"1","18":"204900","19":"0.7790","20":"4","21":"5If9mC2UMUomh7rfbR4ebS","22":"italian hip hop","23":"italian indie pop","24":"italian pop","25":"milan indie","26":"NA","27":"NA","28":"NA"},{"1":"93","2":"Alcool & Acqua (feat. PSICOLOGI)","3":"Bresh","4":"ORO BLU","5":"2022","6":"Spring","7":"60","8":"0.198000","9":"0.703","10":"0.706","11":"0.00e+00","12":"0.1210","13":"-7.320","14":"0.1610","15":"120.027","16":"8","17":"1","18":"171437","19":"0.7050","20":"4","21":"4UpCWcaJdu26OxLwxd3baF","22":"italian hip hop","23":"italian pop","24":"rap genovese","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"94","2":"Novità (feat. Rkomi, Ernia & Tedua)","3":"Night Skinny","4":"Mattoni","5":"2019","6":"Autumn","7":"56","8":"0.252000","9":"0.730","10":"0.593","11":"0.00e+00","12":"0.1210","13":"-7.738","14":"0.1350","15":"96.036","16":"6","17":"1","18":"184807","19":"0.1980","20":"4","21":"0hkY6Je3FYVPCCLZNtPKhH","22":"italian hip hop","23":"rap siciliano","24":"trap italiana","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"95","2":"Mille guerre","3":"ARIETE","4":"18 anni","5":"2020","6":"Winter","7":"56","8":"0.537000","9":"0.538","10":"0.579","11":"0.00e+00","12":"0.1650","13":"-6.986","14":"0.1140","15":"166.053","16":"6","17":"1","18":"137562","19":"0.6160","20":"5","21":"3CXFLrWD9LoyPbKPTSUkQH","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"96","2":"Le Chiavi In Borsa","3":"Willie Peyote","4":"Sindrome di Tôret","5":"2017","6":"Autumn","7":"54","8":"0.583000","9":"0.571","10":"0.709","11":"1.49e-06","12":"0.0774","13":"-7.129","14":"0.0929","15":"102.728","16":"1","17":"1","18":"168786","19":"0.6130","20":"4","21":"44TOxFU2J2QsIHwov9eU5c","22":"italian alternative","23":"italian indie pop","24":"italian pop","25":"rap napoletano","26":"turin indie","27":"NA","28":"NA"},{"1":"97","2":"Vestiti D’Odio (con PSICOLOGI)","3":"Tredici Pietro","4":"Vestiti D’Odio (con PSICOLOGI)","5":"2020","6":"Winter","7":"57","8":"0.299000","9":"0.708","10":"0.678","11":"0.00e+00","12":"0.1400","13":"-7.492","14":"0.1290","15":"128.037","16":"9","17":"1","18":"171093","19":"0.2110","20":"4","21":"3NLE4ioQE8aWxoJjk2IQTC","22":"italian hip hop","23":"NA","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"98","2":"Namasté (feat. Rkomi)","3":"Venerus","4":"Magica Musica","5":"2021","6":"Winter","7":"44","8":"0.664000","9":"0.584","10":"0.640","11":"5.06e-04","12":"0.3710","13":"-7.434","14":"0.0514","15":"79.976","16":"5","17":"1","18":"233040","19":"0.5360","20":"4","21":"6He0QxDkF7LMLAyfHL7kHQ","22":"indie rock italiano","23":"italian hip hop","24":"italian indie pop","25":"italian pop","26":"milan indie","27":"r&b italiano","28":"rome indie"},{"1":"99","2":"Paranoia Mia","3":"Ernia","4":"68","5":"2018","6":"Autumn","7":"48","8":"0.272000","9":"0.854","10":"0.506","11":"1.40e-02","12":"0.4870","13":"-8.529","14":"0.1540","15":"115.933","16":"9","17":"0","18":"151000","19":"0.3550","20":"3","21":"4uiVtLME2Rm0XGRK6M2MLV","22":"italian hip hop","23":"italian pop","24":"milan indie","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"100","2":"NOTTE SCURA (feat. Gazzelle & Tedua)","3":"Sick Luke","4":"X2","5":"2022","6":"Winter","7":"54","8":"0.327000","9":"0.629","10":"0.597","11":"0.00e+00","12":"0.1480","13":"-6.135","14":"0.2080","15":"79.941","16":"11","17":"1","18":"176360","19":"0.6250","20":"4","21":"7sp2D8wdzeyd3epj5NnlLC","22":"italian hip hop","23":"trap italiana","24":"NA","25":"NA","26":"NA","27":"NA","28":"NA"},{"1":"101","2":"CANADA","3":"PSICOLOGI","4":"MILLENNIUM BUG","5":"2020","6":"Summer","7":"42","8":"0.718000","9":"0.352","10":"0.411","11":"0.00e+00","12":"0.1090","13":"-9.279","14":"0.1470","15":"197.773","16":"10","17":"1","18":"150787","19":"0.4460","20":"4","21":"2LO45A3DsKRF2Fe5HwwkkX","22":"italian hip hop","23":"italian pop","24":"rome indie","25":"NA","26":"NA","27":"NA","28":"NA"}],"options":{"columns":{"min":{},"max":[10],"total":[28]},"rows":{"min":[10],"max":[10],"total":[101]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["id"],"name":[1],"type":["chr"],"align":["left"]},{"label":["popularity"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["acousticness"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["danceability"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["energy"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["instrumentalness"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["liveness"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["loudness"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["speechiness"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["tempo"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["valence"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["duration"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["year"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["age"],"name":[14],"type":["chr"],"align":["left"]},{"label":["sesso"],"name":[15],"type":["fctr"],"align":["left"]},{"label":["educazione"],"name":[16],"type":["fctr"],"align":["left"]},{"label":["campo.studi"],"name":[17],"type":["chr"],"align":["left"]},{"label":["stato"],"name":[18],"type":["chr"],"align":["left"]},{"label":["libri"],"name":[19],"type":["chr"],"align":["left"]},{"label":["lavoro"],"name":[20],"type":["fctr"],"align":["left"]},{"label":["importanza.musica"],"name":[21],"type":["fctr"],"align":["left"]},{"label":["genere"],"name":[22],"type":["fctr"],"align":["left"]},{"label":["come.ascolti.musica"],"name":[23],"type":["fctr"],"align":["left"]},{"label":["concerti"],"name":[24],"type":["chr"],"align":["left"]},{"label":["strumento"],"name":[25],"type":["fctr"],"align":["left"]},{"label":["estero"],"name":[26],"type":["chr"],"align":["left"]},{"label":["politica"],"name":[27],"type":["fctr"],"align":["left"]},{"label":["regione"],"name":[28],"type":["fctr"],"align":["left"]},{"label":["abitanti.citta"],"name":[29],"type":["fctr"],"align":["left"]}],"data":[{"1":"03Nplw4GO2h5ut5","2":"0.32","3":"0.506","4":"0.801","5":"0.633","6":"0","7":"0.129","8":"0.703","9":"0.084","10":"0.337","11":"0.805","12":"2.352","13":"2016","14":"Over22.5","15":"Femmina","16":"università","17":"STEM (Science, Technology, Engineering, Mathematics)","18":"Italia","19":"1+","20":"no","21":"poco","22":"pop","23":"ascolto musica volentieri ma non mi allontano dai miei gusti","24":"less than 5","25":"No","26":"No","27":"No ma mi tengo informato","28":"nord","29":"Più di 500 000 abitanti","_rn_":"1"},{"1":"03Nplw4GO2h5ut5","2":"0.65","3":"0.450","4":"0.503","5":"0.616","6":"0","7":"0.244","8":"0.881","9":"0.013","10":"0.422","11":"0.323","12":"3.319","13":"2022","14":"Over22.5","15":"Femmina","16":"università","17":"STEM (Science, Technology, Engineering, Mathematics)","18":"Italia","19":"1+","20":"no","21":"poco","22":"pop","23":"ascolto musica volentieri ma non mi allontano dai miei gusti","24":"less than 5","25":"No","26":"No","27":"No ma mi tengo informato","28":"nord","29":"Più di 500 000 abitanti","_rn_":"2"},{"1":"03Nplw4GO2h5ut5","2":"0.53","3":"0.028","4":"0.427","5":"0.679","6":"0","7":"0.563","8":"0.866","9":"0.012","10":"0.746","11":"0.244","12":"3.664","13":"2022","14":"Over22.5","15":"Femmina","16":"università","17":"STEM (Science, Technology, Engineering, Mathematics)","18":"Italia","19":"1+","20":"no","21":"poco","22":"pop","23":"ascolto musica volentieri ma non mi allontano dai miei gusti","24":"less than 5","25":"No","26":"No","27":"No ma mi tengo informato","28":"nord","29":"Più di 500 000 abitanti","_rn_":"3"},{"1":"03Nplw4GO2h5ut5","2":"0.46","3":"0.002","4":"0.581","5":"0.923","6":"0","7":"0.146","8":"0.854","9":"0.032","10":"0.518","11":"0.479","12":"2.840","13":"2022","14":"Over22.5","15":"Femmina","16":"università","17":"STEM (Science, Technology, Engineering, Mathematics)","18":"Italia","19":"1+","20":"no","21":"poco","22":"pop","23":"ascolto musica volentieri ma non mi allontano dai miei gusti","24":"less than 5","25":"No","26":"No","27":"No ma mi tengo informato","28":"nord","29":"Più di 500 000 abitanti","_rn_":"4"},{"1":"03Nplw4GO2h5ut5","2":"0.59","3":"0.371","4":"0.465","5":"0.368","6":"0","7":"0.187","8":"0.743","9":"0.071","10":"0.469","11":"0.513","12":"3.860","13":"2022","14":"Over22.5","15":"Femmina","16":"università","17":"STEM (Science, Technology, Engineering, Mathematics)","18":"Italia","19":"1+","20":"no","21":"poco","22":"pop","23":"ascolto musica volentieri ma non mi allontano dai miei gusti","24":"less than 5","25":"No","26":"No","27":"No ma mi tengo informato","28":"nord","29":"Più di 500 000 abitanti","_rn_":"5"},{"1":"03Nplw4GO2h5ut5","2":"0.64","3":"0.487","4":"0.603","5":"0.465","6":"0","7":"0.066","8":"0.785","9":"0.063","10":"0.587","11":"0.272","12":"3.263","13":"2021","14":"Over22.5","15":"Femmina","16":"università","17":"STEM (Science, Technology, Engineering, Mathematics)","18":"Italia","19":"1+","20":"no","21":"poco","22":"pop","23":"ascolto musica volentieri ma non mi allontano dai miei gusti","24":"less than 5","25":"No","26":"No","27":"No ma mi tengo informato","28":"nord","29":"Più di 500 000 abitanti","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10],"total":[29]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="save-new-dataset-list" class="section level1">
-<h1>Save new dataset list</h1>
+<div id="nc-measure" class="section level1">
+<h1>NC measure</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2F2ZVJEUyhkYXRhc2V0c19tYW5pcHVsYXRlZCxcIi4uL2RhdGEvZGF0YV9nZW5yZXNfY2xlYW5lZC5SRGF0YVwiKVxuYGBgIn0= -->
-<pre class="r"><code>saveRDS(datasets_manipulated,&quot;../data/data_genres_cleaned.RData&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB8IERpc2NyZXBhbmN5LWJhc2VkIHxcbk5DID0gZnVuY3Rpb24oel9hdWcsIGkpe1xuICAjYWJzKHpfYXVnW2ldIC0gbWVhbih6X2F1Z1staV0pKVxuICBhYnMoel9hdWdbaV0gLSBtZWRpYW4oel9hdWdbLWldKSkgICMgbW9yZSByb2J1c3RcbiAgI2Ficyh6X2F1Z1tpXSAtIDE4KSAgICAgICAgICAgICAgICAgICMgYSBkZXRlcm1pbmlzdGljIHByZWRpY3RvclxuICAjYWJzKHpfYXVnW2ldIC0gcmFuZG9tLm51bWJlcikgICAgICAgIyBhIGZ1bGx5IHJhbmRvbSBwcmVkaWN0b3Jcbn1cbmBgYCJ9 -->
+<pre class="r"><code># | Discrepancy-based |
+NC = function(z_aug, i){
+  #abs(z_aug[i] - mean(z_aug[-i]))
+  abs(z_aug[i] - median(z_aug[-i]))  # more robust
+  #abs(z_aug[i] - 18)                  # a deterministic predictor
+  #abs(z_aug[i] - random.number)       # a fully random predictor
+}</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="main-function" class="section level1">
+<h1>main function</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29uZm9ybWFsX3VuaXZhcmlhdGVfaW50ZXJ2YWwgPC0gZnVuY3Rpb24oeCwgcGxvdHRpbmcgPSBGQUxTRSl7XG4gIHhfZ3JpZCAgPSBzZXEobWluKHgpLTAuMjUqZGlmZihyYW5nZSh4KSksIG1heCh4KSswLjI1KmRpZmYocmFuZ2UoeCkpLCBsZW5ndGgub3V0PTEwMClcbiAgcF92YWx1ZSA9IG51bWVyaWMobGVuZ3RoKHhfZ3JpZCkpXG5cblxuICBmb3IoayBpbiAxOmxlbmd0aCh4X2dyaWQpKXtcbiAgICB4X2F1ZyAgPSBjKHgsIHhfZ3JpZFtrXSlcbiAgICBzY29yZXMgPSBudW1lcmljKGxlbmd0aCh4X2F1ZykpXG4gICAgZm9yKGkgaW4gMTpsZW5ndGgoc2NvcmVzKSl7XG4gICAgICBzY29yZXNbaV0gPSBOQyh4X2F1ZywgaSlcbiAgICB9XG4gICAgcF92YWx1ZVtrXSA9IHN1bShzY29yZXM+PXNjb3Jlc1tsZW5ndGgoeF9hdWcpXSkvKGxlbmd0aCh4X2F1ZykpXG4gIH1cblxuICAjIFByZWRpY3Rpb24gSW50ZXJ2YWxcbiAgUElfZ3JpZCA9IHhfZ3JpZFt3aGljaChwX3ZhbHVlPj1hbHBoYSldXG4gIFBJICAgICAgPSBjKG1pbihQSV9ncmlkKSwgbWF4KFBJX2dyaWQpKVxuICAjIEtOTiBcbiAgIyBQSSA8LSB4X2dyaWRbYXMubG9naWNhbChjKDAsYWJzKGRpZmYocF92YWx1ZT5hbHBoYSkpKSldXG4gIFxuICBcbiAgaWYocGxvdHRpbmcpe1xuICAgICMgUGxvdCBvZiB0aGUgcC12YWx1ZXNcbiAgICBwbG90KHhfZ3JpZCwgcF92YWx1ZSwgdHlwZT0nbCcsIHlsaW09YygwLDEpKVxuICAgIGFibGluZShoPWMoMCwxKSlcbiAgICBhYmxpbmUoaD1hbHBoYSwgY29sPSdyZWQnKVxuICAgIHBvaW50cyh4LCBudW1lcmljKGxlbmd0aCh4KSksIHBjaD0zKVxuICAgIGFibGluZSh2PVBJLCBjb2w9J3JlZCcpXG4gICAgcG9pbnRzKFBJX2dyaWQsIG51bWVyaWMobGVuZ3RoKFBJX2dyaWQpKSwgcGNoPTE2LCBjb2w9J3JlZCcpXG4gICAgXG4gICAgXG4gICAgaGlzdCh4LCBjb2w9J2xpZ2h0Ymx1ZScpXG4gICAgYWJsaW5lKHY9UEksY29sPSdibHVlJykgIyBDb25mb3JtYWwgcHJlZGljdGlvbiBpbnRlcnZhbFxuICAgIFxuICAgIGxlZ2VuZChcInRvcHJpZ2h0XCIsIGxlZ2VuZD1cIkNvbmZvcm1hbFwiLCBjb2w9XCJibHVlXCIsXG4gICAgICAgICAgIGx0eT0xLCBjZXg9MC44KVxuICB9XG4gIHJldHVybihQSSlcblxufVxuYGBgIn0= -->
+<pre class="r"><code>conformal_univariate_interval &lt;- function(x, plotting = FALSE){
+  x_grid  = seq(min(x)-0.25*diff(range(x)), max(x)+0.25*diff(range(x)), length.out=100)
+  p_value = numeric(length(x_grid))
+
+
+  for(k in 1:length(x_grid)){
+    x_aug  = c(x, x_grid[k])
+    scores = numeric(length(x_aug))
+    for(i in 1:length(scores)){
+      scores[i] = NC(x_aug, i)
+    }
+    p_value[k] = sum(scores&gt;=scores[length(x_aug)])/(length(x_aug))
+  }
+
+  # Prediction Interval
+  PI_grid = x_grid[which(p_value&gt;=alpha)]
+  PI      = c(min(PI_grid), max(PI_grid))
+  # KNN 
+  # PI &lt;- x_grid[as.logical(c(0,abs(diff(p_value&gt;alpha))))]
+  
+  
+  if(plotting){
+    # Plot of the p-values
+    plot(x_grid, p_value, type=&#39;l&#39;, ylim=c(0,1))
+    abline(h=c(0,1))
+    abline(h=alpha, col=&#39;red&#39;)
+    points(x, numeric(length(x)), pch=3)
+    abline(v=PI, col=&#39;red&#39;)
+    points(PI_grid, numeric(length(PI_grid)), pch=16, col=&#39;red&#39;)
+    
+    
+    hist(x, col=&#39;lightblue&#39;)
+    abline(v=PI,col=&#39;blue&#39;) # Conformal prediction interval
+    
+    legend(&quot;topright&quot;, legend=&quot;Conformal&quot;, col=&quot;blue&quot;,
+           lty=1, cex=0.8)
+  }
+  return(PI)
+
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="music-and-survey-covariates" class="section level1">
+<h1>Music and Survey covariates</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVzaWNfdmFycyA9IGNvbG5hbWVzKGRhdGFfbnVtZXJpY19jbGVhbmVkKVxubXVzaWNfdmFycyA9IG11c2ljX3ZhcnNbIShtdXNpY192YXJzICVpbiUgYyhcImlkXCIsXCJ5ZWFyXCIsXCJkdXJhdGlvblwiKSldICMgZXhjbHVkZSB5ZWFyIGFuZCBkdXJhdGlvblxuc3VydmV5X2NvdnMgPSBjb2xuYW1lcyhzdXJ2ZXlfZGF0YSlcbnN1cnZleV9jb3ZzID0gc3VydmV5X2NvdnNbIShzdXJ2ZXlfY292cyAlaW4lIGMoXCJnZW5lcmVcIixcImlkXCIpKV1cbmBgYCJ9 -->
+<pre class="r"><code>music_vars = colnames(data_numeric_cleaned)
+music_vars = music_vars[!(music_vars %in% c(&quot;id&quot;,&quot;year&quot;,&quot;duration&quot;))] # exclude year and duration
+survey_covs = colnames(survey_data)
+survey_covs = survey_covs[!(survey_covs %in% c(&quot;genere&quot;,&quot;id&quot;))]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="example" class="section level1">
+<h1>Example</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudW5pdmFyaWF0ZV9kYXRhX2ZpbHRlcmVkXG5cbmBgYCJ9 -->
+<pre class="r"><code>univariate_data_filtered
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgWzFdIDAuNTYgMC42NCAwLjY4IDAuNzQgMC42NiAwLjc0IDAuNjggMC44MCAwLjY5IDAuNDUgMC41OCAwLjYxIDAuNjIgMC42MyAwLjY4IDAuNzcgMC41OSAwLjc0IDAuNjRcbiAgWzIwXSAwLjczIDAuNzUgMC42NyAwLjY4IDAuNTcgMC43MSAwLjc5IDAuNjEgMC40MSAwLjc0IDAuNzIgMC44OCAwLjUxIDAuNjEgMC43OSAwLjU5IDAuNzAgMC41MSAwLjQ0XG4gIFszOV0gMC43NiAwLjc5IDAuNzMgMC42NiAwLjUyIDAuNDEgMC41MiAwLjM3IDAuNzYgMC41MCAwLjU1IDAuNjggMC42NSAwLjgwIDAuNzYgMC40MyAwLjg1IDAuMzYgMC4zN1xuICBbNThdIDAuNjUgMC41MiAwLjcwIDAuNzIgMC43MCAwLjUxIDAuNzEgMC44MCAwLjQ0IDAuNzEgMC43MCAwLjQzIDAuNDQgMC40MiAwLjU3IDAuNTIgMC42MyAwLjgxIDAuODBcbiAgWzc3XSAwLjgwIDAuNzMgMC42NyAwLjY5IDAuOTAgMC4zOSAwLjQ3IDAuNTkgMC43MyAwLjY1IDAuNjUgMC43MiAwLjY0IDAuNDYgMC42MyAwLjUzIDAuNTQgMC41NiAwLjU3XG4gIFs5Nl0gMC42NSAwLjc0IDAuNzggMC43NyAwLjY4IDAuNTUgMC4yOSAwLjMyIDAuNjEgMC44MyAwLjY5IDAuNTAgMC44MyAwLjM5IDAuMjcgMC4yOSAwLjU1IDAuMjQgMC42NFxuIFsxMTVdIDAuNDUgMC42MCAwLjM3IDAuNzAgMC4xNSAwLjg2IDAuMzAgMC43NiAwLjU4IDAuNjEgMC4yOSAwLjYzIDAuMzIgMC4yMyAwLjk1IDAuNjIgMC44MiAwLjIzIDAuMzNcbiBbMTM0XSAwLjgzIDAuODUgMC42NiAwLjI1IDAuNzcgMC42NyAwLjYyIDAuNDIgMC41OSAwLjQ4IDAuODEgMC4zNiAwLjI5IDAuNTUgMC41NSAwLjcxIDAuNzIgMC4yOSAwLjU5XG4gWzE1M10gMC44MyAwLjgyIDAuMjUgMC44MCAwLjMyIDAuNTIgMC42OCAwLjc5IDAuNDYgMC40MCAwLjczIDAuNjYgMC4zNSAwLjYxIDAuNjMgMC4zMyAwLjg1IDAuNjIgMC44MFxuIFsxNzJdIDAuNDUgMC41OCAwLjQ5IDAuNjUgMC42OCAwLjQyIDAuMzcgMC4yMCAwLjg2IDAuNzUgMC42OSAwLjg0IDAuODUgMC43MyAwLjI4IDAuODAgMC41MSAwLjM3IDAuNzFcbiBbMTkxXSAwLjM0IDAuMjEgMC41OCAwLjc2IDAuMjUgMC40MCAwLjY0IDAuNjQgMC40NSAwLjI0IDAuODIgMC43NyAwLjI0IDAuMjQgMC4xMCAwLjA3IDAuMDYgMC4xNiAwLjIwXG4gWzIxMF0gMC4xNyAwLjEwIDAuMTEgMC4xOCAwLjQ1IDAuMDMgMC4yNyAwLjE4IDAuMjcgMC4wNiAwLjI3IDAuNzcgMC4wMSAwLjA5IDAuMDcgMC4xNSAwLjI0IDAuMTQgMC4yMVxuIFsyMjldIDAuMDYgMC4wMiAwLjIwIDAuNDkgMC4xOCAwLjIwIDAuMzAgMC4yMyAwLjI1IDAuMTcgMC4wMyAwLjUyIDAuMzcgMC4wNCAwLjMyIDAuMTUgMC4xMCAwLjQ2IDAuMjhcbiBbMjQ4XSAwLjA3IDAuNDAgMC4zMCAwLjM0IDAuMTEgMC4zMCAwLjQzIDAuMDQgMC4wMCAwLjQ3IDAuNjIgMC4yMiAwLjA0IDAuMTcgMC4xNSAwLjM1IDAuNDYgMC40MSAwLjE0XG4gWzI2N10gMC4zMyAwLjQxIDAuMDYgMC4wNyAwLjU5IDAuNjAgMC4xNSAwLjQ3IDAuNTQgMC4wMiAwLjA0IDAuMzMgMC40MiAwLjE4IDAuMjQgMC4yOCAwLjI2IDAuNDUgMC4xNlxuIFsyODZdIDAuMTYgMC4wOSAwLjI4IDAuMjUgMC4zMCAwLjAxIDAuMjcgMC41NCAwLjM4IDAuMTMgMC42NSAwLjMxIDAuMTMgMC4xMyAwLjA4IDAuMzMgMC4yNiAwLjAxIDAuNDhcbiBbMzA1XSAwLjI0IDAuNjIgMC41MyAwLjg1IDAuMzAgMC44NiAwLjYxIDAuNzcgMC41NSAwLjU0IDAuNjEgMC44OCAwLjU2IDAuNzkgMC44MCAwLjY4IDAuNzggMC42NiAwLjc1XG4gWzMyNF0gMC41MSAwLjQ5IDAuNjAgMC43OCAwLjQwIDAuNzAgMC42NSAwLjgxIDAuMTAgMC41NyAwLjMxIDAuNzUgMC41NSAwLjUwIDAuNzEgMC4yNiAwLjI5IDAuNjUgMC4yN1xuIFszNDNdIDAuNjIgMC43MiAwLjY2IDAuNjMgMC42NCAwLjU2IDAuNzIgMC40MiAwLjE1IDAuNzQgMC43NCAwLjczIDAuNjAgMC43MCAwLjY3IDAuNTcgMC4yMyAwLjMwIDAuNTVcbiBbMzYyXSAwLjQ1IDAuODMgMC42MCAwLjUyIDAuNzkgMC42NSAwLjYxIDAuMjAgMC41MSAwLjQ2IDAuNjAgMC4zMiAwLjY1IDAuNjkgMC41NiAwLjM5IDAuODQgMC4zMiAwLjgxXG4gWzM4MV0gMC4yMyAwLjU1IDAuNTYgMC40MCAwLjg5IDAuNjggMC44NiAwLjI5IDAuNzcgMC42NCAwLjgyIDAuNDEgMC44NiAwLjM1IDAuNDMgMC44MSAwLjUzIDAuMzcgMC44MVxuIFs0MDBdIDAuOTEgMC40NCAwLjU4IDAuNjQgMC40OCAwLjU4IDAuMDEgMC4yMyAwLjI4IDAuNTggMC4xNCAwLjA4IDAuNDEgMC4wNCAwLjIzIDAuNTUgMC4yNiAwLjIzIDAuNDdcbiBbNDE5XSAwLjM1IDAuNDIgMC4wMyAwLjUyIDAuMDQgMC4yOCAwLjI0IDAuMDcgMC42MCAwLjQ2IDAuMzYgMC45MSAwLjQxIDAuMDUgMC4xNiAwLjQ3IDAuMzUgMC43MSAwLjA1XG4gWzQzOF0gMC4yOSAwLjE2IDAuMzUgMC40MCAwLjIxIDAuMTQgMC41NCAwLjA0IDAuNzEgMC44MCAwLjA3IDAuMTQgMC4yOSAwLjcwIDAuMjMgMC41OSAwLjMxIDAuMDIgMC4xMFxuIFs0NTddIDAuMjcgMC4yNiAwLjIwIDAuNTYgMC4yMCAwLjM4IDAuMDMgMC4xMCAwLjM0IDAuNDIgMC4wNSAwLjQ0IDAuNTIgMC40NiAwLjA1IDAuMjEgMC4zMSAwLjY1IDAuMDRcbiBbNDc2XSAwLjQ2IDAuMTMgMC4xOSAwLjA2IDAuMzQgMC43NSAwLjA3IDAuMDIgMC40OCAwLjExIDAuMDIgMC4xOCAwLjU0IDAuMDQgMC4wMyAwLjEwIDAuNDggMC40MiAwLjEyXG4gWzQ5NV0gMC41MiAwLjEzIDAuMTAgMC4zNCAwLjI5IDAuMTEgMC42NCAwLjUwIDAuMzQgMC44MiAwLjk1IDAuNjUgMC43OCAwLjc3IDAuNzAgMC45MSAwLjg3IDAuNzggMC44NlxuIFs1MTRdIDAuODcgMC44MiAwLjcxIDAuNjggMC42MyAwLjU5IDAuNjUgMC41NyAwLjg4IDAuNzQgMC44NiAwLjg2IDAuODEgMC44NyAwLjgxIDAuNjkgMC44MyAwLjcyIDAuNzFcbiBbNTMzXSAwLjc4IDAuODEgMC43OSAwLjgxIDAuNjYgMC43NCAwLjYzIDAuODUgMC43OSAwLjYyIDAuNjEgMC43NSAwLjU5IDAuNTkgMC42NCAwLjgwIDAuNzggMC44NyAwLjYyXG4gWzU1Ml0gMC41NSAwLjc1IDAuNjMgMC43NiAwLjg4IDAuNzAgMC44MyAwLjgxIDAuNTQgMC43MSAwLjc0IDAuNjcgMC44NSAwLjgwIDAuNjUgMC44NyAwLjYxIDAuNzYgMC43OVxuIFs1NzFdIDAuNDcgMC42NSAwLjg1IDAuNzcgMC42NSAwLjcwIDAuODYgMC45MiAwLjY2IDAuNzAgMC44MCAwLjcwIDAuODMgMC42OCAwLjQ3IDAuNTIgMC42NSAwLjU4IDAuNDJcbiBbNTkwXSAwLjkxIDAuODAgMC41OSAwLjY3IDAuNTggMC40OSAwLjgwIDAuODcgMC42MSAwLjkwIDAuNzIgMC44NiAwLjY4IDAuNzQgMC44NCAwLjY1IDAuNTcgMC41MCAwLjUwXG4gWzYwOV0gMC42MSAwLjU4IDAuNzYgMC42NyAwLjUxIDAuNzIgMC43NyAwLjYzIDAuNzIgMC42MCAwLjgwIDAuNjcgMC41OSAwLjc1IDAuNjIgMC41OSAwLjQ1IDAuNjkgMC41N1xuIFs2MjhdIDAuNTggMC44MCAwLjY5IDAuNDYgMC42MiAwLjgxIDAuNzEgMC41OSAwLjQ5IDAuNzEgMC42MyAwLjgyIDAuNzEgMC42NyAwLjQ0IDAuNzAgMC4zMCAwLjYzIDAuNTZcbiBbNjQ3XSAwLjgxIDAuNTUgMC43NiAwLjg4IDAuNTEgMC42MSAwLjYzIDAuNDMgMC42MyAwLjQ3IDAuNjAgMC43MSAwLjY2IDAuNTYgMC43MSAwLjY0IDAuNzIgMC42MyAwLjM4XG4gWzY2Nl0gMC42OSAwLjcxIDAuNzYgMC40MSAwLjI3IDAuNTcgMC4zOSAwLjY0IDAuNjYgMC42MCAwLjc1IDAuNTQgMC41MiAwLjU4IDAuNjcgMC41MyAwLjc0IDAuNzEgMC41MlxuIFs2ODVdIDAuNTEgMC42MiAwLjQwIDAuNjggMC43NiAwLjc4IDAuNjcgMC42NyAwLjYyIDAuODMgMC4zNiAwLjU5IDAuNTMgMC41NiAwLjM4IDAuNDAgMC41MyAwLjUyIDAuNjJcbiBbNzA0XSAwLjcxIDAuNzMgMC43MiAwLjczIDAuNTYgMC43NiAwLjI4IDAuNzIgMC42NCAwLjQ2IDAuNzIgMC42NyAwLjUyIDAuNDQgMC42MSAwLjUyIDAuMjcgMC4zOSAwLjc2XG4gWzcyM10gMC40NiAwLjUxIDAuNzIgMC42OCAwLjI5IDAuMDcgMC42OSAwLjM1IDAuMjggMC42MSAwLjM4IDAuNTAgMC42NSAwLjMwIDAuNTkgMC41MiAwLjMzIDAuNTkgMC4yMlxuIFs3NDJdIDAuNjUgMC41MiAwLjExIDAuMzEgMC42NyAwLjM4IDAuNjAgMC41MCAwLjU4IDAuNDcgMC4yNiAwLjYyIDAuNjYgMC42MSAwLjMzIDAuMzAgMC42NCAwLjQ3IDAuNTJcbiBbNzYxXSAwLjU0IDAuODQgMC43NyAwLjU5IDAuNjcgMC4xOCAwLjYwIDAuNjEgMC43MSAwLjMwIDAuNjMgMC41MSAwLjYwIDAuODEgMC41MCAwLjU5IDAuNTYgMC4zOCAwLjM2XG4gWzc4MF0gMC4zNyAwLjU5IDAuMzggMC40NyAwLjUzIDAuNDUgMC40NyAwLjc3IDAuNTIgMC4zNSAwLjU3IDAuNDggMC42MiAwLjQyIDAuNjggMC43MiAwLjUwIDAuMzkgMC41NVxuIFs3OTldIDAuMjkgMC40MyAwLjQ4IDAuMjEgMC4yNyAwLjU3IDAuODcgMC44NyAwLjYxIDAuNjIgMC41MSAwLjQ2IDAuNTMgMC40NiAwLjU0IDAuNzYgMC41OSAwLjcxIDAuNTRcbiBbODE4XSAwLjUzIDAuNDQgMC43MiAwLjU2IDAuMzkgMC41NSAwLjcyIDAuNzggMC42MyAwLjU5IDAuODAgMC45MSAwLjQ2IDAuNDMgMC44NSAwLjgxIDAuMzMgMC43OSAwLjc5XG4gWzgzN10gMC44MCAwLjY4IDAuNzggMC4yNSAwLjU2IDAuNjEgMC41OCAwLjY1IDAuNzkgMC44MCAwLjc5IDAuNzUgMC42OSAwLjQ2IDAuNDIgMC43MSAwLjU1IDAuNTcgMC41MlxuIFs4NTZdIDAuNTIgMC4yOSAwLjc4IDAuNjYgMC44MyAwLjY0IDAuNDIgMC42NSAwLjc4IDAuNDcgMC44MSAwLjUzIDAuNTAgMC41MSAwLjYzIDAuNDIgMC44MyAwLjU3IDAuODNcbiBbODc1XSAwLjQ0IDAuMzAgMC43NiAwLjU4IDAuNjMgMC43MiAwLjU4IDAuODggMC41MCAwLjc1IDAuNDYgMC42NiAwLjc5IDAuNjYgMC41NSAwLjg5IDAuNzEgMC40MSAwLjU2XG4gWzg5NF0gMC45MiAwLjM3IDAuNzggMC42NiAwLjUzIDAuODAgMC42MyAwLjYwIDAuODkgMC44MSAwLjc0IDAuNTYgMC44MSAwLjUyIDAuODcgMC44MCAwLjg0IDAuODAgMC43OFxuIFs5MTNdIDAuODUgMC43OSAwLjcyIDAuODQgMC44MCAwLjYyIDAuNzcgMC44OSAwLjU1IDAuNzcgMC43NyAwLjUzIDAuODMgMC41MyAwLjU4IDAuNzEgMC42MiAwLjkyIDAuODJcbiBbOTMyXSAwLjgyIDAuNDggMC41NyAwLjU5IDAuNzYgMC41NiAwLjg1IDAuNjcgMC45MSAwLjg0IDAuODcgMC45MSAwLjUzIDAuNjQgMC42MyAwLjUxIDAuNzEgMC44MiAwLjQ0XG4gWzk1MV0gMC42NSAwLjg0IDAuODYgMC43NSAwLjY0IDAuNjYgMC44MiAwLjgwIDAuNDcgMC40MCAwLjgwIDAuNzAgMC40MiAwLjY1IDAuNjUgMC41OSAwLjQ4IDAuNjkgMC42MVxuIFs5NzBdIDAuNjMgMC40NyAwLjc3IDAuNTMgMC42MSAwLjc1IDAuODMgMC42NSAwLjUwIDAuNTIgMC41NiAwLjc4IDAuNjEgMC41NiAwLjgzIDAuODkgMC40OSAwLjYyIDAuNzRcbiBbOTg5XSAwLjc5IDAuNTcgMC42NSAwLjU0IDAuNzQgMC41MiAwLjY4IDAuNzAgMC43NiAwLjY2IDAuNDMgMC44MVxuIFsgcmVhY2hlZCBnZXRPcHRpb24oXCJtYXgucHJpbnRcIikgLS0gb21pdHRlZCAyNTIwIGVudHJpZXMgXVxuIn0= -->
+<pre><code>   [1] 0.56 0.64 0.68 0.74 0.66 0.74 0.68 0.80 0.69 0.45 0.58 0.61 0.62 0.63 0.68 0.77 0.59 0.74 0.64
+  [20] 0.73 0.75 0.67 0.68 0.57 0.71 0.79 0.61 0.41 0.74 0.72 0.88 0.51 0.61 0.79 0.59 0.70 0.51 0.44
+  [39] 0.76 0.79 0.73 0.66 0.52 0.41 0.52 0.37 0.76 0.50 0.55 0.68 0.65 0.80 0.76 0.43 0.85 0.36 0.37
+  [58] 0.65 0.52 0.70 0.72 0.70 0.51 0.71 0.80 0.44 0.71 0.70 0.43 0.44 0.42 0.57 0.52 0.63 0.81 0.80
+  [77] 0.80 0.73 0.67 0.69 0.90 0.39 0.47 0.59 0.73 0.65 0.65 0.72 0.64 0.46 0.63 0.53 0.54 0.56 0.57
+  [96] 0.65 0.74 0.78 0.77 0.68 0.55 0.29 0.32 0.61 0.83 0.69 0.50 0.83 0.39 0.27 0.29 0.55 0.24 0.64
+ [115] 0.45 0.60 0.37 0.70 0.15 0.86 0.30 0.76 0.58 0.61 0.29 0.63 0.32 0.23 0.95 0.62 0.82 0.23 0.33
+ [134] 0.83 0.85 0.66 0.25 0.77 0.67 0.62 0.42 0.59 0.48 0.81 0.36 0.29 0.55 0.55 0.71 0.72 0.29 0.59
+ [153] 0.83 0.82 0.25 0.80 0.32 0.52 0.68 0.79 0.46 0.40 0.73 0.66 0.35 0.61 0.63 0.33 0.85 0.62 0.80
+ [172] 0.45 0.58 0.49 0.65 0.68 0.42 0.37 0.20 0.86 0.75 0.69 0.84 0.85 0.73 0.28 0.80 0.51 0.37 0.71
+ [191] 0.34 0.21 0.58 0.76 0.25 0.40 0.64 0.64 0.45 0.24 0.82 0.77 0.24 0.24 0.10 0.07 0.06 0.16 0.20
+ [210] 0.17 0.10 0.11 0.18 0.45 0.03 0.27 0.18 0.27 0.06 0.27 0.77 0.01 0.09 0.07 0.15 0.24 0.14 0.21
+ [229] 0.06 0.02 0.20 0.49 0.18 0.20 0.30 0.23 0.25 0.17 0.03 0.52 0.37 0.04 0.32 0.15 0.10 0.46 0.28
+ [248] 0.07 0.40 0.30 0.34 0.11 0.30 0.43 0.04 0.00 0.47 0.62 0.22 0.04 0.17 0.15 0.35 0.46 0.41 0.14
+ [267] 0.33 0.41 0.06 0.07 0.59 0.60 0.15 0.47 0.54 0.02 0.04 0.33 0.42 0.18 0.24 0.28 0.26 0.45 0.16
+ [286] 0.16 0.09 0.28 0.25 0.30 0.01 0.27 0.54 0.38 0.13 0.65 0.31 0.13 0.13 0.08 0.33 0.26 0.01 0.48
+ [305] 0.24 0.62 0.53 0.85 0.30 0.86 0.61 0.77 0.55 0.54 0.61 0.88 0.56 0.79 0.80 0.68 0.78 0.66 0.75
+ [324] 0.51 0.49 0.60 0.78 0.40 0.70 0.65 0.81 0.10 0.57 0.31 0.75 0.55 0.50 0.71 0.26 0.29 0.65 0.27
+ [343] 0.62 0.72 0.66 0.63 0.64 0.56 0.72 0.42 0.15 0.74 0.74 0.73 0.60 0.70 0.67 0.57 0.23 0.30 0.55
+ [362] 0.45 0.83 0.60 0.52 0.79 0.65 0.61 0.20 0.51 0.46 0.60 0.32 0.65 0.69 0.56 0.39 0.84 0.32 0.81
+ [381] 0.23 0.55 0.56 0.40 0.89 0.68 0.86 0.29 0.77 0.64 0.82 0.41 0.86 0.35 0.43 0.81 0.53 0.37 0.81
+ [400] 0.91 0.44 0.58 0.64 0.48 0.58 0.01 0.23 0.28 0.58 0.14 0.08 0.41 0.04 0.23 0.55 0.26 0.23 0.47
+ [419] 0.35 0.42 0.03 0.52 0.04 0.28 0.24 0.07 0.60 0.46 0.36 0.91 0.41 0.05 0.16 0.47 0.35 0.71 0.05
+ [438] 0.29 0.16 0.35 0.40 0.21 0.14 0.54 0.04 0.71 0.80 0.07 0.14 0.29 0.70 0.23 0.59 0.31 0.02 0.10
+ [457] 0.27 0.26 0.20 0.56 0.20 0.38 0.03 0.10 0.34 0.42 0.05 0.44 0.52 0.46 0.05 0.21 0.31 0.65 0.04
+ [476] 0.46 0.13 0.19 0.06 0.34 0.75 0.07 0.02 0.48 0.11 0.02 0.18 0.54 0.04 0.03 0.10 0.48 0.42 0.12
+ [495] 0.52 0.13 0.10 0.34 0.29 0.11 0.64 0.50 0.34 0.82 0.95 0.65 0.78 0.77 0.70 0.91 0.87 0.78 0.86
+ [514] 0.87 0.82 0.71 0.68 0.63 0.59 0.65 0.57 0.88 0.74 0.86 0.86 0.81 0.87 0.81 0.69 0.83 0.72 0.71
+ [533] 0.78 0.81 0.79 0.81 0.66 0.74 0.63 0.85 0.79 0.62 0.61 0.75 0.59 0.59 0.64 0.80 0.78 0.87 0.62
+ [552] 0.55 0.75 0.63 0.76 0.88 0.70 0.83 0.81 0.54 0.71 0.74 0.67 0.85 0.80 0.65 0.87 0.61 0.76 0.79
+ [571] 0.47 0.65 0.85 0.77 0.65 0.70 0.86 0.92 0.66 0.70 0.80 0.70 0.83 0.68 0.47 0.52 0.65 0.58 0.42
+ [590] 0.91 0.80 0.59 0.67 0.58 0.49 0.80 0.87 0.61 0.90 0.72 0.86 0.68 0.74 0.84 0.65 0.57 0.50 0.50
+ [609] 0.61 0.58 0.76 0.67 0.51 0.72 0.77 0.63 0.72 0.60 0.80 0.67 0.59 0.75 0.62 0.59 0.45 0.69 0.57
+ [628] 0.58 0.80 0.69 0.46 0.62 0.81 0.71 0.59 0.49 0.71 0.63 0.82 0.71 0.67 0.44 0.70 0.30 0.63 0.56
+ [647] 0.81 0.55 0.76 0.88 0.51 0.61 0.63 0.43 0.63 0.47 0.60 0.71 0.66 0.56 0.71 0.64 0.72 0.63 0.38
+ [666] 0.69 0.71 0.76 0.41 0.27 0.57 0.39 0.64 0.66 0.60 0.75 0.54 0.52 0.58 0.67 0.53 0.74 0.71 0.52
+ [685] 0.51 0.62 0.40 0.68 0.76 0.78 0.67 0.67 0.62 0.83 0.36 0.59 0.53 0.56 0.38 0.40 0.53 0.52 0.62
+ [704] 0.71 0.73 0.72 0.73 0.56 0.76 0.28 0.72 0.64 0.46 0.72 0.67 0.52 0.44 0.61 0.52 0.27 0.39 0.76
+ [723] 0.46 0.51 0.72 0.68 0.29 0.07 0.69 0.35 0.28 0.61 0.38 0.50 0.65 0.30 0.59 0.52 0.33 0.59 0.22
+ [742] 0.65 0.52 0.11 0.31 0.67 0.38 0.60 0.50 0.58 0.47 0.26 0.62 0.66 0.61 0.33 0.30 0.64 0.47 0.52
+ [761] 0.54 0.84 0.77 0.59 0.67 0.18 0.60 0.61 0.71 0.30 0.63 0.51 0.60 0.81 0.50 0.59 0.56 0.38 0.36
+ [780] 0.37 0.59 0.38 0.47 0.53 0.45 0.47 0.77 0.52 0.35 0.57 0.48 0.62 0.42 0.68 0.72 0.50 0.39 0.55
+ [799] 0.29 0.43 0.48 0.21 0.27 0.57 0.87 0.87 0.61 0.62 0.51 0.46 0.53 0.46 0.54 0.76 0.59 0.71 0.54
+ [818] 0.53 0.44 0.72 0.56 0.39 0.55 0.72 0.78 0.63 0.59 0.80 0.91 0.46 0.43 0.85 0.81 0.33 0.79 0.79
+ [837] 0.80 0.68 0.78 0.25 0.56 0.61 0.58 0.65 0.79 0.80 0.79 0.75 0.69 0.46 0.42 0.71 0.55 0.57 0.52
+ [856] 0.52 0.29 0.78 0.66 0.83 0.64 0.42 0.65 0.78 0.47 0.81 0.53 0.50 0.51 0.63 0.42 0.83 0.57 0.83
+ [875] 0.44 0.30 0.76 0.58 0.63 0.72 0.58 0.88 0.50 0.75 0.46 0.66 0.79 0.66 0.55 0.89 0.71 0.41 0.56
+ [894] 0.92 0.37 0.78 0.66 0.53 0.80 0.63 0.60 0.89 0.81 0.74 0.56 0.81 0.52 0.87 0.80 0.84 0.80 0.78
+ [913] 0.85 0.79 0.72 0.84 0.80 0.62 0.77 0.89 0.55 0.77 0.77 0.53 0.83 0.53 0.58 0.71 0.62 0.92 0.82
+ [932] 0.82 0.48 0.57 0.59 0.76 0.56 0.85 0.67 0.91 0.84 0.87 0.91 0.53 0.64 0.63 0.51 0.71 0.82 0.44
+ [951] 0.65 0.84 0.86 0.75 0.64 0.66 0.82 0.80 0.47 0.40 0.80 0.70 0.42 0.65 0.65 0.59 0.48 0.69 0.61
+ [970] 0.63 0.47 0.77 0.53 0.61 0.75 0.83 0.65 0.50 0.52 0.56 0.78 0.61 0.56 0.83 0.89 0.49 0.62 0.74
+ [989] 0.79 0.57 0.65 0.54 0.74 0.52 0.68 0.70 0.76 0.66 0.43 0.81
+ [ reached getOption(&quot;max.print&quot;) -- omitted 2520 entries ]</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="for-loop-for-every-possible-combination" class="section level1">
+<h1>For loop for every possible combination</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlzdF9pbnRlcnZhbHNcblxuYGBgIn0= -->
+<pre class="r"><code>list_intervals
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJGBzZXNzbzogRmVtbWluYSwgVkFSOiBwb3B1bGFyaXR5YFxuWzFdIDAuMjY1MTUxNSAwLjkzMTgxODJcblxuJGBzZXNzbzogTWFzY2hpbywgVkFSOiBwb3B1bGFyaXR5YFxuWzFdIDAuMTUxMTM2NCAwLjk0MjgwMzBcblxuJGBzZXNzbzogRmVtbWluYSwgVkFSOiBhY291c3RpY25lc3NgXG5bMV0gLTAuMjUwMDAwMCAgMC44NTYwNjA2XG5cbiRgc2Vzc286IE1hc2NoaW8sIFZBUjogYWNvdXN0aWNuZXNzYFxuWzFdIC0wLjI1MDAwMDAgIDAuODU2MDYwNlxuXG4kYHNlc3NvOiBGZW1taW5hLCBWQVI6IGRhbmNlYWJpbGl0eWBcblsxXSAwLjM2NTA3NTggMC45NjI2NTE1XG5cbiRgc2Vzc286IE1hc2NoaW8sIFZBUjogZGFuY2VhYmlsaXR5YFxuWzFdIDAuMzEwNjA2MSAwLjk2MjEyMTJcblxuJGBzZXNzbzogRmVtbWluYSwgVkFSOiBlbmVyZ3lgXG5bMV0gMC4yOTUxNTkxIDEuMDY3MTEzNlxuXG4kYHNlc3NvOiBNYXNjaGlvLCBWQVI6IGVuZXJneWBcblsxXSAwLjI5NzU2ODIgMS4wNjc5NzczXG5cbiRgc2Vzc286IEZlbW1pbmEsIFZBUjogaW5zdHJ1bWVudGFsbmVzc2BcblsxXSAtMC4xNTU5MDkxICAwLjE1NTkwOTFcblxuJGBzZXNzbzogTWFzY2hpbywgVkFSOiBpbnN0cnVtZW50YWxuZXNzYFxuWzFdIC0wLjI1MDAwMDAgIDAuNzk1NDU0NVxuXG4kYHNlc3NvOiBGZW1taW5hLCBWQVI6IGxpdmVuZXNzYFxuWzFdIC0wLjE2MTcxMjEgIDAuMzg0MzE4MlxuXG4kYHNlc3NvOiBNYXNjaGlvLCBWQVI6IGxpdmVuZXNzYFxuWzFdIC0wLjIzNDg0ODUgIDAuNDQ2OTY5N1xuXG4kYHNlc3NvOiBGZW1taW5hLCBWQVI6IGxvdWRuZXNzYFxuWzFdIDAuNjg1MTEzNiAwLjk5MzgyNThcblxuJGBzZXNzbzogTWFzY2hpbywgVkFSOiBsb3VkbmVzc2BcblsxXSAwLjY1NjAzNzkgMC45OTUxMTM2XG5cbiRgc2Vzc286IEZlbW1pbmEsIFZBUjogc3BlZWNoaW5lc3NgXG5bMV0gLTAuMjE5Njk3MCAgMC4yOTU0NTQ1XG5cbiRgc2Vzc286IE1hc2NoaW8sIFZBUjogc3BlZWNoaW5lc3NgXG5bMV0gLTAuMjUwMDAwMCAgMC4zMjU3NTc2XG5cbiRgc2Vzc286IEZlbW1pbmEsIFZBUjogdGVtcG9gXG5bMV0gMC4wOTg0ODQ4NSAwLjcwNDU0NTQ1XG5cbiRgc2Vzc286IE1hc2NoaW8sIFZBUjogdGVtcG9gXG5bMV0gMC4wOTQ3MjcyNyAwLjcwNTI3MjczXG5cbiRgc2Vzc286IEZlbW1pbmEsIFZBUjogdmFsZW5jZWBcblsxXSAwLjA4MzU4MzMzIDAuOTM5NDQ2OTdcblxuJGBzZXNzbzogTWFzY2hpbywgVkFSOiB2YWxlbmNlYFxuWzFdIDAuMDY4MTgxODIgMC45NjIxMjEyMVxuXG4kYGVkdWNhemlvbmU6IHN1cGVyaW9yaSwgVkFSOiBwb3B1bGFyaXR5YFxuWzFdIDAuMjk2NDM5NCAwLjg4OTMxODJcblxuJGBlZHVjYXppb25lOiB1bml2ZXJzaXTDoCwgVkFSOiBwb3B1bGFyaXR5YFxuWzFdIDAuMjA0NTQ1NSAwLjk0Njk2OTdcblxuJGBlZHVjYXppb25lOiBzdXBlcmlvcmksIFZBUjogYWNvdXN0aWNuZXNzYFxuWzFdIC0wLjIzOCAgMC43MTRcblxuJGBlZHVjYXppb25lOiB1bml2ZXJzaXTDoCwgVkFSOiBhY291c3RpY25lc3NgXG5bMV0gLTAuMjUwMDAwMCAgMC44NzEyMTIxXG5cbiRgZWR1Y2F6aW9uZTogc3VwZXJpb3JpLCBWQVI6IGRhbmNlYWJpbGl0eWBcblsxXSAwLjMyNyAwLjk2N1xuXG4kYGVkdWNhemlvbmU6IHVuaXZlcnNpdMOgLCBWQVI6IGRhbmNlYWJpbGl0eWBcblsxXSAwLjM0MDkwOTEgMC45NjIxMjEyXG5cbiRgZWR1Y2F6aW9uZTogc3VwZXJpb3JpLCBWQVI6IGVuZXJneWBcblsxXSAwLjM3NDUwNzYgMC45OTI3MTk3XG5cbiRgZWR1Y2F6aW9uZTogdW5pdmVyc2l0w6AsIFZBUjogZW5lcmd5YFxuWzFdIDAuMjgwMzAzIDEuMDY4MTgyXG5cbiRgZWR1Y2F6aW9uZTogc3VwZXJpb3JpLCBWQVI6IGluc3RydW1lbnRhbG5lc3NgXG5bMV0gLTAuMDgxNjY2NjcgIDAuMDgxNjY2NjdcblxuJGBlZHVjYXppb25lOiB1bml2ZXJzaXTDoCwgVkFSOiBpbnN0cnVtZW50YWxuZXNzYFxuWzFdIC0wLjI1MDAwMDAgIDAuNjEzNjM2NFxuXG4kYGVkdWNhemlvbmU6IHN1cGVyaW9yaSwgVkFSOiBsaXZlbmVzc2BcblsxXSAtMC4yMzc1ICAwLjQ2NzVcblxuJGBlZHVjYXppb25lOiB1bml2ZXJzaXTDoCwgVkFSOiBsaXZlbmVzc2BcblsxXSAtMC4xODkwMTUyICAwLjQwMDcxMjFcblxuJGBlZHVjYXppb25lOiBzdXBlcmlvcmksIFZBUjogbG91ZG5lc3NgXG5bMV0gMC42OTE4ODY0IDAuOTg0NDE2N1xuXG4kYGVkdWNhemlvbmU6IHVuaXZlcnNpdMOgLCBWQVI6IGxvdWRuZXNzYFxuWzFdIDAuNjc0MjQyNCAwLjk5MjQyNDJcblxuJGBlZHVjYXppb25lOiBzdXBlcmlvcmksIFZBUjogc3BlZWNoaW5lc3NgXG5bMV0gLTAuMjI3MDAwMCAgMC4zNTMzNjM2XG5cbiRgZWR1Y2F6aW9uZTogdW5pdmVyc2l0w6AsIFZBUjogc3BlZWNoaW5lc3NgXG5bMV0gLTAuMjM0ODQ4NSAgMC4zMTA2MDYxXG5cbiRgZWR1Y2F6aW9uZTogc3VwZXJpb3JpLCBWQVI6IHRlbXBvYFxuWzFdIDAuMTA5NzY1MiAwLjY5ODE3NDJcblxuJGBlZHVjYXppb25lOiB1bml2ZXJzaXTDoCwgVkFSOiB0ZW1wb2BcblsxXSAwLjA5ODQ4NDg1IDAuNzE5Njk2OTdcblxuJGBlZHVjYXppb25lOiBzdXBlcmlvcmksIFZBUjogdmFsZW5jZWBcblsxXSAwLjEwNzY0MzkgMC45Mzc1OTg1XG5cbiRgZWR1Y2F6aW9uZTogdW5pdmVyc2l0w6AsIFZBUjogdmFsZW5jZWBcblsxXSAwLjA4MzMzMzMzIDAuOTQ2OTY5NzBcblxuJGBsYXZvcm86IEZ1bGwgdGltZSwgVkFSOiBwb3B1bGFyaXR5YFxuWzFdIDAuMzI1NzU3NiAwLjkxNjY2NjdcblxuJGBsYXZvcm86IG5vLCBWQVI6IHBvcHVsYXJpdHlgXG5bMV0gMC4xNzQyNDI0IDAuOTYyMTIxMlxuXG4kYGxhdm9ybzogUGFydCB0aW1lLCBWQVI6IHBvcHVsYXJpdHlgXG5bMV0gMC4yMzA3NTc2IDAuOTAwMTUxNVxuXG4kYGxhdm9ybzogRnVsbCB0aW1lLCBWQVI6IGFjb3VzdGljbmVzc2BcblsxXSAtMC4yNDc1ICAwLjgxNzVcblxuJGBsYXZvcm86IG5vLCBWQVI6IGFjb3VzdGljbmVzc2BcblsxXSAtMC4yNTAwMDAwICAwLjg4NjM2MzZcblxuJGBsYXZvcm86IFBhcnQgdGltZSwgVkFSOiBhY291c3RpY25lc3NgXG5bMV0gLTAuMjQ5NzUgIDAuNzQ5MjVcblxuJGBsYXZvcm86IEZ1bGwgdGltZSwgVkFSOiBkYW5jZWFiaWxpdHlgXG5bMV0gMC4zNTQzMTgyIDAuOTI1NzcyN1xuXG4kYGxhdm9ybzogbm8sIFZBUjogZGFuY2VhYmlsaXR5YFxuWzFdIDAuMzI1NzU3NiAwLjk3NzI3MjdcblxuJGBsYXZvcm86IFBhcnQgdGltZSwgVkFSOiBkYW5jZWFiaWxpdHlgXG5bMV0gMC4zNzA4NDA5IDAuOTY2MTc0MlxuXG4kYGxhdm9ybzogRnVsbCB0aW1lLCBWQVI6IGVuZXJneWBcblsxXSAwLjMzNzYzNjQgMS4wMDU4MTgyXG5cbiRgbGF2b3JvOiBubywgVkFSOiBlbmVyZ3lgXG5bMV0gMC4yNTAwMDAgMS4wOTg0ODVcblxuJGBsYXZvcm86IFBhcnQgdGltZSwgVkFSOiBlbmVyZ3lgXG5bMV0gMC4zNzQ1MzAzIDEuMDE1ODYzNlxuXG4kYGxhdm9ybzogRnVsbCB0aW1lLCBWQVI6IGluc3RydW1lbnRhbG5lc3NgXG5bMV0gLTAuMjI4MDM3OSAgMC4yMjgwMzc5XG5cbiRgbGF2b3JvOiBubywgVkFSOiBpbnN0cnVtZW50YWxuZXNzYFxuWzFdIC0wLjI1MDAwMDAgIDAuNzA0NTQ1NVxuXG4kYGxhdm9ybzogUGFydCB0aW1lLCBWQVI6IGluc3RydW1lbnRhbG5lc3NgXG5bMV0gLTAuMjQ0NTAwMCAgMC4zNjMwNDU1XG5cbiRgbGF2b3JvOiBGdWxsIHRpbWUsIFZBUjogbGl2ZW5lc3NgXG5bMV0gLTAuMjA5NSAgMC40MjA1XG5cbiRgbGF2b3JvOiBubywgVkFSOiBsaXZlbmVzc2BcblsxXSAtMC4xODU4MjU4ICAwLjQwMzMxMDZcblxuJGBsYXZvcm86IFBhcnQgdGltZSwgVkFSOiBsaXZlbmVzc2BcblsxXSAtMC4yMTU3NDI0ICAwLjQyNDA0NTVcblxuJGBsYXZvcm86IEZ1bGwgdGltZSwgVkFSOiBsb3VkbmVzc2BcblsxXSAwLjcwNTQ5MjQgMC45NzA4MTA2XG5cbiRgbGF2b3JvOiBubywgVkFSOiBsb3VkbmVzc2BcblsxXSAwLjY1OTA5MDkgMS4wMDc1NzU4XG5cbiRgbGF2b3JvOiBQYXJ0IHRpbWUsIFZBUjogbG91ZG5lc3NgXG5bMV0gMC43MjE4NjM2IDAuOTYxNDA5MVxuXG4kYGxhdm9ybzogRnVsbCB0aW1lLCBWQVI6IHNwZWVjaGluZXNzYFxuWzFdIC0wLjIxODQ3NzMgIDAuMjk2MTU5MVxuXG4kYGxhdm9ybzogbm8sIFZBUjogc3BlZWNoaW5lc3NgXG5bMV0gLTAuMjI5MjUwMCAgMC4zMTI2MTM2XG5cbiRgbGF2b3JvOiBQYXJ0IHRpbWUsIFZBUjogc3BlZWNoaW5lc3NgXG5bMV0gLTAuMTQ2NzUwMCAgMC4yOTQ5OTI0XG5cbiRgbGF2b3JvOiBGdWxsIHRpbWUsIFZBUjogdGVtcG9gXG5bMV0gMC4xMDM1MjI3IDAuNzEwODU2MVxuXG4kYGxhdm9ybzogbm8sIFZBUjogdGVtcG9gXG5bMV0gMC4xMDI1ODMzIDAuNzEwNzUwMFxuXG4kYGxhdm9ybzogUGFydCB0aW1lLCBWQVI6IHRlbXBvYFxuWzFdIDAuMTEyNDU0NSAwLjcwOTA2MDZcblxuJGBsYXZvcm86IEZ1bGwgdGltZSwgVkFSOiB2YWxlbmNlYFxuWzFdIDAuMDczNjgxODIgMC44ODg2ODE4MlxuXG4kYGxhdm9ybzogbm8sIFZBUjogdmFsZW5jZWBcblsxXSAwLjA2Nzk3NzI3IDAuOTQ0MTI4NzlcblxuJGBsYXZvcm86IFBhcnQgdGltZSwgVkFSOiB2YWxlbmNlYFxuWzFdIDAuMTE0NTIyNyAwLjk2MjE1OTFcblxuJGBpbXBvcnRhbnphLm11c2ljYTogYWJiYXN0YW56YSwgVkFSOiBwb3B1bGFyaXR5YFxuWzFdIDAuMjY1MTUxNSAwLjg4NjM2MzZcblxuJGBpbXBvcnRhbnphLm11c2ljYTogbW9sdG8sIFZBUjogcG9wdWxhcml0eWBcblsxXSAwLjIzODQwOTEgMC45MDA2ODE4XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IHBvY28sIFZBUjogcG9wdWxhcml0eWBcblsxXSAwLjMwODg2MzYgMC45MTU1MzAzXG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IHRhbnRvLCBWQVI6IHBvcHVsYXJpdHlgXG5bMV0gMC4xNDM5Mzk0IDAuOTkyNDI0MlxuXG4kYGltcG9ydGFuemEubXVzaWNhOiBhYmJhc3RhbnphLCBWQVI6IGFjb3VzdGljbmVzc2BcblsxXSAtMC4yNTAwMDAwICAwLjc2NTE1MTVcblxuJGBpbXBvcnRhbnphLm11c2ljYTogbW9sdG8sIFZBUjogYWNvdXN0aWNuZXNzYFxuWzFdIC0wLjI0NzUgIDAuODc3NVxuXG4kYGltcG9ydGFuemEubXVzaWNhOiBwb2NvLCBWQVI6IGFjb3VzdGljbmVzc2BcblsxXSAtMC4yNSAgMC43NVxuXG4kYGltcG9ydGFuemEubXVzaWNhOiB0YW50bywgVkFSOiBhY291c3RpY25lc3NgXG5bMV0gLTAuMjUwMDAwMCAgMC44ODYzNjM2XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IGFiYmFzdGFuemEsIFZBUjogZGFuY2VhYmlsaXR5YFxuWzFdIDAuMzY0OTAxNSAwLjk3NTU1MzBcblxuJGBpbXBvcnRhbnphLm11c2ljYTogbW9sdG8sIFZBUjogZGFuY2VhYmlsaXR5YFxuWzFdIDAuMzA4MTEzNiAxLjAxNTQzMThcblxuJGBpbXBvcnRhbnphLm11c2ljYTogcG9jbywgVkFSOiBkYW5jZWFiaWxpdHlgXG5bMV0gMC4zNjQ1NjA2IDAuOTU0ODYzNlxuXG4kYGltcG9ydGFuemEubXVzaWNhOiB0YW50bywgVkFSOiBkYW5jZWFiaWxpdHlgXG5bMV0gMC4zMjAyNTc2IDAuOTYyNjUxNVxuXG4kYGltcG9ydGFuemEubXVzaWNhOiBhYmJhc3RhbnphLCBWQVI6IGVuZXJneWBcblsxXSAwLjM3MjcyNzMgMS4wMjE2MzY0XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IG1vbHRvLCBWQVI6IGVuZXJneWBcblsxXSAwLjIzOTg4NjQgMS4wMjU3MTk3XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IHBvY28sIFZBUjogZW5lcmd5YFxuWzFdIDAuMzgyODg2NCAxLjA1ODU2ODJcblxuJGBpbXBvcnRhbnphLm11c2ljYTogdGFudG8sIFZBUjogZW5lcmd5YFxuWzFdIDAuMjUzMDAwIDEuMDk4MDkxXG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IGFiYmFzdGFuemEsIFZBUjogaW5zdHJ1bWVudGFsbmVzc2BcblsxXSAtMC4xNzQyNDI0ICAwLjE3NDI0MjRcblxuJGBpbXBvcnRhbnphLm11c2ljYTogbW9sdG8sIFZBUjogaW5zdHJ1bWVudGFsbmVzc2BcblsxXSAtMC4yNDUwMDAwICAwLjg4MzQ4NDhcblxuJGBpbXBvcnRhbnphLm11c2ljYTogcG9jbywgVkFSOiBpbnN0cnVtZW50YWxuZXNzYFxuWzFdIC0wLjEyNjA4MzMgIDAuMTI2MDgzM1xuXG4kYGltcG9ydGFuemEubXVzaWNhOiB0YW50bywgVkFSOiBpbnN0cnVtZW50YWxuZXNzYFxuWzFdIC0wLjI0NTAwMDAgIDAuNTU2ODE4MlxuXG4kYGltcG9ydGFuemEubXVzaWNhOiBhYmJhc3RhbnphLCBWQVI6IGxpdmVuZXNzYFxuWzFdIC0wLjE5MzE1OTEgIDAuNDAyNTgzM1xuXG4kYGltcG9ydGFuemEubXVzaWNhOiBtb2x0bywgVkFSOiBsaXZlbmVzc2BcblsxXSAtMC4yNDk1MDAwICAwLjUwNjU2MDZcblxuJGBpbXBvcnRhbnphLm11c2ljYTogcG9jbywgVkFSOiBsaXZlbmVzc2BcblsxXSAtMC4xNjc5NTQ1ICAwLjM5NjU5MDlcblxuJGBpbXBvcnRhbnphLm11c2ljYTogdGFudG8sIFZBUjogbGl2ZW5lc3NgXG5bMV0gLTAuMjAzMzQwOSAgMC40MTcyNTAwXG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IGFiYmFzdGFuemEsIFZBUjogbG91ZG5lc3NgXG5bMV0gMC43MTk2OTcwIDAuOTYyMTIxMlxuXG4kYGltcG9ydGFuemEubXVzaWNhOiBtb2x0bywgVkFSOiBsb3VkbmVzc2BcblsxXSAwLjYzOTEzNjQgMC45Njc4NjM2XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IHBvY28sIFZBUjogbG91ZG5lc3NgXG5bMV0gMC43MTE3MzQ4IDAuOTczNDQ3MFxuXG4kYGltcG9ydGFuemEubXVzaWNhOiB0YW50bywgVkFSOiBsb3VkbmVzc2BcblsxXSAwLjY1NDc4MDMgMS4wMDgxNzQyXG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IGFiYmFzdGFuemEsIFZBUjogc3BlZWNoaW5lc3NgXG5bMV0gLTAuMjE3MjU3NiAgMC4zMTE5ODQ4XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IG1vbHRvLCBWQVI6IHNwZWVjaGluZXNzYFxuWzFdIC0wLjE1NDc1MDAgIDAuMzI2NjU5MVxuXG4kYGltcG9ydGFuemEubXVzaWNhOiBwb2NvLCBWQVI6IHNwZWVjaGluZXNzYFxuWzFdIC0wLjE5ODUwMCAgMC4zMTg4MDNcblxuJGBpbXBvcnRhbnphLm11c2ljYTogdGFudG8sIFZBUjogc3BlZWNoaW5lc3NgXG5bMV0gLTAuMjI5MjUwMCAgMC4zMTI2MTM2XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IGFiYmFzdGFuemEsIFZBUjogdGVtcG9gXG5bMV0gMC4xMDc4NDA5IDAuNzExNzUwMFxuXG4kYGltcG9ydGFuemEubXVzaWNhOiBtb2x0bywgVkFSOiB0ZW1wb2BcblsxXSAwLjA3MzgxODE4IDAuNzIyOTA5MDlcblxuJGBpbXBvcnRhbnphLm11c2ljYTogcG9jbywgVkFSOiB0ZW1wb2BcblsxXSAwLjA5OTQ1NDU1IDAuNzA5MjcyNzNcblxuJGBpbXBvcnRhbnphLm11c2ljYTogdGFudG8sIFZBUjogdGVtcG9gXG5bMV0gMC4wOTgzMzMzMyAwLjcwMjkzOTM5XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IGFiYmFzdGFuemEsIFZBUjogdmFsZW5jZWBcblsxXSAwLjExNTk1NDUgMC45NTkzNDg1XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IG1vbHRvLCBWQVI6IHZhbGVuY2VgXG5bMV0gMC4wODg4MzMzMyAwLjk2MjM0ODQ4XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IHBvY28sIFZBUjogdmFsZW5jZWBcblsxXSAwLjExNjM2MzYgMC45NDc4Nzg4XG5cbiRgaW1wb3J0YW56YS5tdXNpY2E6IHRhbnRvLCBWQVI6IHZhbGVuY2VgXG5bMV0gMC4wNTI2MDYwNiAwLjkyNDM2MzY0XG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogYXNjb2x0byBtdXNpY2Egc29sbyBpbiBzb3R0b2ZvbmRvIHF1YW5kbyBmYWNjaW8gYWx0cm8sIFZBUjogcG9wdWxhcml0eWBcblsxXSAwLjMzMDQ1NDUgMC45OTk4NDg1XG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogYXNjb2x0byBtdXNpY2Egdm9sZW50aWVyaSBtYSBub24gbWkgYWxsb250YW5vIGRhaSBtaWVpIGd1c3RpLCBWQVI6IHBvcHVsYXJpdHlgXG5bMV0gMC4yODAzMDMwIDAuODg2MzYzNlxuXG4kYGNvbWUuYXNjb2x0aS5tdXNpY2E6IHJpY2VyY28gc3Blc3NvIG11c2ljYSBudW92YSBlIGxhIGNvbnNpZGVybyB1buKAmWF0dGl2aXTDoCBhIHPDqSwgVkFSOiBwb3B1bGFyaXR5YFxuWzFdIDAuMTU5MDkwOSAwLjk0Njk2OTdcblxuJGBjb21lLmFzY29sdGkubXVzaWNhOiBhc2NvbHRvIG11c2ljYSBzb2xvIGluIHNvdHRvZm9uZG8gcXVhbmRvIGZhY2NpbyBhbHRybywgVkFSOiBhY291c3RpY25lc3NgXG5bMV0gLTAuMjM3NzUgIDAuNzEzMjVcblxuJGBjb21lLmFzY29sdGkubXVzaWNhOiBhc2NvbHRvIG11c2ljYSB2b2xlbnRpZXJpIG1hIG5vbiBtaSBhbGxvbnRhbm8gZGFpIG1pZWkgZ3VzdGksIFZBUjogYWNvdXN0aWNuZXNzYFxuWzFdIC0wLjI1ICAwLjc1XG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogcmljZXJjbyBzcGVzc28gbXVzaWNhIG51b3ZhIGUgbGEgY29uc2lkZXJvIHVu4oCZYXR0aXZpdMOgIGEgc8OpLCBWQVI6IGFjb3VzdGljbmVzc2BcblsxXSAtMC4yNTAwMDAwICAwLjkwMTUxNTJcblxuJGBjb21lLmFzY29sdGkubXVzaWNhOiBhc2NvbHRvIG11c2ljYSBzb2xvIGluIHNvdHRvZm9uZG8gcXVhbmRvIGZhY2NpbyBhbHRybywgVkFSOiBkYW5jZWFiaWxpdHlgXG5bMV0gMC4zNTM0NDcwIDAuOTY3OTkyNFxuXG4kYGNvbWUuYXNjb2x0aS5tdXNpY2E6IGFzY29sdG8gbXVzaWNhIHZvbGVudGllcmkgbWEgbm9uIG1pIGFsbG9udGFubyBkYWkgbWllaSBndXN0aSwgVkFSOiBkYW5jZWFiaWxpdHlgXG5bMV0gMC4zNjYzODY0IDAuOTY0NTY4MlxuXG4kYGNvbWUuYXNjb2x0aS5tdXNpY2E6IHJpY2VyY28gc3Blc3NvIG11c2ljYSBudW92YSBlIGxhIGNvbnNpZGVybyB1buKAmWF0dGl2aXTDoCBhIHPDqSwgVkFSOiBkYW5jZWFiaWxpdHlgXG5bMV0gMC4zMjAyNTc2IDAuOTYyNjUxNVxuXG4kYGNvbWUuYXNjb2x0aS5tdXNpY2E6IGFzY29sdG8gbXVzaWNhIHNvbG8gaW4gc290dG9mb25kbyBxdWFuZG8gZmFjY2lvIGFsdHJvLCBWQVI6IGVuZXJneWBcblsxXSAwLjQyNzkzMTggMS4wMTM1MjI3XG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogYXNjb2x0byBtdXNpY2Egdm9sZW50aWVyaSBtYSBub24gbWkgYWxsb250YW5vIGRhaSBtaWVpIGd1c3RpLCBWQVI6IGVuZXJneWBcblsxXSAwLjM4NTg4NjQgMS4wMDE1MDc2XG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogcmljZXJjbyBzcGVzc28gbXVzaWNhIG51b3ZhIGUgbGEgY29uc2lkZXJvIHVu4oCZYXR0aXZpdMOgIGEgc8OpLCBWQVI6IGVuZXJneWBcblsxXSAwLjIzNzkwOTEgMS4wODMwMDAwXG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogYXNjb2x0byBtdXNpY2Egc29sbyBpbiBzb3R0b2ZvbmRvIHF1YW5kbyBmYWNjaW8gYWx0cm8sIFZBUjogaW5zdHJ1bWVudGFsbmVzc2BcblsxXSAtMC4wMDcxNTE1MTUgIDAuMDA3MTUxNTE1XG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogYXNjb2x0byBtdXNpY2Egdm9sZW50aWVyaSBtYSBub24gbWkgYWxsb250YW5vIGRhaSBtaWVpIGd1c3RpLCBWQVI6IGluc3RydW1lbnRhbG5lc3NgXG5bMV0gLTAuMDk4NDg0ODUgIDAuMDk4NDg0ODVcblxuJGBjb21lLmFzY29sdGkubXVzaWNhOiByaWNlcmNvIHNwZXNzbyBtdXNpY2EgbnVvdmEgZSBsYSBjb25zaWRlcm8gdW7igJlhdHRpdml0w6AgYSBzw6ksIFZBUjogaW5zdHJ1bWVudGFsbmVzc2BcblsxXSAtMC4yNDUwMDAwICAwLjc0OTg0ODVcblxuJGBjb21lLmFzY29sdGkubXVzaWNhOiBhc2NvbHRvIG11c2ljYSBzb2xvIGluIHNvdHRvZm9uZG8gcXVhbmRvIGZhY2NpbyBhbHRybywgVkFSOiBsaXZlbmVzc2BcblsxXSAtMC4xODMwMDAwICAwLjM5MDE1MTVcblxuJGBjb21lLmFzY29sdGkubXVzaWNhOiBhc2NvbHRvIG11c2ljYSB2b2xlbnRpZXJpIG1hIG5vbiBtaSBhbGxvbnRhbm8gZGFpIG1pZWkgZ3VzdGksIFZBUjogbGl2ZW5lc3NgXG5bMV0gLTAuMTgyNDE2NyAgMC4zOTYwODMzXG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogcmljZXJjbyBzcGVzc28gbXVzaWNhIG51b3ZhIGUgbGEgY29uc2lkZXJvIHVu4oCZYXR0aXZpdMOgIGEgc8OpLCBWQVI6IGxpdmVuZXNzYFxuWzFdIC0wLjIzNDg0ODUgIDAuNDQ2OTY5N1xuXG4kYGNvbWUuYXNjb2x0aS5tdXNpY2E6IGFzY29sdG8gbXVzaWNhIHNvbG8gaW4gc290dG9mb25kbyBxdWFuZG8gZmFjY2lvIGFsdHJvLCBWQVI6IGxvdWRuZXNzYFxuWzFdIDAuNzUxNDY5NyAwLjk0ODY1MTVcblxuJGBjb21lLmFzY29sdGkubXVzaWNhOiBhc2NvbHRvIG11c2ljYSB2b2xlbnRpZXJpIG1hIG5vbiBtaSBhbGxvbnRhbm8gZGFpIG1pZWkgZ3VzdGksIFZBUjogbG91ZG5lc3NgXG5bMV0gMC43MzQ4NDg1IDAuOTYyMTIxMlxuXG4kYGNvbWUuYXNjb2x0aS5tdXNpY2E6IHJpY2VyY28gc3Blc3NvIG11c2ljYSBudW92YSBlIGxhIGNvbnNpZGVybyB1buKAmWF0dGl2aXTDoCBhIHPDqSwgVkFSOiBsb3VkbmVzc2BcblsxXSAwLjY0NzY4MTggMS4wMDQ4OTM5XG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogYXNjb2x0byBtdXNpY2Egc29sbyBpbiBzb3R0b2ZvbmRvIHF1YW5kbyBmYWNjaW8gYWx0cm8sIFZBUjogc3BlZWNoaW5lc3NgXG5bMV0gLTAuMTY0NTAwMCAgMC4zMDQwNzU4XG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogYXNjb2x0byBtdXNpY2Egdm9sZW50aWVyaSBtYSBub24gbWkgYWxsb250YW5vIGRhaSBtaWVpIGd1c3RpLCBWQVI6IHNwZWVjaGluZXNzYFxuWzFdIC0wLjIxNzI1NzYgIDAuMzExOTg0OFxuXG4kYGNvbWUuYXNjb2x0aS5tdXNpY2E6IHJpY2VyY28gc3Blc3NvIG11c2ljYSBudW92YSBlIGxhIGNvbnNpZGVybyB1buKAmWF0dGl2aXTDoCBhIHPDqSwgVkFSOiBzcGVlY2hpbmVzc2BcblsxXSAtMC4yMzQ4NDg1ICAwLjMxMDYwNjFcblxuJGBjb21lLmFzY29sdGkubXVzaWNhOiBhc2NvbHRvIG11c2ljYSBzb2xvIGluIHNvdHRvZm9uZG8gcXVhbmRvIGZhY2NpbyBhbHRybywgVkFSOiB0ZW1wb2BcblsxXSAwLjEyNzgxODIgMC43MDkyNzI3XG5cbiRgY29tZS5hc2NvbHRpLm11c2ljYTogYXNjb2x0byBtdXNpY2Egdm9sZW50aWVyaSBtYSBub24gbWkgYWxsb250YW5vIGRhaSBtaWVpIGd1c3RpLCBWQVI6IHRlbXBvYFxuWzFdIDAuMDkzNDYyMTIgMC43MTE3NTAwMFxuIn0= -->
+<pre><code>$`sesso: Femmina, VAR: popularity`
+[1] 0.2651515 0.9318182
+
+$`sesso: Maschio, VAR: popularity`
+[1] 0.1511364 0.9428030
+
+$`sesso: Femmina, VAR: acousticness`
+[1] -0.2500000  0.8560606
+
+$`sesso: Maschio, VAR: acousticness`
+[1] -0.2500000  0.8560606
+
+$`sesso: Femmina, VAR: danceability`
+[1] 0.3650758 0.9626515
+
+$`sesso: Maschio, VAR: danceability`
+[1] 0.3106061 0.9621212
+
+$`sesso: Femmina, VAR: energy`
+[1] 0.2951591 1.0671136
+
+$`sesso: Maschio, VAR: energy`
+[1] 0.2975682 1.0679773
+
+$`sesso: Femmina, VAR: instrumentalness`
+[1] -0.1559091  0.1559091
+
+$`sesso: Maschio, VAR: instrumentalness`
+[1] -0.2500000  0.7954545
+
+$`sesso: Femmina, VAR: liveness`
+[1] -0.1617121  0.3843182
+
+$`sesso: Maschio, VAR: liveness`
+[1] -0.2348485  0.4469697
+
+$`sesso: Femmina, VAR: loudness`
+[1] 0.6851136 0.9938258
+
+$`sesso: Maschio, VAR: loudness`
+[1] 0.6560379 0.9951136
+
+$`sesso: Femmina, VAR: speechiness`
+[1] -0.2196970  0.2954545
+
+$`sesso: Maschio, VAR: speechiness`
+[1] -0.2500000  0.3257576
+
+$`sesso: Femmina, VAR: tempo`
+[1] 0.09848485 0.70454545
+
+$`sesso: Maschio, VAR: tempo`
+[1] 0.09472727 0.70527273
+
+$`sesso: Femmina, VAR: valence`
+[1] 0.08358333 0.93944697
+
+$`sesso: Maschio, VAR: valence`
+[1] 0.06818182 0.96212121
+
+$`educazione: superiori, VAR: popularity`
+[1] 0.2964394 0.8893182
+
+$`educazione: università, VAR: popularity`
+[1] 0.2045455 0.9469697
+
+$`educazione: superiori, VAR: acousticness`
+[1] -0.238  0.714
+
+$`educazione: università, VAR: acousticness`
+[1] -0.2500000  0.8712121
+
+$`educazione: superiori, VAR: danceability`
+[1] 0.327 0.967
+
+$`educazione: università, VAR: danceability`
+[1] 0.3409091 0.9621212
+
+$`educazione: superiori, VAR: energy`
+[1] 0.3745076 0.9927197
+
+$`educazione: università, VAR: energy`
+[1] 0.280303 1.068182
+
+$`educazione: superiori, VAR: instrumentalness`
+[1] -0.08166667  0.08166667
+
+$`educazione: università, VAR: instrumentalness`
+[1] -0.2500000  0.6136364
+
+$`educazione: superiori, VAR: liveness`
+[1] -0.2375  0.4675
+
+$`educazione: università, VAR: liveness`
+[1] -0.1890152  0.4007121
+
+$`educazione: superiori, VAR: loudness`
+[1] 0.6918864 0.9844167
+
+$`educazione: università, VAR: loudness`
+[1] 0.6742424 0.9924242
+
+$`educazione: superiori, VAR: speechiness`
+[1] -0.2270000  0.3533636
+
+$`educazione: università, VAR: speechiness`
+[1] -0.2348485  0.3106061
+
+$`educazione: superiori, VAR: tempo`
+[1] 0.1097652 0.6981742
+
+$`educazione: università, VAR: tempo`
+[1] 0.09848485 0.71969697
+
+$`educazione: superiori, VAR: valence`
+[1] 0.1076439 0.9375985
+
+$`educazione: università, VAR: valence`
+[1] 0.08333333 0.94696970
+
+$`lavoro: Full time, VAR: popularity`
+[1] 0.3257576 0.9166667
+
+$`lavoro: no, VAR: popularity`
+[1] 0.1742424 0.9621212
+
+$`lavoro: Part time, VAR: popularity`
+[1] 0.2307576 0.9001515
+
+$`lavoro: Full time, VAR: acousticness`
+[1] -0.2475  0.8175
+
+$`lavoro: no, VAR: acousticness`
+[1] -0.2500000  0.8863636
+
+$`lavoro: Part time, VAR: acousticness`
+[1] -0.24975  0.74925
+
+$`lavoro: Full time, VAR: danceability`
+[1] 0.3543182 0.9257727
+
+$`lavoro: no, VAR: danceability`
+[1] 0.3257576 0.9772727
+
+$`lavoro: Part time, VAR: danceability`
+[1] 0.3708409 0.9661742
+
+$`lavoro: Full time, VAR: energy`
+[1] 0.3376364 1.0058182
+
+$`lavoro: no, VAR: energy`
+[1] 0.250000 1.098485
+
+$`lavoro: Part time, VAR: energy`
+[1] 0.3745303 1.0158636
+
+$`lavoro: Full time, VAR: instrumentalness`
+[1] -0.2280379  0.2280379
+
+$`lavoro: no, VAR: instrumentalness`
+[1] -0.2500000  0.7045455
+
+$`lavoro: Part time, VAR: instrumentalness`
+[1] -0.2445000  0.3630455
+
+$`lavoro: Full time, VAR: liveness`
+[1] -0.2095  0.4205
+
+$`lavoro: no, VAR: liveness`
+[1] -0.1858258  0.4033106
+
+$`lavoro: Part time, VAR: liveness`
+[1] -0.2157424  0.4240455
+
+$`lavoro: Full time, VAR: loudness`
+[1] 0.7054924 0.9708106
+
+$`lavoro: no, VAR: loudness`
+[1] 0.6590909 1.0075758
+
+$`lavoro: Part time, VAR: loudness`
+[1] 0.7218636 0.9614091
+
+$`lavoro: Full time, VAR: speechiness`
+[1] -0.2184773  0.2961591
+
+$`lavoro: no, VAR: speechiness`
+[1] -0.2292500  0.3126136
+
+$`lavoro: Part time, VAR: speechiness`
+[1] -0.1467500  0.2949924
+
+$`lavoro: Full time, VAR: tempo`
+[1] 0.1035227 0.7108561
+
+$`lavoro: no, VAR: tempo`
+[1] 0.1025833 0.7107500
+
+$`lavoro: Part time, VAR: tempo`
+[1] 0.1124545 0.7090606
+
+$`lavoro: Full time, VAR: valence`
+[1] 0.07368182 0.88868182
+
+$`lavoro: no, VAR: valence`
+[1] 0.06797727 0.94412879
+
+$`lavoro: Part time, VAR: valence`
+[1] 0.1145227 0.9621591
+
+$`importanza.musica: abbastanza, VAR: popularity`
+[1] 0.2651515 0.8863636
+
+$`importanza.musica: molto, VAR: popularity`
+[1] 0.2384091 0.9006818
+
+$`importanza.musica: poco, VAR: popularity`
+[1] 0.3088636 0.9155303
+
+$`importanza.musica: tanto, VAR: popularity`
+[1] 0.1439394 0.9924242
+
+$`importanza.musica: abbastanza, VAR: acousticness`
+[1] -0.2500000  0.7651515
+
+$`importanza.musica: molto, VAR: acousticness`
+[1] -0.2475  0.8775
+
+$`importanza.musica: poco, VAR: acousticness`
+[1] -0.25  0.75
+
+$`importanza.musica: tanto, VAR: acousticness`
+[1] -0.2500000  0.8863636
+
+$`importanza.musica: abbastanza, VAR: danceability`
+[1] 0.3649015 0.9755530
+
+$`importanza.musica: molto, VAR: danceability`
+[1] 0.3081136 1.0154318
+
+$`importanza.musica: poco, VAR: danceability`
+[1] 0.3645606 0.9548636
+
+$`importanza.musica: tanto, VAR: danceability`
+[1] 0.3202576 0.9626515
+
+$`importanza.musica: abbastanza, VAR: energy`
+[1] 0.3727273 1.0216364
+
+$`importanza.musica: molto, VAR: energy`
+[1] 0.2398864 1.0257197
+
+$`importanza.musica: poco, VAR: energy`
+[1] 0.3828864 1.0585682
+
+$`importanza.musica: tanto, VAR: energy`
+[1] 0.253000 1.098091
+
+$`importanza.musica: abbastanza, VAR: instrumentalness`
+[1] -0.1742424  0.1742424
+
+$`importanza.musica: molto, VAR: instrumentalness`
+[1] -0.2450000  0.8834848
+
+$`importanza.musica: poco, VAR: instrumentalness`
+[1] -0.1260833  0.1260833
+
+$`importanza.musica: tanto, VAR: instrumentalness`
+[1] -0.2450000  0.5568182
+
+$`importanza.musica: abbastanza, VAR: liveness`
+[1] -0.1931591  0.4025833
+
+$`importanza.musica: molto, VAR: liveness`
+[1] -0.2495000  0.5065606
+
+$`importanza.musica: poco, VAR: liveness`
+[1] -0.1679545  0.3965909
+
+$`importanza.musica: tanto, VAR: liveness`
+[1] -0.2033409  0.4172500
+
+$`importanza.musica: abbastanza, VAR: loudness`
+[1] 0.7196970 0.9621212
+
+$`importanza.musica: molto, VAR: loudness`
+[1] 0.6391364 0.9678636
+
+$`importanza.musica: poco, VAR: loudness`
+[1] 0.7117348 0.9734470
+
+$`importanza.musica: tanto, VAR: loudness`
+[1] 0.6547803 1.0081742
+
+$`importanza.musica: abbastanza, VAR: speechiness`
+[1] -0.2172576  0.3119848
+
+$`importanza.musica: molto, VAR: speechiness`
+[1] -0.1547500  0.3266591
+
+$`importanza.musica: poco, VAR: speechiness`
+[1] -0.198500  0.318803
+
+$`importanza.musica: tanto, VAR: speechiness`
+[1] -0.2292500  0.3126136
+
+$`importanza.musica: abbastanza, VAR: tempo`
+[1] 0.1078409 0.7117500
+
+$`importanza.musica: molto, VAR: tempo`
+[1] 0.07381818 0.72290909
+
+$`importanza.musica: poco, VAR: tempo`
+[1] 0.09945455 0.70927273
+
+$`importanza.musica: tanto, VAR: tempo`
+[1] 0.09833333 0.70293939
+
+$`importanza.musica: abbastanza, VAR: valence`
+[1] 0.1159545 0.9593485
+
+$`importanza.musica: molto, VAR: valence`
+[1] 0.08883333 0.96234848
+
+$`importanza.musica: poco, VAR: valence`
+[1] 0.1163636 0.9478788
+
+$`importanza.musica: tanto, VAR: valence`
+[1] 0.05260606 0.92436364
+
+$`come.ascolti.musica: ascolto musica solo in sottofondo quando faccio altro, VAR: popularity`
+[1] 0.3304545 0.9998485
+
+$`come.ascolti.musica: ascolto musica volentieri ma non mi allontano dai miei gusti, VAR: popularity`
+[1] 0.2803030 0.8863636
+
+$`come.ascolti.musica: ricerco spesso musica nuova e la considero un’attività a sé, VAR: popularity`
+[1] 0.1590909 0.9469697
+
+$`come.ascolti.musica: ascolto musica solo in sottofondo quando faccio altro, VAR: acousticness`
+[1] -0.23775  0.71325
+
+$`come.ascolti.musica: ascolto musica volentieri ma non mi allontano dai miei gusti, VAR: acousticness`
+[1] -0.25  0.75
+
+$`come.ascolti.musica: ricerco spesso musica nuova e la considero un’attività a sé, VAR: acousticness`
+[1] -0.2500000  0.9015152
+
+$`come.ascolti.musica: ascolto musica solo in sottofondo quando faccio altro, VAR: danceability`
+[1] 0.3534470 0.9679924
+
+$`come.ascolti.musica: ascolto musica volentieri ma non mi allontano dai miei gusti, VAR: danceability`
+[1] 0.3663864 0.9645682
+
+$`come.ascolti.musica: ricerco spesso musica nuova e la considero un’attività a sé, VAR: danceability`
+[1] 0.3202576 0.9626515
+
+$`come.ascolti.musica: ascolto musica solo in sottofondo quando faccio altro, VAR: energy`
+[1] 0.4279318 1.0135227
+
+$`come.ascolti.musica: ascolto musica volentieri ma non mi allontano dai miei gusti, VAR: energy`
+[1] 0.3858864 1.0015076
+
+$`come.ascolti.musica: ricerco spesso musica nuova e la considero un’attività a sé, VAR: energy`
+[1] 0.2379091 1.0830000
+
+$`come.ascolti.musica: ascolto musica solo in sottofondo quando faccio altro, VAR: instrumentalness`
+[1] -0.007151515  0.007151515
+
+$`come.ascolti.musica: ascolto musica volentieri ma non mi allontano dai miei gusti, VAR: instrumentalness`
+[1] -0.09848485  0.09848485
+
+$`come.ascolti.musica: ricerco spesso musica nuova e la considero un’attività a sé, VAR: instrumentalness`
+[1] -0.2450000  0.7498485
+
+$`come.ascolti.musica: ascolto musica solo in sottofondo quando faccio altro, VAR: liveness`
+[1] -0.1830000  0.3901515
+
+$`come.ascolti.musica: ascolto musica volentieri ma non mi allontano dai miei gusti, VAR: liveness`
+[1] -0.1824167  0.3960833
+
+$`come.ascolti.musica: ricerco spesso musica nuova e la considero un’attività a sé, VAR: liveness`
+[1] -0.2348485  0.4469697
+
+$`come.ascolti.musica: ascolto musica solo in sottofondo quando faccio altro, VAR: loudness`
+[1] 0.7514697 0.9486515
+
+$`come.ascolti.musica: ascolto musica volentieri ma non mi allontano dai miei gusti, VAR: loudness`
+[1] 0.7348485 0.9621212
+
+$`come.ascolti.musica: ricerco spesso musica nuova e la considero un’attività a sé, VAR: loudness`
+[1] 0.6476818 1.0048939
+
+$`come.ascolti.musica: ascolto musica solo in sottofondo quando faccio altro, VAR: speechiness`
+[1] -0.1645000  0.3040758
+
+$`come.ascolti.musica: ascolto musica volentieri ma non mi allontano dai miei gusti, VAR: speechiness`
+[1] -0.2172576  0.3119848
+
+$`come.ascolti.musica: ricerco spesso musica nuova e la considero un’attività a sé, VAR: speechiness`
+[1] -0.2348485  0.3106061
+
+$`come.ascolti.musica: ascolto musica solo in sottofondo quando faccio altro, VAR: tempo`
+[1] 0.1278182 0.7092727
+
+$`come.ascolti.musica: ascolto musica volentieri ma non mi allontano dai miei gusti, VAR: tempo`
+[1] 0.09346212 0.71175000</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="saving-data" class="section level1">
+<h1>Saving data</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2F2ZVJEUyhsaXN0X2ludGVydmFscyxcIi4uL2NvbmZvcm1hbF9pbnRlcnZhbHNfYnlHcm91cHMuUkRhdGFcIilcbmBgYCJ9 -->
+<pre class="r"><code>saveRDS(list_intervals,&quot;../conformal_intervals_byGroups.RData&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KYGBge3J9DQpsaWJyYXJ5KGdncGxvdDIpDQpgYGANCg0KIyBMb2FkIERhdGFzZXRzDQpgYGB7cn0NCmRhdGFzZXRfbGlzdCA9IHJlYWRSRFMoIi4uL2RhdGEvZGF0YV9saXN0LlJEYXRhIikNCm5hbWVzKGRhdGFzZXRfbGlzdCkNCmRhdGFzZXRfbGlzdFtbMV1dDQpgYGANCg0KIyBTYXZlIG5ldyBkYXRhc2V0IGxpc3QNCmBgYHtyfQ0Kc2F2ZVJEUyhkYXRhc2V0c19tYW5pcHVsYXRlZCwiLi4vZGF0YS9kYXRhX2dlbnJlc19jbGVhbmVkLlJEYXRhIikNCmBgYA0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KYGBge3J9DQpsaWJyYXJ5KGhleGJpbikNCmxpYnJhcnkoZ2dwbG90MikNCmxpYnJhcnkocm9haGQpDQpsaWJyYXJ5KHNwYXRzdGF0Lmdlb20pDQpgYGANCmBgYHtyfQ0KbGlicmFyeShkcGx5cikgDQpsaWJyYXJ5KGdncGxvdDIpDQpsaWJyYXJ5KGtuaXRyKQ0KbGlicmFyeShicm9vbSkNCmxpYnJhcnkodGlkeXIpDQpsaWJyYXJ5KHByb2dyZXNzKQ0KbGlicmFyeShwYmFwcGx5KQ0KcGJvcHRpb25zKHR5cGU9J25vbmUnKQ0KbGlicmFyeShkYnNjYW4pDQpsaWJyYXJ5KGdyaWRFeHRyYSkNCmBgYA0KDQoNCmBgYHtyfQ0KZGF0YV9udW1lcmljX2NsZWFuZWQgPSByZWFkUkRTKCIuLi9kYXRhL2RhdGFfbnVtZXJpY19jbGVhbmVkMi5SRGF0YSIpDQpzdXJ2ZXlfZGF0YSA9IHJlYWRSRFMoIi4uL2RhdGEvU3VydmV5Y2xlYW5lZC5SRGF0YSIpDQp0ZXN0PC1zdXJ2ZXlfZGF0YSRjYW1wby5zdHVkaSE9IlNURU0gKFNjaWVuY2UsIFRlY2hub2xvZ3ksIEVuZ2luZWVyaW5nLCBNYXRoZW1hdGljcykiICAgICAgICAgDQpzdXJ2ZXlfZGF0YSRjYW1wby5zdHVkaTwtaWZlbHNlKHRlc3QsIk90aGVycyIsIlNURU0gKFNjaWVuY2UsIFRlY2hub2xvZ3ksIEVuZ2luZWVyaW5nLCBNYXRoZW1hdGljcykiKQ0Kc3VydmV5X2RhdGEkY2FtcG8uc3R1ZGlbaXMubmEoc3VydmV5X2RhdGEkY2FtcG8uc3R1ZGkpXSA9ICJtaXNzaW5nIg0KIyMjIyMjIyMjIyMNCnRlc3Q8LXN1cnZleV9kYXRhJHN0YXRvIT0iSXRhbGlhIiAgICAgICAgIA0Kc3VydmV5X2RhdGEkc3RhdG88LWlmZWxzZSh0ZXN0LCJPdGhlcnMiLCJJdGFsaWEiKQ0Kc3VydmV5X2RhdGEkc3RhdG9baXMubmEoc3VydmV5X2RhdGEkc3RhdG8pXSA9ICJtaXNzaW5nIg0KIyMjIyMjIyMjIyMNCnRlc3Q8LXN1cnZleV9kYXRhJGxpYnJpIT0iMCIgICAgICAgICANCnN1cnZleV9kYXRhJGxpYnJpPC1pZmVsc2UodGVzdCwiMSsiLCIwIikNCnN1cnZleV9kYXRhJGxpYnJpW2lzLm5hKHN1cnZleV9kYXRhJGxpYnJpKV0gPSAibWlzc2luZyINCiMjIyMjIyMjIyMNCnRlc3Q8LXN1cnZleV9kYXRhJGVzdGVybyE9Ik5vIiAgICAgICAgIA0Kc3VydmV5X2RhdGEkZXN0ZXJvPC1pZmVsc2UodGVzdCwiU2kiLCJObyIpDQpzdXJ2ZXlfZGF0YSRlc3Rlcm9baXMubmEoc3VydmV5X2RhdGEkZXN0ZXJvKV0gPSAibWlzc2luZyINCiMjIyMjIyMjIyMNCmNvbG5hbWVzKHN1cnZleV9kYXRhKVsxXSA9ICJhZ2UiDQoNCnRlc3Q8LXN1cnZleV9kYXRhJGFnZSA8IDIyLjUgICAgICAgICANCnN1cnZleV9kYXRhJGFnZTwtaWZlbHNlKHRlc3QsIlVuZGVyMjIuNSIsIk92ZXIyMi41IikNCnN1cnZleV9kYXRhJGFnZVtpcy5uYShzdXJ2ZXlfZGF0YSRhZ2UpXSA9ICJtaXNzaW5nIg0KIyMjIyMjIyMjIFRPIERPDQojIHRlc3Q8LXN1cnZleV9kYXRhJGdlbmVyZSE9Ik5vIiAgICAgICAgIA0KIyBzdXJ2ZXlfZGF0YSRnZW5lcmU8LWlmZWxzZSh0ZXN0LCJTaSIsIk5vIikNCiMgc3VydmV5X2RhdGEkZ2VuZXJlW2lzLm5hKHN1cnZleV9kYXRhJGdlbmVyZSldID0gIm1pc3NpbmciDQojIyMjIyMjIyMgDQp0ZXN0PC1zdXJ2ZXlfZGF0YSRjb25jZXJ0aT41ICAgICAgICAgDQpzdXJ2ZXlfZGF0YSRjb25jZXJ0aTwtaWZlbHNlKHRlc3QsIm1vcmUgdGhhbiA1IiwibGVzcyB0aGFuIDUiKQ0KIyMjIyMjIyMjIA0Kc3VydmV5X2RhdGEkcmVnaW9uZVtpcy5uYShzdXJ2ZXlfZGF0YSRyZWdpb25lKV0gPSAibWlzc2luZyINCiMjIyMjIyMjIyBUTyBETw0Kc3VydmV5X2RhdGEkYWJpdGFudGkuY2l0dGFbc3VydmV5X2RhdGEkYWJpdGFudGkuY2l0dGE9PSJNZW5vIGRpIDEwMDAgYWJpdGFudGkiXSA9ICJUcmEgMTAuMDAwIGUgMTAwLjAwMCINCiMgUmltdW92aSBsaXZlbGxpIHZ1b3RpDQpzdXJ2ZXlfZGF0YSRhYml0YW50aS5jaXR0YSA8LSBkcm9wbGV2ZWxzKHN1cnZleV9kYXRhJGFiaXRhbnRpLmNpdHRhKQ0KYGBgDQoNCg0KIyBjb21iaW5lIHRoZSBkYXRhDQoNCmBgYHtyfQ0KY29tYmluZWRfZGF0YSA8LSBtZXJnZShkYXRhX251bWVyaWNfY2xlYW5lZCwgc3VydmV5X2RhdGEsIGJ5LnggPSAiaWQiLCBieS55ID0gImlkIikNCmhlYWQoY29tYmluZWRfZGF0YSkNCmBgYA0KDQoNCg0KIyBOQyBtZWFzdXJlDQpgYGB7cn0NCiMgfCBEaXNjcmVwYW5jeS1iYXNlZCB8DQpOQyA9IGZ1bmN0aW9uKHpfYXVnLCBpKXsNCiAgI2Ficyh6X2F1Z1tpXSAtIG1lYW4oel9hdWdbLWldKSkNCiAgYWJzKHpfYXVnW2ldIC0gbWVkaWFuKHpfYXVnWy1pXSkpICAjIG1vcmUgcm9idXN0DQogICNhYnMoel9hdWdbaV0gLSAxOCkgICAgICAgICAgICAgICAgICAjIGEgZGV0ZXJtaW5pc3RpYyBwcmVkaWN0b3INCiAgI2Ficyh6X2F1Z1tpXSAtIHJhbmRvbS5udW1iZXIpICAgICAgICMgYSBmdWxseSByYW5kb20gcHJlZGljdG9yDQp9DQpgYGANCg0KIyBtYWluIGZ1bmN0aW9uDQpgYGB7cn0NCmNvbmZvcm1hbF91bml2YXJpYXRlX2ludGVydmFsIDwtIGZ1bmN0aW9uKHgsIHBsb3R0aW5nID0gRkFMU0Upew0KICB4X2dyaWQgID0gc2VxKG1pbih4KS0wLjI1KmRpZmYocmFuZ2UoeCkpLCBtYXgoeCkrMC4yNSpkaWZmKHJhbmdlKHgpKSwgbGVuZ3RoLm91dD0xMDApDQogIHBfdmFsdWUgPSBudW1lcmljKGxlbmd0aCh4X2dyaWQpKQ0KDQoNCiAgZm9yKGsgaW4gMTpsZW5ndGgoeF9ncmlkKSl7DQogICAgeF9hdWcgID0gYyh4LCB4X2dyaWRba10pDQogICAgc2NvcmVzID0gbnVtZXJpYyhsZW5ndGgoeF9hdWcpKQ0KICAgIGZvcihpIGluIDE6bGVuZ3RoKHNjb3Jlcykpew0KICAgICAgc2NvcmVzW2ldID0gTkMoeF9hdWcsIGkpDQogICAgfQ0KICAgIHBfdmFsdWVba10gPSBzdW0oc2NvcmVzPj1zY29yZXNbbGVuZ3RoKHhfYXVnKV0pLyhsZW5ndGgoeF9hdWcpKQ0KICB9DQoNCiAgIyBQcmVkaWN0aW9uIEludGVydmFsDQogIFBJX2dyaWQgPSB4X2dyaWRbd2hpY2gocF92YWx1ZT49YWxwaGEpXQ0KICBQSSAgICAgID0gYyhtaW4oUElfZ3JpZCksIG1heChQSV9ncmlkKSkNCiAgIyBLTk4gDQogICMgUEkgPC0geF9ncmlkW2FzLmxvZ2ljYWwoYygwLGFicyhkaWZmKHBfdmFsdWU+YWxwaGEpKSkpXQ0KICANCiAgDQogIGlmKHBsb3R0aW5nKXsNCiAgICAjIFBsb3Qgb2YgdGhlIHAtdmFsdWVzDQogICAgcGxvdCh4X2dyaWQsIHBfdmFsdWUsIHR5cGU9J2wnLCB5bGltPWMoMCwxKSkNCiAgICBhYmxpbmUoaD1jKDAsMSkpDQogICAgYWJsaW5lKGg9YWxwaGEsIGNvbD0ncmVkJykNCiAgICBwb2ludHMoeCwgbnVtZXJpYyhsZW5ndGgoeCkpLCBwY2g9MykNCiAgICBhYmxpbmUodj1QSSwgY29sPSdyZWQnKQ0KICAgIHBvaW50cyhQSV9ncmlkLCBudW1lcmljKGxlbmd0aChQSV9ncmlkKSksIHBjaD0xNiwgY29sPSdyZWQnKQ0KICAgIA0KICAgIA0KICAgIGhpc3QoeCwgY29sPSdsaWdodGJsdWUnKQ0KICAgIGFibGluZSh2PVBJLGNvbD0nYmx1ZScpICMgQ29uZm9ybWFsIHByZWRpY3Rpb24gaW50ZXJ2YWwNCiAgICANCiAgICBsZWdlbmQoInRvcHJpZ2h0IiwgbGVnZW5kPSJDb25mb3JtYWwiLCBjb2w9ImJsdWUiLA0KICAgICAgICAgICBsdHk9MSwgY2V4PTAuOCkNCiAgfQ0KICByZXR1cm4oUEkpDQoNCn0NCmBgYA0KDQojIE11c2ljIGFuZCBTdXJ2ZXkgY292YXJpYXRlcw0KYGBge3J9DQptdXNpY192YXJzID0gY29sbmFtZXMoZGF0YV9udW1lcmljX2NsZWFuZWQpDQptdXNpY192YXJzID0gbXVzaWNfdmFyc1shKG11c2ljX3ZhcnMgJWluJSBjKCJpZCIsInllYXIiLCJkdXJhdGlvbiIpKV0gIyBleGNsdWRlIHllYXIgYW5kIGR1cmF0aW9uDQpzdXJ2ZXlfY292cyA9IGNvbG5hbWVzKHN1cnZleV9kYXRhKQ0Kc3VydmV5X2NvdnMgPSBzdXJ2ZXlfY292c1shKHN1cnZleV9jb3ZzICVpbiUgYygiZ2VuZXJlIiwiaWQiKSldDQpgYGANCg0KIyBFeGFtcGxlDQpgYGB7cn0NCnVuaXZhcmlhdGVfZGF0YV9maWx0ZXJlZCA9IGNvbWJpbmVkX2RhdGFbY29tYmluZWRfZGF0YVssInNlc3NvIl0gPT0gIk1hc2NoaW8iLCAicG9wdWxhcml0eSJdDQpjb25mb3JtYWxfdW5pdmFyaWF0ZV9pbnRlcnZhbCh1bml2YXJpYXRlX2RhdGFfZmlsdGVyZWQpDQpgYGANCg0KDQojIEZvciBsb29wIGZvciBldmVyeSBwb3NzaWJsZSBjb21iaW5hdGlvbg0KYGBge3J9DQphbHBoYSA9IDAuMDUNCg0KbGlzdF9pbnRlcnZhbHMgPSBsaXN0KCkNCmZvcihzIGluIHN1cnZleV9jb3ZzKXsNCiAgZ3JvdXBzX3N1cnZleSA9IGxldmVscyhjb21iaW5lZF9kYXRhWyxzXSkNCiAgZm9yICggbSBpbiBtdXNpY192YXJzICl7DQogICAgZm9yKCBnIGluIGdyb3Vwc19zdXJ2ZXkpew0KICAgICAgdW5pdmFyaWF0ZV9kYXRhX2ZpbHRlcmVkID0gY29tYmluZWRfZGF0YVtjb21iaW5lZF9kYXRhWyxzXSA9PSBnLCBtXQ0KICAgICAgbmFtZV9mb3JfbGlzdCA9IHBhc3RlMChzLCI6ICIsZywiLCBWQVI6ICIsbSkNCiAgICAgIHByaW50KG5hbWVfZm9yX2xpc3QpDQogICAgICBsaXN0X2ludGVydmFsc1tbbmFtZV9mb3JfbGlzdF1dID0gY29uZm9ybWFsX3VuaXZhcmlhdGVfaW50ZXJ2YWwodW5pdmFyaWF0ZV9kYXRhX2ZpbHRlcmVkKQ0KICAgIH0NCiAgfQ0KfQ0KDQoNCmBgYA0KIyBTYXZpbmcgZGF0YQ0KYGBge3J9DQpzYXZlUkRTKGxpc3RfaW50ZXJ2YWxzLCIuLi9jb25mb3JtYWxfaW50ZXJ2YWxzX2J5R3JvdXBzLlJEYXRhIikNCmBgYA0KDQoNCg0KDQoNCg0KDQoNCg0KDQo=</div>
 
 
 
@@ -1830,7 +2461,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Template.Rmd");
+  window.initializeSourceEmbed("Conformal Prediction-Ettore.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

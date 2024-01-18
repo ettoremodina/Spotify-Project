@@ -301,7 +301,7 @@ covariate_iterator <- function(){
 }
 
 results_IWT_list <- list()
-alpha_vect = c(0,0.1,0.5,0.7,0.9,1,2)
+alpha_vect = c(0.1,0.5,0.7,0.9)
 index = 1
 for(a in alpha_vect){
   print(a)
@@ -334,7 +334,8 @@ print(paste0("music_covs = ",unique(music_cov_passed)))
 print(paste0("survey_covs = ",unique(survey_cov_passed)))
 ```
 [1] "music_covs = popularity"   "music_covs = acousticness"
-[3] "music_covs = liveness"    
+[3] "music_covs = liveness"   
+
  [1] "survey_covs = sesso"              
  [2] "survey_covs = campo.studi"        
  [3] "survey_covs = stato"              
