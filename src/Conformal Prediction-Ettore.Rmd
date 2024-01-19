@@ -141,34 +141,43 @@ conformal_univariate_interval(univariate_data_filtered)
 ```
 
 
+
+
 # For loop for every possible combination
 ```{r}
 alpha = 0.05
-
-list_intervals = list()
+#list_intervals = list()
 for(s in survey_covs){
   groups_survey = levels(combined_data[,s])
   for ( m in music_vars ){
     for( g in groups_survey){
-      univariate_data_filtered = combined_data[combined_data[,s] == g, m]
+      
       name_for_list = paste0(s,": ",g,", VAR: ",m)
       print(name_for_list)
-      list_intervals[[name_for_list]] = conformal_univariate_interval(univariate_data_filtered)
       
-      # cut if exceed [0,1]
-      list_intervals[[name_for_list]][1]=max(list_intervals[[name_for_list]][1],0)
-      list_intervals[[name_for_list]][2]=min(list_intervals[[name_for_list]][2],1)
-        
+      # jump tests that have already been done
+      if(!(name_for_list%in%names(list_intervals))){
+        univariate_data_filtered = combined_data[combined_data[,s] == g, m]
+        list_intervals[[name_for_list]] = conformal_univariate_interval(univariate_data_filtered)
+        # cut if exceed [0,1], the prediction is still valid at alpha percent
+        list_intervals[[name_for_list]][1]=max(list_intervals[[name_for_list]][1],0)
+        list_intervals[[name_for_list]][2]=min(list_intervals[[name_for_list]][2],1)
+      }
+      
+      
+      
+      
     }
   }
 }
 
-
 ```
+
 # Saving data
 ```{r}
-saveRDS(list_intervals,"../conformal_intervals_byGroups.RData")
+#saveRDS(list_intervals,"../conformal_intervals_byGroups.RData")
 ```
+
 
 
 
