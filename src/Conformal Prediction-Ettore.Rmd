@@ -154,6 +154,11 @@ for(s in survey_covs){
       name_for_list = paste0(s,": ",g,", VAR: ",m)
       print(name_for_list)
       list_intervals[[name_for_list]] = conformal_univariate_interval(univariate_data_filtered)
+      
+      # cut if exceed [0,1]
+      list_intervals[[name_for_list]][1]=max(list_intervals[[name_for_list]][1],0)
+      list_intervals[[name_for_list]][2]=min(list_intervals[[name_for_list]][2],1)
+        
     }
   }
 }
