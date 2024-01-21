@@ -533,6 +533,10 @@ saveRDS(reduced,"../../data/survey_reduced.RData")
 
 ```
  
+```{r}
+res<-readRDS("../../data/pvalues_cat.RData")
+```
+
 ## Two-way Anova
 
 ```{r}
