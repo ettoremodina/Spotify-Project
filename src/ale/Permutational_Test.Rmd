@@ -5,7 +5,7 @@ date: "2023-11-22"
 output: html_document
 ---
 
-```{r, eval=FALSE}
+```{r}
 library(dplyr)
 set.seed(53)
 ```
@@ -254,23 +254,24 @@ res_abroad
 ### Permutation Test each num_cov by age
 
 ```{r}
+colnames(survey_data)[1] ="age"
 # Count values below 22.5 in the 'age' column
-values_below_23 <- sum(survey_data$età < 23, na.rm = TRUE)
+values_below_23 <- sum(survey_data$age < 23, na.rm = TRUE)
 values_below_23
 
 # Count missing data in the 'age' column
-missing_data_age <- sum(is.na(survey_data$età))
+missing_data_age <- sum(is.na(survey_data$age))
 missing_data_age
 
 ```
 
 ```{r}
-test<-survey_data$età < 23        
-survey_data$età<-ifelse(test,"Under23","Over23")
-temp<-survey_data$id[!is.na(survey_data$età)]
-selected_età <- survey_data$età[!is.na(survey_data$età)]
-cat1<-temp[selected_età =="Under23"]
-cat2<-temp[selected_età =="Over23"]
+test<-survey_data$age < 23        
+survey_data$age<-ifelse(test,"Under23","Over23")
+temp<-survey_data$id[!is.na(survey_data$age)]
+selected_age <- survey_data$age[!is.na(survey_data$age)]
+cat1<-temp[selected_age =="Under23"]
+cat2<-temp[selected_age =="Over23"]
 ```
 
 
@@ -550,10 +551,10 @@ p-value:0.048
 ```{r}
 B=1000
 
-T0_stat <- summary.aov(aov(median_data$energy~ survey_data$età+ survey_data$estero+survey_data$età:survey_data$estero))[[1]][3,4]  
+T0_stat <- summary.aov(aov(median_data$energy~ survey_data$age+ survey_data$estero+survey_data$age:survey_data$estero))[[1]][3,4]  
 T0_stat
 
-aov.H0 <- aov(median_data$energy~ survey_data$età+ survey_data$estero)
+aov.H0 <- aov(median_data$energy~ survey_data$age+ survey_data$estero)
 aov.H0
 
 residuals.H0 <- aov.H0$residuals 
@@ -567,7 +568,7 @@ for(perm in 1:B){
   residuals.H0 <- residuals.H0[permutation]
   perm.response.H0 <- aov.H0$fitted + residuals.H0
   # re-fit full model to calculate statistic
-  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$età + survey_data$estero + survey_data$età:survey_data$estero))[[1]][3,4]
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$age + survey_data$estero + survey_data$age:survey_data$estero))[[1]][3,4]
 }
 sum(T_stat >= T0_stat)/B
 ```
@@ -606,10 +607,10 @@ accept H0
 ```{r}
 B=1000
 
-T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$età+survey_data$età:survey_data$estero+survey_data$lavoro:survey_data$estero:survey_data$età))[[1]][3,4]  
+T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero+survey_data$lavoro:survey_data$estero:survey_data$age))[[1]][3,4]  
 
 
-aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$età+survey_data$età:survey_data$estero)
+aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero)
 
 
 residuals.H0 <- aov.H0$residuals 
@@ -623,7 +624,7 @@ for(perm in 1:B){
   residuals.H0 <- residuals.H0[permutation]
   perm.response.H0 <- aov.H0$fitted + residuals.H0
   # re-fit full model to calculate statistic
-  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$età+survey_data$età:survey_data$estero+survey_data$lavoro:survey_data$estero:survey_data$età))[[1]][3,4]
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero+survey_data$lavoro:survey_data$estero:survey_data$age))[[1]][3,4]
 }
 sum(T_stat >= T0_stat)/B
 ```
@@ -632,10 +633,10 @@ accept H0
 ```{r}
 B=1000
 
-T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$età+survey_data$età:survey_data$estero))[[1]][3,4]  
+T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]  
 
 
-aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$età+survey_data$età:survey_data$estero)
+aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero)
 
 
 residuals.H0 <- aov.H0$residuals 
@@ -649,21 +650,21 @@ for(perm in 1:B){
   residuals.H0 <- residuals.H0[permutation]
   perm.response.H0 <- aov.H0$fitted + residuals.H0
   # re-fit full model to calculate statistic
-  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$età+survey_data$età:survey_data$estero))[[1]][3,4]
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]
 }
 sum(T_stat >= T0_stat)/B
 ```
-H1 as before H0 remove estero:età
+H1 as before H0 remove estero:age
 accept H0
 
 
 ```{r}
 B=1000
 
-T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$età+survey_data$età:survey_data$estero))[[1]][3,4]  
+T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]  
 
 
-aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$età)
+aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age)
 
 
 residuals.H0 <- aov.H0$residuals 
@@ -677,21 +678,21 @@ for(perm in 1:B){
   residuals.H0 <- residuals.H0[permutation]
   perm.response.H0 <- aov.H0$fitted + residuals.H0
   # re-fit full model to calculate statistic
-  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$età+survey_data$età:survey_data$estero))[[1]][3,4]
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]
 }
 sum(T_stat >= T0_stat)/B
 ```
-H1 as before H0 remove lavoro:età
+H1 as before H0 remove lavoro:age
 accept H0
 
 -> no interactions
 ```{r}
 B=1000
 
-T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$età))[[1]][3,4]  
+T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age))[[1]][3,4]  
 
 
-aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$età+ survey_data$estero)
+aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero)
 
 
 residuals.H0 <- aov.H0$residuals 
@@ -705,7 +706,7 @@ for(perm in 1:B){
   residuals.H0 <- residuals.H0[permutation]
   perm.response.H0 <- aov.H0$fitted + residuals.H0
   # re-fit full model to calculate statistic
-  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$età+ survey_data$estero+survey_data$lavoro:survey_data$età))[[1]][3,4]
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age))[[1]][3,4]
 }
 sum(T_stat >= T0_stat)/B
 ```
@@ -717,10 +718,10 @@ accept H0
 ```{r}
 B=1000
 
-T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$età+survey_data$età:survey_data$estero+survey_data$strumento:survey_data$estero:survey_data$età))[[1]][3,4]  
+T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero+survey_data$strumento:survey_data$estero:survey_data$age))[[1]][3,4]  
 
 
-aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$età+survey_data$età:survey_data$estero)
+aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero)
 
 
 residuals.H0 <- aov.H0$residuals 
@@ -734,20 +735,20 @@ for(perm in 1:B){
   residuals.H0 <- residuals.H0[permutation]
   perm.response.H0 <- aov.H0$fitted + residuals.H0
   # re-fit full model to calculate statistic
-  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$età+survey_data$età:survey_data$estero+survey_data$strumento:survey_data$estero:survey_data$età))[[1]][3,4]
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero+survey_data$strumento:survey_data$estero:survey_data$age))[[1]][3,4]
 }
 sum(T_stat >= T0_stat)/B
 ```
 
-H0 remove età:estero
+H0 remove age:estero
 accept H0
 ```{r}
 B=1000
 
-T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$età+survey_data$età:survey_data$estero))[[1]][3,4]  
+T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]  
 
 
-aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$età)
+aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age)
 
 
 residuals.H0 <- aov.H0$residuals 
@@ -761,19 +762,19 @@ for(perm in 1:B){
   residuals.H0 <- residuals.H0[permutation]
   perm.response.H0 <- aov.H0$fitted + residuals.H0
   # re-fit full model to calculate statistic
-  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$età+survey_data$età:survey_data$estero))[[1]][3,4]
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]
 }
 sum(T_stat >= T0_stat)/B
 ```
-H0 remove età:strumento
+H0 remove age:strumento
 accept H0
 ```{r}
 B=1000
 
-T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$età))[[1]][3,4]  
+T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age))[[1]][3,4]  
 
 
-aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero)
+aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero)
 
 
 residuals.H0 <- aov.H0$residuals 
@@ -787,7 +788,7 @@ for(perm in 1:B){
   residuals.H0 <- residuals.H0[permutation]
   perm.response.H0 <- aov.H0$fitted + residuals.H0
   # re-fit full model to calculate statistic
-  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$età))[[1]][3,4]
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age))[[1]][3,4]
 }
 sum(T_stat >= T0_stat)/B
 ```
@@ -797,10 +798,10 @@ accept H0
 ```{r}
 B=1000
 
-T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero))[[1]][3,4]  
+T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero))[[1]][3,4]  
 
 
-aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$età+ survey_data$estero)
+aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero)
 
 
 residuals.H0 <- aov.H0$residuals 
@@ -814,7 +815,7 @@ for(perm in 1:B){
   residuals.H0 <- residuals.H0[permutation]
   perm.response.H0 <- aov.H0$fitted + residuals.H0
   # re-fit full model to calculate statistic
-  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$età+ survey_data$estero+survey_data$strumento:survey_data$estero))[[1]][3,4]
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero))[[1]][3,4]
 }
 sum(T_stat >= T0_stat)/B
 ```
@@ -873,4 +874,8 @@ ggplot(k_data, aes(x = sesso, y = libri, color = cluster)) +
 ```
 
 
+
+```{r}
+
+```
 

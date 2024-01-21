@@ -1,0 +1,288 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library(hexbin)
+library(ggplot2)
+library(roahd)
+library(spatstat.geom)
+```
+```{r}
+library(dplyr) 
+library(ggplot2)
+library(knitr)
+library(broom)
+library(tidyr)
+library(progress)
+library(pbapply)
+pboptions(type='none')
+library(dbscan)
+library(gridExtra)
+```
+
+
+```{r}
+data_numeric_cleaned = readRDS("../data/data_numeric_cleaned2.RData")
+survey_data = readRDS("../data/Surveycleaned.RData")
+test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
+survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
+survey_data$campo.studi[is.na(survey_data$campo.studi)] = "missing"
+###########
+test<-survey_data$stato!="Italia"         
+survey_data$stato<-ifelse(test,"Others","Italia")
+survey_data$stato[is.na(survey_data$stato)] = "missing"
+###########
+test<-survey_data$libri!="0"         
+survey_data$libri<-ifelse(test,"1+","0")
+survey_data$libri[is.na(survey_data$libri)] = "missing"
+##########
+test<-survey_data$estero!="No"         
+survey_data$estero<-ifelse(test,"Si","No")
+survey_data$estero[is.na(survey_data$estero)] = "missing"
+##########
+colnames(survey_data)[1] = "age"
+
+test<-survey_data$age < 22.5         
+survey_data$age<-ifelse(test,"Under22.5","Over22.5")
+survey_data$age[is.na(survey_data$age)] = "missing"
+######### TO DO
+# test<-survey_data$genere!="No"         
+# survey_data$genere<-ifelse(test,"Si","No")
+# survey_data$genere[is.na(survey_data$genere)] = "missing"
+######### 
+test<-survey_data$concerti>5         
+survey_data$concerti<-ifelse(test,"more than 5","less than 5")
+######### 
+survey_data$regione[is.na(survey_data$regione)] = "missing"
+######### TO DO
+survey_data$abitanti.citta[survey_data$abitanti.citta=="Meno di 1000 abitanti"] = "Tra 10.000 e 100.000"
+# Rimuovi livelli vuoti
+survey_data$abitanti.citta <- droplevels(survey_data$abitanti.citta)
+```
+
+
+# combine the data
+
+```{r}
+combined_data <- merge(data_numeric_cleaned, survey_data, by.x = "id", by.y = "id")
+head(combined_data)
+```
+
+
+
+# NC measure
+```{r}
+# | Discrepancy-based |
+NC = function(z_aug, i){
+  #abs(z_aug[i] - mean(z_aug[-i]))
+  abs(z_aug[i] - median(z_aug[-i]))  # more robust
+  #abs(z_aug[i] - 18)                  # a deterministic predictor
+  #abs(z_aug[i] - random.number)       # a fully random predictor
+}
+```
+
+# main function
+```{r}
+conformal_univariate_interval <- function(x, plotting = FALSE){
+  x_grid  = seq(min(x)-0.25*diff(range(x)), max(x)+0.25*diff(range(x)), length.out=100)
+  p_value = numeric(length(x_grid))
+
+
+  for(k in 1:length(x_grid)){
+    x_aug  = c(x, x_grid[k])
+    scores = numeric(length(x_aug))
+    for(i in 1:length(scores)){
+      scores[i] = NC(x_aug, i)
+    }
+    p_value[k] = sum(scores>=scores[length(x_aug)])/(length(x_aug))
+  }
+
+  # Prediction Interval
+  PI_grid = x_grid[which(p_value>=alpha)]
+  PI      = c(min(PI_grid), max(PI_grid))
+  # KNN 
+  # PI <- x_grid[as.logical(c(0,abs(diff(p_value>alpha))))]
+  
+  
+  if(plotting){
+    # Plot of the p-values
+    plot(x_grid, p_value, type='l', ylim=c(0,1))
+    abline(h=c(0,1))
+    abline(h=alpha, col='red')
+    points(x, numeric(length(x)), pch=3)
+    abline(v=PI, col='red')
+    points(PI_grid, numeric(length(PI_grid)), pch=16, col='red')
+    
+    
+    hist(x, col='lightblue')
+    abline(v=PI,col='blue') # Conformal prediction interval
+    
+    legend("topright", legend="Conformal", col="blue",
+           lty=1, cex=0.8)
+  }
+  return(PI)
+
+}
+```
+
+# Music and Survey covariates
+```{r}
+music_vars = colnames(data_numeric_cleaned)
+music_vars = music_vars[!(music_vars %in% c("id","year","duration"))] # exclude year and duration
+survey_covs = colnames(survey_data)
+survey_covs = survey_covs[!(survey_covs %in% c("genere","id"))]
+```
+
+# Example
+```{r}
+univariate_data_filtered = combined_data[combined_data[,"sesso"] == "Maschio", "popularity"]
+conformal_univariate_interval(univariate_data_filtered)
+```
+
+
+
+
+# For loop for every possible combination- 270 tests
+```{r}
+alpha = 0.05
+#list_intervals = list()
+for(s in survey_covs){
+  groups_survey = levels(as.factor(combined_data[,s]))
+  for ( m in music_vars ){
+    for( g in groups_survey){
+      
+      name_for_list = paste0(s,": ",g,", VAR: ",m)
+
+      
+      # jump tests that have already been done
+      if(!(name_for_list%in%names(list_intervals))){
+        print(name_for_list)
+        univariate_data_filtered = combined_data[combined_data[,s] == g, m]
+        list_intervals[[name_for_list]] = conformal_univariate_interval(univariate_data_filtered)
+        # cut if exceed [0,1], the prediction is still valid at alpha percent
+        list_intervals[[name_for_list]][1]=max(list_intervals[[name_for_list]][1],0)
+        list_intervals[[name_for_list]][2]=min(list_intervals[[name_for_list]][2],1)
+      }
+      
+   
+    }
+  }
+}
+
+```
+
+
+
+
+# Saving data
+```{r}
+#saveRDS(list_intervals,"../conformal_intervals_byGroups.RData")
+```
+
+# Relevant variables from other tests
+(permutational and band depth)
+```{r}
+# dunctional band depth
+survey_vars_chosen = c("sesso","campo.studi","stato","lavoro","importanza.musica",
+                       "come.ascolti.musica","politica","regione","abitanti.citta",
+                       "educazione")
+music_vars_chosen = c("popularity","acousticness","liveness")
+```
+
+
+# Exploring CI
+```{r}
+plot_CI <- function(temp_list_CI){
+  g = length(temp_list_CI)
+  plot(c(1,g),range(c(0,1)), pch='',xlab='pairs treat',
+     ylab='Conformal prediction interval', main="name_level_music_cov")
+  for(i in 1:g) {
+    lines(c(i,i), c(temp_list_CI[[i]][1],temp_list_CI[[i]][2]), col='grey55');
+    points(i, temp_list_CI[[i]][1], col=rainbow(g)[i], pch=16);
+    points(i, temp_list_CI[[i]][2], col=rainbow(g)[i], pch=16);
+  }
+}
+
+```
+
+
+
+```{r}
+for(s in survey_vars_chosen){
+  groups_survey = levels(as.factor(combined_data[,s]))
+  for ( m in music_vars_chosen ){
+    temp_list_CI = list()
+    count = 1
+    for( g in groups_survey){
+      
+      name_for_list = paste0(s,": ",g,", VAR: ",m)
+      
+      temp_list_CI[[count]] = list_intervals[[name_for_list]]
+      count = count + 1
+    
+    }
+    plot_CI(temp_list_CI)
+  }
+}
+```
+
+
+
+
+# Multivariate
+
+# **3.** MULTIVARIATE 2
+
+```{r}
+data_predict = data ## change
+n_grid = 20
+grid_factor = 0.25
+n = nrow(data_predict)
+range_x = range(data_predict[, 1])[2] - range(data_predict[, 1])[1]
+range_y = range(data_predict[, 2])[2] - range(data_predict[, 2])[1]
+test_grid_x = seq(
+  min(data_predict[, 1]) - grid_factor * range_x,
+  max(data_predict[, 1]) + grid_factor * range_x,
+  length.out = n_grid
+  )
+test_grid_y = seq(
+  min(data_predict[, 2]) - grid_factor * range_y,
+  max(data_predict[, 2]) + grid_factor * range_y,
+  length.out = n_grid
+  )
+
+xy_surface = expand.grid(test_grid_x, test_grid_y)
+colnames(xy_surface) = colnames(data_predict)
+
+wrapper_multi_conf = function(test_point) {
+  newdata = rbind(test_point, data_predict)
+  
+  newmedian = depthMedian(newdata, depth_params = list(method = 'Tukey'))
+  depth_surface_vec = rowSums(t(t(newdata) - newmedian) ^2) 
+  
+  sum(depth_surface_vec[-1] >= depth_surface_vec[1]) / (n + 1)
+}
+
+
+pval_surf = pbapply(xy_surface, 1, wrapper_multi_conf)
+data_plot = cbind(pval_surf, xy_surface)
+p_set = xy_surface[pval_surf > alpha, ]
+poly_points = p_set[chull(p_set), ]
+
+
+ggplot() +
+  geom_tile(data = data_plot, aes(kappa_casein, Native_pH, fill = pval_surf)) +## change
+  geom_point(data = data.frame(data_predict), aes(kappa_casein, Native_pH)) +## change
+  geom_polygon(
+  data = poly_points,
+  aes(kappa_casein, Native_pH),## change
+  color = 'red',
+  size = 1,
+  alpha = 0.01
+  )
+
+
+```
+
+
