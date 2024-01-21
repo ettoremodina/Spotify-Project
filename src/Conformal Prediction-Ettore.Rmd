@@ -143,20 +143,21 @@ conformal_univariate_interval(univariate_data_filtered)
 
 
 
-# For loop for every possible combination
+# For loop for every possible combination- 270 tests
 ```{r}
 alpha = 0.05
 #list_intervals = list()
 for(s in survey_covs){
-  groups_survey = levels(combined_data[,s])
+  groups_survey = levels(as.factor(combined_data[,s]))
   for ( m in music_vars ){
     for( g in groups_survey){
       
       name_for_list = paste0(s,": ",g,", VAR: ",m)
-      print(name_for_list)
+
       
       # jump tests that have already been done
       if(!(name_for_list%in%names(list_intervals))){
+        print(name_for_list)
         univariate_data_filtered = combined_data[combined_data[,s] == g, m]
         list_intervals[[name_for_list]] = conformal_univariate_interval(univariate_data_filtered)
         # cut if exceed [0,1], the prediction is still valid at alpha percent
@@ -164,27 +165,124 @@ for(s in survey_covs){
         list_intervals[[name_for_list]][2]=min(list_intervals[[name_for_list]][2],1)
       }
       
-      
-      
-      
+   
     }
   }
 }
 
 ```
 
+
+
+
 # Saving data
 ```{r}
 #saveRDS(list_intervals,"../conformal_intervals_byGroups.RData")
 ```
 
+# Relevant variables from other tests
+(permutational and band depth)
+```{r}
+# dunctional band depth
+survey_vars_chosen = c("sesso","campo.studi","stato","lavoro","importanza.musica",
+                       "come.ascolti.musica","politica","regione","abitanti.citta",
+                       "educazione")
+music_vars_chosen = c("popularity","acousticness","liveness")
+```
+
+
+# Exploring CI
+```{r}
+plot_CI <- function(temp_list_CI){
+  g = length(temp_list_CI)
+  plot(c(1,g),range(c(0,1)), pch='',xlab='pairs treat',
+     ylab='Conformal prediction interval', main="name_level_music_cov")
+  for(i in 1:g) {
+    lines(c(i,i), c(temp_list_CI[[i]][1],temp_list_CI[[i]][2]), col='grey55');
+    points(i, temp_list_CI[[i]][1], col=rainbow(g)[i], pch=16);
+    points(i, temp_list_CI[[i]][2], col=rainbow(g)[i], pch=16);
+  }
+}
+
+```
+
+
+
+```{r}
+for(s in survey_vars_chosen){
+  groups_survey = levels(as.factor(combined_data[,s]))
+  for ( m in music_vars_chosen ){
+    temp_list_CI = list()
+    count = 1
+    for( g in groups_survey){
+      
+      name_for_list = paste0(s,": ",g,", VAR: ",m)
+      
+      temp_list_CI[[count]] = list_intervals[[name_for_list]]
+      count = count + 1
+    
+    }
+    plot_CI(temp_list_CI)
+  }
+}
+```
 
 
 
 
+# Multivariate
+
+# **3.** MULTIVARIATE 2
+
+```{r}
+data_predict = data ## change
+n_grid = 20
+grid_factor = 0.25
+n = nrow(data_predict)
+range_x = range(data_predict[, 1])[2] - range(data_predict[, 1])[1]
+range_y = range(data_predict[, 2])[2] - range(data_predict[, 2])[1]
+test_grid_x = seq(
+  min(data_predict[, 1]) - grid_factor * range_x,
+  max(data_predict[, 1]) + grid_factor * range_x,
+  length.out = n_grid
+  )
+test_grid_y = seq(
+  min(data_predict[, 2]) - grid_factor * range_y,
+  max(data_predict[, 2]) + grid_factor * range_y,
+  length.out = n_grid
+  )
+
+xy_surface = expand.grid(test_grid_x, test_grid_y)
+colnames(xy_surface) = colnames(data_predict)
+
+wrapper_multi_conf = function(test_point) {
+  newdata = rbind(test_point, data_predict)
+  
+  newmedian = depthMedian(newdata, depth_params = list(method = 'Tukey'))
+  depth_surface_vec = rowSums(t(t(newdata) - newmedian) ^2) 
+  
+  sum(depth_surface_vec[-1] >= depth_surface_vec[1]) / (n + 1)
+}
 
 
+pval_surf = pbapply(xy_surface, 1, wrapper_multi_conf)
+data_plot = cbind(pval_surf, xy_surface)
+p_set = xy_surface[pval_surf > alpha, ]
+poly_points = p_set[chull(p_set), ]
 
 
+ggplot() +
+  geom_tile(data = data_plot, aes(kappa_casein, Native_pH, fill = pval_surf)) +## change
+  geom_point(data = data.frame(data_predict), aes(kappa_casein, Native_pH)) +## change
+  geom_polygon(
+  data = poly_points,
+  aes(kappa_casein, Native_pH),## change
+  color = 'red',
+  size = 1,
+  alpha = 0.01
+  )
+
+
+```
 
 
