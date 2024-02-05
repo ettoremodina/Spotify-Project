@@ -1,0 +1,201 @@
+---
+title: "Cluster"
+author: "Alessandra Pescina"
+date: "2024-01-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+seed=2024
+```
+
+## NOPE
+```{r}
+
+library(klaR)
+colSums(is.na(survey_data))
+k_data<-survey_data[,-c(3,8,13,15)]
+k_data<-as.data.frame(lapply(k_data, as.factor))
+res_clust<-kmodes(k_data, 4, iter.max = 15, weighted = FALSE, fast = TRUE)
+
+
+{r}
+
+cost <- numeric(length = 10)
+silhouette_scores <- numeric(length = 10)
+
+for (i in 2:10) {
+  kmodes_model <- kmodes(k_data, i, iter.max = 15, weighted = FALSE, fast = TRUE)
+  cost[i] <- kmodes_model$withindiff
+
+}
+
+plot(2:10, cost[2:10], type = "b", pch = 19, frame = FALSE, 
+     xlab = "Number of Clusters", ylab = "Cost")
+
+{r}
+library(ggplot2)
+
+k_data$cluster <- as.factor(res_clust$cluster)
+table(k_data$cluster)
+
+
+ggplot(k_data, aes(x = sesso, y = libri, color = cluster)) +
+  geom_point() +
+  labs(title = "Cluster Plot")
+```
+
+
+```{r}
+numeric_data<-readRDS("../../data/data_numeric_cleaned2.RData")
+numeric_red<-numeric_data[,-c(5,11,12,13)]
+```
+
+
+## Outlier detection (non usare)
+
+```{r}
+
+data_MCD<-numeric_red[,-5]
+set.seed(seed)
+library(robustbase)
+fit_MCD <- covMcd(x = data_MCD, 
+                  alpha = .75,
+                  nsamp = "best") 
+p<-11
+ind_best <-
+  which(
+    mahalanobis(
+      x = data_MCD,
+      center = fit_MCD$center,
+      cov = fit_MCD$cov
+    ) <= qchisq(p = .975, df = p)
+  )
+ind_out<-setdiff(1:nrow(numeric_red),ind_best)
+
+cleaned<-data_MCD[-ind_out, ]
+numeric_red_cleaned<-numeric_red[-ind_out,]
+```
+
+
+## Cluster of songs 
+
+euclidean, 9 cov, ward.D2
+```{r}
+library(StatMatch)
+n<-dim(numeric_red)[1]
+p<-dim(numeric_red)[2]
+distance <- 'euclidean' # manhattan, canberra
+linkages <- c('single', 'average', 'complete', 'ward.D2')
+
+# distance matrix:
+data.dist_e <- dist(numeric_red, method=distance)
+#data.dist<-mahalanobis.dist(numeric_red)
+#temp<-dist(data.dist)
+# plot:
+#image(1:n,1:n, as.matrix(data.dist), main=paste('metrics: ', distance), asp=1, xlab='', ylab='')
+
+
+# perform hierarchical clustering:
+#data.s <- hclust(data.dist, method=linkages[1])
+#data.a <- hclust(data.dist, method=linkages[2])
+#data.c <- hclust(data.dist, method=linkages[3])
+#data.w <- hclust(data.dist, method=linkages[4])
+
+# perform hierarchical clustering maha:
+data.s <- hclust(data.dist_e, method=linkages[1])
+data.a <- hclust(data.dist_e, method=linkages[2])
+data.c <- hclust(data.dist_e, method=linkages[3])
+data.w <- hclust(data.dist_e, method=linkages[4])
+
+# plot dendograms:
+quartz()
+par(mfrow=c(2,2))
+
+plot(data.s, main=paste(distance, ' - ', linkages[1]), hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
+plot(data.a, main=paste(distance, ' - ', linkages[2]), hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
+plot(data.c, main=paste(distance, ' - ', linkages[3]), hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
+plot(data.w, main=paste(distance, ' - ', linkages[4]), hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
+```
+
+```{r}
+#cut dendogram:
+k=4
+data.hc<-data.w
+clusters <- cutree(data.hc, k=k)
+
+
+#Dimension of the Clusters
+table(clusters)
+```
+
+
+```{r}
+numeric_red$cluster<-clusters
+```
+
+## Assign people to clusters
+
+```{r}
+library(dplyr)
+
+# Assuming your DataFrame is named 'songs_df'
+# It should have columns like 'playlist_id', 'song_id', and 'cluster'
+numeric_red$id<-numeric_data$id
+
+# Count the distribution of songs in each cluster for each playlist
+playlist_cluster_counts <- numeric_red %>%
+  group_by(id, cluster) %>%
+  summarise(count = n())
+
+# Display the result
+print(playlist_cluster_counts)
+
+library(tidyr)
+cluster_df <- playlist_cluster_counts %>%
+  pivot_wider(names_from = cluster, values_from = count, values_fill = 0) %>%
+  select(id, everything())
+```
+
+subtract to each cluster column expected values of songs by cluster in each playlist
+
+```{r}
+cluster_df_exp<-cluster_df
+#cluster_df_exp[,2]<-cluster_df_exp[,2]-28
+#cluster_df_exp[,3]<-cluster_df_exp[,3]-73
+
+
+cluster_df_exp[,3]<-cluster_df_exp[,3]-52
+cluster_df_exp[,2]<-cluster_df_exp[,2]-17
+cluster_df_exp[,3]<-cluster_df_exp[,3]-52
+cluster_df_exp[,4]<-cluster_df_exp[,4]-21
+cluster_df_exp[,5]<-cluster_df_exp[,5]-10
+```
+
+```{r}
+cluster_df_exp$final<-apply(cluster_df_exp[,-1], 1, function(row) which.max(row))
+
+```
+
+## Classify people 
+
+```{r}
+survey_data<-readRDS("../../data/survey_reduced.RData")
+survey_data$cluster<-cluster_df_exp$final
+survey_data<-survey_data[,-c(8,13,15)]
+survey_data$cluster<-as.factor(survey_data$cluster)
+```
+
+decision tree-> not performing
+```{r}
+library(rpart)
+fit<-rpart(cluster ~. , data=survey_data)
+summary(fit)
+residuals(fit)
+
+quartz()
+plot(fit)
+text(fit, use.n=T)
+```
+
