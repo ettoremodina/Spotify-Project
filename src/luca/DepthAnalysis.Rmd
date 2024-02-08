@@ -1,3 +1,7 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
 ```{r}
 library(hexbin)
 library(ggplot2)
@@ -74,7 +78,7 @@ create_exponential_weights <- function(n, alpha) {
 n <- nrow(person_data)
 
 # Calcola i pesi esponenziali
-alpha <- 0.99  # Puoi regolare il valore di alpha
+alpha <- 2  # Puoi regolare il valore di alpha
 weights_ecdf <- create_exponential_weights(n, alpha)
 
 # Calcola l'EDF per la covariata specifica
@@ -318,10 +322,10 @@ survey_cov_passed = c()
 for( i in 1:length(results_IWT_list)){
   sub_list = results_IWT_list[[i]]
   if(!is.empty(sub_list)){
-    #print(paste0("for alpha = ",alpha_vect[i]))
+    print(paste0("for alpha = ",alpha_vect[i]))
     for( j in 1:length(sub_list)){
       if(!is.null(sub_list[[j]])){
-        #print(sub_list[[j]])
+        print(sub_list[[j]])
         music_cov_passed = c(music_cov_passed,sub_list[[j]][1])
         survey_cov_passed = c(survey_cov_passed,sub_list[[j]][3])
       }
@@ -330,22 +334,79 @@ for( i in 1:length(results_IWT_list)){
   }
 }
 
-print(paste0("music_covs = ",unique(music_cov_passed)))
-print(paste0("survey_covs = ",unique(survey_cov_passed)))
+# print(paste0("music_covs = ",unique(music_cov_passed)))
+# print(paste0("survey_covs = ",unique(survey_cov_passed)))
 ```
-[1] "music_covs = popularity"   "music_covs = acousticness"
-[3] "music_covs = liveness"   
+alpha = 0.1"
+"popularity" "--"         "sesso"  
+"acousticness"           
+                "campo.studi" 
+                "stato"       
+                "lavoro"      
+                "importanza.musica"
+                "come.ascolti.musica"
+                "politica"    
+                "regione"     
+                "abitanti.citta"
 
- [1] "survey_covs = sesso"              
- [2] "survey_covs = campo.studi"        
- [3] "survey_covs = stato"              
- [4] "survey_covs = lavoro"             
- [5] "survey_covs = importanza.musica"  
- [6] "survey_covs = come.ascolti.musica"
- [7] "survey_covs = politica"           
- [8] "survey_covs = regione"            
- [9] "survey_covs = abitanti.citta"     
-[10] "survey_covs = educazione"   
+# re-run only good
+```{r}
+music_vars=c("popularity", "acousticness")
+survey_covs = c( "campo.studi" ,
+                "stato"       ,
+                "lavoro"      ,
+                "importanza.musica",
+                "come.ascolti.musica",
+                "politica"   , 
+                "regione"     ,
+                "abitanti.citta"
+)  
+
+
+results_IWT_list_filter <- list()
+alpha_vect = c(0.1)
+index = 1
+for(a in alpha_vect){
+  print(a)
+  weights_ecdf <- create_exponential_weights(n, a)
+  results_IWT_list_filter[[index]] = covariate_iterator()
+  index = index+1
+}
+```
+# plots of ecdf for the ones that passed
+```{r}
+ecdf_plotter <- function(music_cov, survey_cov){ 
+  
+  # Creare una lista di EDF per tutte le persone
+  edf_list <- create_edf_list(music_cov)
+
+  
+  # Definisci una palette di colori in base ai valori unici nella colonna di gruppo
+  unique_groups = levels(as.factor(combined_data[,survey_cov]))
+  num_groups <- length(unique_groups)
+  color_palette <- rainbow(num_groups)
+  indices_list <- create_indices_list(unique_groups,survey_cov)  
+  median_curve_list = list()
+  for (i in 1:num_groups) {
+   matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
+   f_data = fData(grid, t(matrice_da_lista_i))
+   median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
+  
+  }
+  plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+
+}
+
+
+ecdf_plotter("popularity","sesso")
+for (s in survey_covs){
+  print(s)
+  ecdf_plotter("acousticness",s )
+}
+
+
+
+```
 
 # depth function
 ```{r}

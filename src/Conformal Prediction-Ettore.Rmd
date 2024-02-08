@@ -7,8 +7,6 @@ library(hexbin)
 library(ggplot2)
 library(roahd)
 library(spatstat.geom)
-```
-```{r}
 library(dplyr) 
 library(ggplot2)
 library(knitr)
@@ -19,6 +17,12 @@ library(pbapply)
 pboptions(type='none')
 library(dbscan)
 library(gridExtra)
+library(rgl)
+library(DepthProc)
+library(hexbin)
+library(aplpack)
+library(robustbase)
+
 ```
 
 
@@ -145,7 +149,7 @@ conformal_univariate_interval(univariate_data_filtered)
 
 # For loop for every possible combination- 270 tests
 ```{r}
-alpha = 0.05
+alpha = 0.15
 #list_intervals = list()
 for(s in survey_covs){
   groups_survey = levels(as.factor(combined_data[,s]))
@@ -178,25 +182,37 @@ for(s in survey_covs){
 # Saving data
 ```{r}
 #saveRDS(list_intervals,"../conformal_intervals_byGroups.RData")
+list_intervals = readRDS("../conformal_intervals_byGroups.RData")
 ```
 
 # Relevant variables from other tests
 (permutational and band depth)
 ```{r}
 # dunctional band depth
-survey_vars_chosen = c("sesso","campo.studi","stato","lavoro","importanza.musica",
+survey_covs_chosen = c("sesso","campo.studi","stato","lavoro","importanza.musica",
                        "come.ascolti.musica","politica","regione","abitanti.citta",
                        "educazione")
 music_vars_chosen = c("popularity","acousticness","liveness")
+music_vars_chosen = c("popularity","acousticness","danceability","energy","instrumentalness","liveness","loudness","tempo","valence")
 ```
+Popularity - sesso
+Acousticness - eta, lavoro, estero
+Danceability - books
+Energy - eta, estero(con interazione)
+Instrumentalness- estero
+Liveness - sesso, estero
+Loudness - eta , estero, strumento
+Tempo- lavoro 
+Valence- genere 
+
 
 
 # Exploring CI
 ```{r}
-plot_CI <- function(temp_list_CI){
+plot_CI <- function(temp_list_CI,title){
   g = length(temp_list_CI)
-  plot(c(1,g),range(c(0,1)), pch='',xlab='pairs treat',
-     ylab='Conformal prediction interval', main="name_level_music_cov")
+  plot(c(1,g),range(c(0,1)), pch='',
+     ylab='Conformal prediction interval', main=title)
   for(i in 1:g) {
     lines(c(i,i), c(temp_list_CI[[i]][1],temp_list_CI[[i]][2]), col='grey55');
     points(i, temp_list_CI[[i]][1], col=rainbow(g)[i], pch=16);
@@ -209,9 +225,9 @@ plot_CI <- function(temp_list_CI){
 
 
 ```{r}
-for(s in survey_vars_chosen){
+for(s in survey_covs){
   groups_survey = levels(as.factor(combined_data[,s]))
-  for ( m in music_vars_chosen ){
+  for ( m in music_vars){
     temp_list_CI = list()
     count = 1
     for( g in groups_survey){
@@ -220,14 +236,70 @@ for(s in survey_vars_chosen){
       
       temp_list_CI[[count]] = list_intervals[[name_for_list]]
       count = count + 1
+      title = paste0(s," ",", VAR: ",m)
     
     }
-    plot_CI(temp_list_CI)
+    plot_CI(temp_list_CI,title)
+    
   }
+}
+```
+```{r}
+Intersection_Over_Union <- function(list){
+  lower = c()
+  upper = c()
+  for(i in 1:length(list)){
+    lower = c(lower,list[[i]][1])
+    upper = c(upper,list[[i]][2])
+  }
+  union = max(upper)-min(lower)
+  intersection = min(upper) - max(lower)
+  return(intersection/union)
 }
 ```
 
 
+```{r}
+IoU_list = list()
+for(s in survey_covs){
+  groups_survey = levels(as.factor(combined_data[,s]))
+  for ( m in music_vars){
+    temp_list_CI = list()
+    count = 1
+    for( g in groups_survey){
+      
+      name_for_list = paste0(s,": ",g,", VAR: ",m)
+      
+      temp_list_CI[[count]] = list_intervals[[name_for_list]]
+      count = count + 1
+    }
+    name = paste0(s," ",", VAR: ",m)
+    IoU_list[[name]] = Intersection_Over_Union(temp_list_CI)
+
+  }
+}
+```
+```{r}
+soglia = 0.6
+for ( i in 1:length(IoU_list)){
+  if(IoU_list[[i]]<soglia){
+    print(IoU_list[i])
+  }
+}
+```
+```{r}
+plot(df_unique[,"loudness"],df_unique[,"instrumentalness"],pch = 16, xlab = "loudness",ylab = "instrumentalness")
+```
+
+```{r}
+IoU_list = list()
+for(s in survey_covs){
+  groups_survey = combined_data[,s]
+    plot(combined_data[,"loudness"],combined_data[,"instrumentalness"],pch = 16, xlab = "loudness",ylab = "instrumentalness",main = s,col =factor(groups_survey) )
+    
+
+}
+```
 
 
 # Multivariate
@@ -235,7 +307,8 @@ for(s in survey_vars_chosen){
 # **3.** MULTIVARIATE 2
 
 ```{r}
-data_predict = data ## change
+data_predict = univariate_data_filtered = combined_data[combined_data[,"sesso"] == "Maschio", c("popularity","acousticness")]
+
 n_grid = 20
 grid_factor = 0.25
 n = nrow(data_predict)
@@ -272,11 +345,11 @@ poly_points = p_set[chull(p_set), ]
 
 
 ggplot() +
-  geom_tile(data = data_plot, aes(kappa_casein, Native_pH, fill = pval_surf)) +## change
-  geom_point(data = data.frame(data_predict), aes(kappa_casein, Native_pH)) +## change
+  geom_tile(data = data_plot, aes(popularity, acousticness, fill = pval_surf)) +## change
+  geom_point(data = data.frame(data_predict), aes(popularity, acousticness)) +## change
   geom_polygon(
   data = poly_points,
-  aes(kappa_casein, Native_pH),## change
+  aes(popularity, acousticness),## change
   color = 'red',
   size = 1,
   alpha = 0.01
