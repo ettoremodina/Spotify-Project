@@ -529,7 +529,7 @@ reduced<-survey_data[,-c(3,14)]
 ```{r}
 saveRDS(res,"../../data/pvalues_cat.RData")
 saveRDS(reduced,"../../data/survey_reduced.RData")
-
+write.csv(condition0.05, "../../data/ptable.RData")
 ```
  
 ```{r}

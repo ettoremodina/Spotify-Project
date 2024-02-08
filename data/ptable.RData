@@ -1,0 +1,15 @@
+"","popularity","acousticness","danceability","energy","instrumentalness","liveness","loudness","speechiness","tempo","valence","duration","year"
+"res_sex",1,0,0,0,0,1,0,0,0,0,0,0
+"res_fieldofstudy",0,0,0,0,0,0,0,0,0,0,0,0
+"res_age",0,1,0,1,0,0,1,0,0,0,0,0
+"res_books",0,0,1,0,0,0,0,0,0,0,0,0
+"res_abroad",0,1,0,1,1,1,1,0,0,0,0,0
+"res_country",0,0,0,0,0,0,0,0,0,0,0,0
+"res_instrument",0,0,0,0,0,0,1,0,0,0,0,0
+"res_region",0,0,0,0,0,0,0,0,0,0,0,0
+"res_work",0,1,0,0,0,0,0,0,1,0,0,0
+"res_importance.music",0,0,0,0,0,0,0,0,0,0,0,0
+"res_how.listen",0,0,0,0,0,0,0,0,0,0,0,0
+"res_concerts",0,0,0,0,0,0,0,0,0,0,0,0
+"res_inhabitants",0,0,0,0,0,0,0,0,0,0,0,0
+"res_genre",0,0,0,0,0,0,0,0,0,1,0,0

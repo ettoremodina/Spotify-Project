@@ -10,46 +10,12 @@ knitr::opts_chunk$set(echo = TRUE)
 seed=2024
 ```
 
-## NOPE
-```{r}
-
-library(klaR)
-colSums(is.na(survey_data))
-k_data<-survey_data[,-c(3,8,13,15)]
-k_data<-as.data.frame(lapply(k_data, as.factor))
-res_clust<-kmodes(k_data, 4, iter.max = 15, weighted = FALSE, fast = TRUE)
-
-
-{r}
-
-cost <- numeric(length = 10)
-silhouette_scores <- numeric(length = 10)
-
-for (i in 2:10) {
-  kmodes_model <- kmodes(k_data, i, iter.max = 15, weighted = FALSE, fast = TRUE)
-  cost[i] <- kmodes_model$withindiff
-
-}
-
-plot(2:10, cost[2:10], type = "b", pch = 19, frame = FALSE, 
-     xlab = "Number of Clusters", ylab = "Cost")
-
-{r}
-library(ggplot2)
-
-k_data$cluster <- as.factor(res_clust$cluster)
-table(k_data$cluster)
-
-
-ggplot(k_data, aes(x = sesso, y = libri, color = cluster)) +
-  geom_point() +
-  labs(title = "Cluster Plot")
-```
 
 
 ```{r}
 numeric_data<-readRDS("../../data/data_numeric_cleaned2.RData")
 numeric_red<-numeric_data[,-c(5,11,12,13)]
+
 ```
 
 
@@ -86,7 +52,7 @@ euclidean, 9 cov, ward.D2
 library(StatMatch)
 n<-dim(numeric_red)[1]
 p<-dim(numeric_red)[2]
-distance <- 'euclidean' # manhattan, canberra
+distance <- 'canberra' # manhattan, canberra
 linkages <- c('single', 'average', 'complete', 'ward.D2')
 
 # distance matrix:
@@ -121,7 +87,7 @@ plot(data.w, main=paste(distance, ' - ', linkages[4]), hang=-0.1, xlab='', label
 
 ```{r}
 #cut dendogram:
-k=4
+k=2
 data.hc<-data.w
 clusters <- cutree(data.hc, k=k)
 
@@ -161,41 +127,92 @@ cluster_df <- playlist_cluster_counts %>%
 subtract to each cluster column expected values of songs by cluster in each playlist
 
 ```{r}
-cluster_df_exp<-cluster_df
-#cluster_df_exp[,2]<-cluster_df_exp[,2]-28
-#cluster_df_exp[,3]<-cluster_df_exp[,3]-73
-
-
-cluster_df_exp[,3]<-cluster_df_exp[,3]-52
-cluster_df_exp[,2]<-cluster_df_exp[,2]-17
-cluster_df_exp[,3]<-cluster_df_exp[,3]-52
-cluster_df_exp[,4]<-cluster_df_exp[,4]-21
-cluster_df_exp[,5]<-cluster_df_exp[,5]-10
+cluster_df_centered<-apply(cluster_df[,-1],2,function(x) x-mean(x))
+cluster_df_centered<-as.data.frame(cluster_df_centered)
 ```
 
 ```{r}
-cluster_df_exp$final<-apply(cluster_df_exp[,-1], 1, function(row) which.max(row))
-
+#cluster_df_centered<-cluster_df[,-1]
+cluster_df_centered$final<-apply(cluster_df_centered, 1, function(row) which.max(row))
+table(cluster_df_centered$final)
 ```
 
 ## Classify people 
 
 ```{r}
 survey_data<-readRDS("../../data/survey_reduced.RData")
-survey_data$cluster<-cluster_df_exp$final
+survey_data$cluster<-cluster_df_centered$final
 survey_data<-survey_data[,-c(8,13,15)]
 survey_data$cluster<-as.factor(survey_data$cluster)
+survey_data$cluster <- make.names(survey_data$cluster)
+survey_data$campo.studi<-ifelse(is.na(survey_data$campo.studi), "others", survey_data$campo.studi)
 ```
 
 decision tree-> not performing
 ```{r}
 library(rpart)
-fit<-rpart(cluster ~. , data=survey_data)
+fit<-rpart(as.factor(cluster) ~. , data=survey_data)
 summary(fit)
 residuals(fit)
 
 quartz()
 plot(fit)
 text(fit, use.n=T)
+
+predictions <- predict(fit, survey_data, type = "class")
+conf_matrix <- confusionMatrix(predictions, as.factor(survey_data$cluster))
+print(conf_matrix)
 ```
+random forest
+```{r}
+library(randomForest)
+library(caret)
+set.seed(seed)
+
+param_grid <- expand.grid(
+  mtry = seq(4, ncol(survey_data) - 1, by = 1)  # Adjust the range as needed
+)
+
+# Define the control parameters for the cross-validation
+ctrl <- trainControl(
+  method = "LOOCV",  # Use leave-one-out cross-validation
+  search = "grid",
+  summaryFunction = defaultSummary,
+  classProbs = TRUE,
+  verboseIter = TRUE
+)
+
+# Fit the Random Forest model with cross-validation
+rf_model <- train(
+  cluster ~ .,
+  data = survey_data,
+  method = "rf",  # Use Random Forest
+  trControl = ctrl,
+  tuneGrid = param_grid
+)
+
+# Print the best model's parameters
+print(rf_model$bestTune)
+
+# Access the best Random Forest model
+best_rf_model <- rf_model$finalModel
+```
+```{r}
+
+#indices <- sample(1:nrow(survey_data), 60)
+#train_data <- survey_data[indices, ]
+#test_data <- survey_data[-indices, ]
+fit_RF<-randomForest(as.factor(cluster) ~ ., data = survey_data, mtry=10, ntree=5000, replace=T)
+
+#predictions <- predict(fit_RF, test_data, type = "class")
+#conf_matrix <- confusionMatrix(predictions, as.factor(test_data$cluster))
+#print(conf_matrix)
+```
+
+
+TODO
+scegliere nuove variabili per fittare i cluster
+come?
+-selezione (solo variabili signfificative per differenze al 0.01)
+-pca e fittare i cluster su nuove variabili
 
