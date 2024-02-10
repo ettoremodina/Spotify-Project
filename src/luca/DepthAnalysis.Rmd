@@ -400,7 +400,6 @@ ecdf_plotter <- function(music_cov, survey_cov){
 
 ecdf_plotter("popularity","sesso")
 for (s in survey_covs){
-  print(s)
   ecdf_plotter("acousticness",s )
 }
 
