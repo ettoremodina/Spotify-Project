@@ -14,54 +14,73 @@ seed=2024
 
 ```{r}
 numeric_data<-readRDS("../../data/data_numeric_cleaned2.RData")
-#numeric_red<-numeric_data[,-c(5,11,12,13)]
- min_max_normalize <- function(x) {
-    return((x - min(x)) / (max(x) - min(x)))
-  }
-numeric_data$duration<- min_max_normalize(numeric_data$duration)
-numeric_data$year<- min_max_normalize(numeric_data$year)
-numeric_red<-numeric_data[,-13]
+numeric_red<-numeric_data[,-c(5,11,12,13)]
+#pca_data <- numeric_red
+#scale in (0,1) year and duration
+min_max_normalize <- function(x) {
+  return((x - min(x)) / (max(x) - min(x)))
+}
 
+pca_data <- numeric_data[,-13]
+pca_data$duration<-  min_max_normalize(numeric_data$duration)
+pca_data$year<-  min_max_normalize(numeric_data$year)
 ```
 
 
-## Outlier detection (non usare)
+## PCA
 
 ```{r}
+n <- dim(pca_data)[1]
+p <- dim(pca_data)[2]
 
-data_MCD<-numeric_red
-set.seed(seed)
-library(robustbase)
-fit_MCD <- covMcd(x = data_MCD, 
-                  alpha = .75,
-                  nsamp = "best") 
-p<-12
-ind_best <-
-  which(
-    mahalanobis(
-      x = data_MCD,
-      center = fit_MCD$center,
-      cov = fit_MCD$cov
-    ) <= qchisq(p = .975, df = p)
-  )
-ind_out<-setdiff(1:nrow(numeric_red),ind_best)
+# checking variability: if there are some variables with a very larger variance, 
+# they could driven the analysis of Principal Components:
+boxplot(pca_data, las = 2, col = 'gold')
 
-numeric_red_cleaned<-numeric_red[-ind_out,]
+# performing PCA:
+pc.data <- princomp(pca_data, scores=T)
+summary(pc.data)
+load.data <- pc.data$loadings
+
+cumsum(pc.data$sd^2)/sum(pc.data$sd^2)
+
+varmax <- max(var(pca_data[,1:dim(pca_data)[2]]))
+varmax_pc <- max(pc.data$sd)
+layout(matrix(c(2,3,1,3),2,byrow=T))
+plot(pc.data, las=2, main='Principal components', ylim=c(0,varmax_pc^2))
+barplot(sapply(pca_data,sd)^2, las=2, main='Original Variables', ylim=c(0,varmax),
+        ylab='Variances')
+plot(cumsum(pc.data$sd^2)/sum(pc.data$sd^2), type='b', axes=F, 
+     xlab='number of components', ylab='contribution to the total variance', ylim=c(0,1))
+abline(h=1, col='blue')
+abline(h=0.8, lty=2, col='blue')
+box()
+axis(2,at=0:10/10,labels=0:10/10)
+axis(1,at=1:ncol(pca_data),labels=1:ncol(pca_data),las=2)
+
+#considero le prime 6 pca (82% della varianza spiegata, non troppo soddisfaciente ma ci provo)
+```
+#k numero di pc che scelgo
+```{r}
+k <- 6
+par(mfrow = c(3,2))
+for(i in 1:k) barplot(load.data[,i], ylim = c(-1, 1), main = paste('PC', i))
+pca_red_data <- data.frame(pc.data$scores[,1:k])
 ```
 
 
 ## Cluster of songs 
 
-euclidean, 9 cov, ward.D2
+euclidean, 6 pc, ward.D2
 ```{r}
 library(StatMatch)
-n<-dim(numeric_red)[1]
-p<-dim(numeric_red)[2]
+n<-dim(pca_red_data)[1]
+p<-dim(pca_red_data)[2]
 distance <- 'canberra' # manhattan, canberra
 linkages <- c('single', 'average', 'complete', 'ward.D2')
 
 # distance matrix:
-data.dist_e <- dist(numeric_red, method=distance)
+data.dist_e <- dist(pca_red_data, method=distance)
 #data.dist<-mahalanobis.dist(numeric_red)
 #temp<-dist(data.dist)
 # plot:
@@ -81,7 +100,7 @@ data.c <- hclust(data.dist_e, method=linkages[3])
 data.w <- hclust(data.dist_e, method=linkages[4])
 
 # plot dendograms:
-quartz()
+x11()   #quartz() if form mac
 par(mfrow=c(2,2))
 
 plot(data.s, main=paste(distance, ' - ', linkages[1]), hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
@@ -92,7 +111,7 @@ plot(data.w, main=paste(distance, ' - ', linkages[4]), hang=-0.1, xlab='', label
 
 ```{r}
 #cut dendogram:
-k=3
+k=2
 data.hc<-data.w
 clusters <- cutree(data.hc, k=k)
 
@@ -103,86 +122,7 @@ table(clusters)
 
 
 ```{r}
-numeric_red$cluster<-as.factor(clusters)
-```
-
-
-## Feature selection to improve clusters
-```{r}
-
-
-library(caret)
-library(randomForest)
-
-# Create a control object for rfe with random forest as the underlying model
-ctrl <- rfeControl(functions=rfFuncs, method="cv", number=10)
-
-# Perform Recursive Feature Elimination (RFE)
-result <- rfe(numeric_red[, -13], 
-              numeric_red[, 13], 
-              sizes=c(1:12), 
-              rfeControl=ctrl)
-
-# Print the results
-print(result)
-
-# Get the best set of features
-best_features <- result$optVariables
-
-```
-
-## Redo clusters
-```{r}
-
-subset<-numeric_red[,best_features]
-
-library(StatMatch)
-n<-dim(subset)[1]
-p<-dim(subset)[2]
-distance <- 'canberra' # manhattan, canberra
-linkages <- c('single', 'average', 'complete', 'ward.D2')
-
-# distance matrix:
-data.dist_e <- dist(subset, method=distance)
-#data.dist<-mahalanobis.dist(numeric_red)
-#temp<-dist(data.dist)
-# plot:
-#image(1:n,1:n, as.matrix(data.dist), main=paste('metrics: ', distance), asp=1, xlab='', ylab='')
-
-
-# perform hierarchical clustering:
-#data.s <- hclust(data.dist, method=linkages[1])
-#data.a <- hclust(data.dist, method=linkages[2])
-#data.c <- hclust(data.dist, method=linkages[3])
-#data.w <- hclust(data.dist, method=linkages[4])
-
-# perform hierarchical clustering maha:
-data.s <- hclust(data.dist_e, method=linkages[1])
-data.a <- hclust(data.dist_e, method=linkages[2])
-data.c <- hclust(data.dist_e, method=linkages[3])
-data.w <- hclust(data.dist_e, method=linkages[4])
-
-# plot dendograms:
-quartz()
-par(mfrow=c(2,2))
-
-plot(data.s, main=paste(distance, ' - ', linkages[1]), hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
-plot(data.a, main=paste(distance, ' - ', linkages[2]), hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
-plot(data.c, main=paste(distance, ' - ', linkages[3]), hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
-plot(data.w, main=paste(distance, ' - ', linkages[4]), hang=-0.1, xlab='', labels=F, cex=0.6, sub='')
-```
-
-```{r}
-#cut dendogram:
-k=3
-data.hc<-data.w
-clusters <- cutree(data.hc, k=k)
-
-
-#Dimension of the Clusters
-table(clusters)
-
-numeric_red$cluster<-as.factor(clusters)
+numeric_red$cluster<-clusters
 ```
 
 ## Assign people to clusters
@@ -232,14 +172,16 @@ survey_data$cluster <- make.names(survey_data$cluster)
 survey_data$campo.studi<-ifelse(is.na(survey_data$campo.studi), "others", survey_data$campo.studi)
 ```
 
-decision tree-> not performing
+decision tree-> not the worst
 ```{r}
 library(rpart)
+library(caret)
 fit<-rpart(as.factor(cluster) ~. , data=survey_data)
 summary(fit)
 residuals(fit)
 
-quartz()
+x11() #quartz()
+plot(fit)
 
 text(fit, use.n=T)
 
@@ -251,7 +193,7 @@ random forest
 ```{r}
 library(randomForest)
 library(caret)
-set.seed(seed)
+set.seed(2024)
 
 param_grid <- expand.grid(
   mtry = seq(4, ncol(survey_data) - 1, by = 1)  # Adjust the range as needed
@@ -286,8 +228,8 @@ best_rf_model <- rf_model$finalModel
 #indices <- sample(1:nrow(survey_data), 60)
 #train_data <- survey_data[indices, ]
 #test_data <- survey_data[-indices, ]
-fit_RF<-randomForest(as.factor(cluster) ~ ., data = survey_data, mtry=9, ntree=5000, replace=T)
-
+fit_RF<-randomForest(as.factor(cluster) ~ ., data = survey_data, mtry=10, ntree=5000, replace=T)
+fit_RF
 #predictions <- predict(fit_RF, test_data, type = "class")
 #conf_matrix <- confusionMatrix(predictions, as.factor(test_data$cluster))
 #print(conf_matrix)
