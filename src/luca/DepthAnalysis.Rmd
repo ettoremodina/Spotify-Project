@@ -504,3 +504,97 @@ which(IWT.result$corrected.pval < 0.05)
 table(survey_data$educazione)
 ```
 
+
+
+# 2 particular groups
+
+
+```{r}
+grid <- seq(0, 1, length.out = 50)
+create_edf_list_2 <- function(data,music_cov){
+  edf_list <-  lapply(unique(data$id), function(person_id) {
+    ecdf <-ecdf(data[data$id == person_id,music_cov ])
+    val = ecdf(grid)
+    return(val)
+  })
+  return(edf_list)
+}
+```
+
+
+```{r}
+IWT_covcov_2  <- function(music_cov){ 
+ 
+  soglia_pvalue = 0.05
+  
+  # Creare una lista di EDF per tutte le persone
+  edf_list <- list(create_edf_list_2(data1,music_cov),create_edf_list_2(data2,music_cov))
+  matrice_da_lista_all <- do.call(cbind, edf_list)
+  response = t(matrice_da_lista_all)
+  plot_ecdf_2(music_cov,edf_list)
+  
+  data1 = t(do.call(cbind, edf_list[[1]]))
+  data2 = t(do.call(cbind, edf_list[[2]]))
+
+    
+  result_test = IWT2(data1, data2, mu = 0)
+  
+  IWTimage(result_test,abscissa_range=c(0,12))
+
+  
+  
+
+    
+}
+```
+
+```{r}
+plot_ecdf_2 <- function(music_cov,edf_list){
+  plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+  main = paste0(c("Empirical Distribution Functions (EDF) ",music_cov)),
+  xlab = "Data Values", ylab = "Probability")
+
+  
+  for(i in 1:length(edf_list[[1]])){
+      lines(grid, edf_list[[1]][[i]], lwd = 1, col = "red", cex = 0.1)
+  }
+  for(i in 1:length(edf_list[[2]])){
+        lines(grid, edf_list[[2]][[i]], lwd = 1, col = "blue", cex = 0.1)
+  }
+
+  
+
+
+  
+  legend("topleft", legend = c("group1","group2"), col = c("red","blue"), lwd = 2)
+}
+
+```
+
+
+```{r}
+data1 = combined_data[combined_data$estero== levels(as.factor(combined_data$estero))[1] #no
+                    & combined_data$campo.studi== levels(as.factor(combined_data$campo.studi))[1] #STEM
+                    & combined_data$age== levels(as.factor(combined_data$age))[1] #OVER 22
+                        ,]
+
+
+
+data2 = combined_data[combined_data$estero== levels(as.factor(combined_data$estero))[2] #no
+                    & combined_data$campo.studi== levels(as.factor(combined_data$campo.studi))[2] #STEM
+                    & combined_data$age== levels(as.factor(combined_data$age))[2] #UNDER 22
+                        ,]
+results_IWT = list()
+music_vars = c("popularity","acousticness")
+for(m in music_vars){
+  IWT_covcov_2(m)
+}
+
+
+```
+
+
+
+
+
+
