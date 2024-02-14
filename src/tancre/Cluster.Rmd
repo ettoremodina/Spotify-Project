@@ -237,9 +237,12 @@ fit_RF
 ```
 
 
-TODO
-scegliere nuove variabili per fittare i cluster
-come?
--selezione (solo variabili signfificative per differenze al 0.01)
--pca e fittare i cluster su nuove variabili
+```{r}
+importance_features <- importance(fit_RF)
+importance_features
+sort(importance_features, decreasing=T) 
+varImpPlot(fit_RF)
+
+saveRDS(survey_data,"../../data/survey_cluster.RData")
+```
 

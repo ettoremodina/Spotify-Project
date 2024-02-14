@@ -12,21 +12,91 @@ seed=2024
 ```
 
 ```{r}
+numeric_clusters<-readRDS("../../data/numeric_clusters.RData")
+survey_data<-readRDS("../../data/survey_cluster.RData")
+survey_data<-as.data.frame(lapply(survey_data, as.factor))
 
+survey_data$campo.studi[survey_data$campo.studi == "others"] <- "Others"
+survey_data$campo.studi <- droplevels(survey_data$campo.studi)
+survey_data$campo.studi<-as.factor(survey_data$campo.studi)
+```
+
+
+Categories for permutational results.
+```{r}
+person1 <- data.frame(
+  sesso = "Maschio",
+  age = "Over23",
+  libri = "0",
+  estero = "Si",
+  strumento = "No",
+  lavoro = "Part time"
+)
+person2<-data.frame(
+  sesso = "Femmina",
+  age = "Under23",
+  libri = "1+",
+  estero = "No",
+  strumento = "Si",
+  lavoro = "No"
+)
+```
+
+Categories for clusters.
+(add: stato, campo.studi, importanza.musica, come.ascolti.musica, concerti, abitanti.città)
+
+```{r}
+person1_cl <- data.frame(
+  sesso = "Maschio",
+  age = "Over23",
+  libri = "0",
+  estero = "Si",
+  strumento = "Si",
+  lavoro = "Part time",
+  stato="Italia",
+  campo.studi="STEM (Science, Technology, Engineering, Mathematics)",
+  importanza.musica="molto",
+  come.ascolti.musica="ricerco spesso musica nuova e la considero un’attività a sé",
+  concerti=">3",
+  abitanti.citta="Più di 500 000 abitanti"
+)
+
+
+person2_cl<-data.frame(
+  sesso = "Femmina",
+  age = "Under23",
+  libri = "1+",
+  estero = "No",
+  strumento = "No",
+  lavoro = "no",
+  stato="Italia",
+  campo.studi="STEM (Science, Technology, Engineering, Mathematics)",
+  importanza.musica="abbastanza",
+  come.ascolti.musica="ascolto musica volentieri ma non mi allontano dai miei gusti",
+  concerti="<=1",
+  abitanti.citta="Meno di 100.000 abitanti"
+)
+
+newdata<-rbind(person1_cl, person2_cl)
 ```
 
 ```{r}
-data1 = combined_data[combined_data$estero== levels(as.factor(combined_data$estero))[1] #no
-                    & combined_data$campo.studi== levels(as.factor(combined_data$campo.studi))[1] #STEM
-                    & combined_data$age== levels(as.factor(combined_data$age))[1] #OVER 22
-                        ,]
+library(randomForest)
+library(caret)
+set.seed(2024)
+fit_RF<-randomForest(as.factor(cluster) ~ ., data = survey_data, mtry=4, ntree=5000, replace=T)
+fit_RF
+```
+```{r}
+total<-rbind(survey_data[,-13], newdata)
+total<-as.data.frame(lapply(total, as.factor))
+newdata<-total[c(70,71),]
+pred<- predict(fit_RF, newdata = newdata)
+pred
+```
 
-
-
-data2 = combined_data[combined_data$estero== levels(as.factor(combined_data$estero))[2] #no
-                    & combined_data$campo.studi== levels(as.factor(combined_data$campo.studi))[2] #STEM
-                    & combined_data$age== levels(as.factor(combined_data$age))[2] #UNDER 22
-                        ,]
-
+```{r}
+songs2<-numeric_clusters[numeric_clusters$cluster=="2",]
+songs1<-numeric_clusters[numeric_clusters$cluster=="1",]
 ```
 
