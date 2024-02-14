@@ -60,9 +60,45 @@ survey_data$concerti<-ifelse(test,"more than 5","less than 5")
 ######### 
 survey_data$regione[is.na(survey_data$regione)] = "missing"
 ######### TO DO
-survey_data$abitanti.citta[survey_data$abitanti.citta=="Meno di 1000 abitanti"] = "Tra 10.000 e 100.000"
+
+
+# new to create only 2 levels
+
+
+survey_data$abitanti.citta <- factor(survey_data$abitanti.citta, levels = c(levels(survey_data$abitanti.citta), "meno di 100.000 abitanti","Più di 100.000 abitanti"))
+
+survey_data$abitanti.citta[survey_data$abitanti.citta=="Meno di 1000 abitanti"] =as.factor("meno di 100.000 abitanti")
+
+
+survey_data$abitanti.citta[survey_data$abitanti.citta=="Tra 1.000 e 10.000 abitanti"] = "meno di 100.000 abitanti"
+survey_data$abitanti.citta[survey_data$abitanti.citta=="Tra 10.000 e 100.000"] = "meno di 100.000 abitanti"
+survey_data$abitanti.citta[survey_data$abitanti.citta=="Tra 100.000 e 500.000 abitanti"] = "Più di 100.000 abitanti"
+survey_data$abitanti.citta[survey_data$abitanti.citta=="Più di 500 000 abitanti"] = "Più di 100.000 abitanti"
+
 # Rimuovi livelli vuoti
 survey_data$abitanti.citta <- droplevels(survey_data$abitanti.citta)
+
+###
+
+survey_data$lavoro <- factor(survey_data$lavoro, levels = c(levels(survey_data$lavoro), "si"))
+
+survey_data$lavoro[survey_data$lavoro=="Part time" ] = "si"
+survey_data$lavoro[survey_data$lavoro=="Full time" ] = "si"
+survey_data$lavoro <- droplevels(survey_data$lavoro)
+
+
+
+####
+
+
+survey_data$importanza.musica[survey_data$importanza.musica=="tanto" ] = "molto"
+survey_data$importanza.musica[survey_data$importanza.musica=="abbastanza" ] = "poco"
+survey_data$importanza.musica <- droplevels(survey_data$importanza.musica)
+
+
+###
+survey_data$campo.studi[survey_data$campo.studi=="missing" ] = "Others"
+#survey_data$campo.studi <- droplevels(survey_data$campo.studi)
 ```
 
 
@@ -71,6 +107,7 @@ survey_data$abitanti.citta <- droplevels(survey_data$abitanti.citta)
 ```{r}
 combined_data <- merge(data_numeric_cleaned, survey_data, by.x = "id", by.y = "id")
 head(combined_data)
+dim(combined_data)
 ```
 
 
@@ -89,6 +126,7 @@ NC = function(z_aug, i){
 # main function
 ```{r}
 conformal_univariate_interval <- function(x, plotting = FALSE){
+  alpha = 0.05
   x_grid  = seq(min(x)-0.25*diff(range(x)), max(x)+0.25*diff(range(x)), length.out=100)
   p_value = numeric(length(x_grid))
 
@@ -104,7 +142,9 @@ conformal_univariate_interval <- function(x, plotting = FALSE){
 
   # Prediction Interval
   PI_grid = x_grid[which(p_value>=alpha)]
-  PI      = c(min(PI_grid), max(PI_grid))
+      # cut if exceed [0,1], the prediction is still valid at alpha percent
+  PI      = c(max(min(PI_grid),0),min(max(PI_grid),1) )
+  
   # KNN 
   # PI <- x_grid[as.logical(c(0,abs(diff(p_value>alpha))))]
   
@@ -147,7 +187,7 @@ conformal_univariate_interval(univariate_data_filtered)
 
 
 
-# For loop for every possible combination- 270 tests
+# For loop for every possible combination- 400 tests
 ```{r}
 alpha = 0.15
 #list_intervals = list()
@@ -164,9 +204,7 @@ for(s in survey_covs){
         print(name_for_list)
         univariate_data_filtered = combined_data[combined_data[,s] == g, m]
         list_intervals[[name_for_list]] = conformal_univariate_interval(univariate_data_filtered)
-        # cut if exceed [0,1], the prediction is still valid at alpha percent
-        list_intervals[[name_for_list]][1]=max(list_intervals[[name_for_list]][1],0)
-        list_intervals[[name_for_list]][2]=min(list_intervals[[name_for_list]][2],1)
+
       }
       
    
@@ -195,16 +233,6 @@ survey_covs_chosen = c("sesso","campo.studi","stato","lavoro","importanza.musica
 music_vars_chosen = c("popularity","acousticness","liveness")
 music_vars_chosen = c("popularity","acousticness","danceability","energy","instrumentalness","liveness","loudness","tempo","valence")
 ```
-Popularity - sesso
-Acousticness - eta, lavoro, estero
-Danceability - books
-Energy - eta, estero(con interazione)
-Instrumentalness- estero
-Liveness - sesso, estero
-Loudness - eta , estero, strumento
-Tempo- lavoro 
-Valence- genere 
-
 
 
 # Exploring CI
@@ -265,14 +293,12 @@ for(s in survey_covs){
   groups_survey = levels(as.factor(combined_data[,s]))
   for ( m in music_vars){
     temp_list_CI = list()
-    count = 1
     for( g in groups_survey){
       
       name_for_list = paste0(s,": ",g,", VAR: ",m)
-      
-      temp_list_CI[[count]] = list_intervals[[name_for_list]]
-      count = count + 1
+      temp_list_CI[[g]] = list_intervals[[name_for_list]]
     }
+    
     name = paste0(s," ",", VAR: ",m)
     IoU_list[[name]] = Intersection_Over_Union(temp_list_CI)
 
@@ -300,7 +326,254 @@ for(s in survey_covs){
 
 }
 ```
+# Best 2 groups finder
 
+##
+```{r}
+condition_1 = combined_data$importanza.musica==levels(combined_data$importanza.musica)[4]
+condition_2 = combined_data$politica==levels(combined_data$politica)[2]
+conditions <- list(condition_1, condition_2)
+# Combine conditions using Reduce with the '&' operator
+filter_survey <- Reduce(`&`, conditions)
+
+# Apply the combined filter to the data
+filtered_data <- combined_data[filter_survey,]
+
+
+condition_1 = combined_data$importanza.musica==levels(combined_data$importanza.musica)[2]
+condition_2 = combined_data$politica==levels(combined_data$politica)[1]
+conditions <- list(condition_1, condition_2)
+# Combine conditions using Reduce with the '&' operator
+filter_survey <- Reduce(`&`, conditions)
+
+# Apply the combined filter to the data
+filtered_data_2 <- combined_data[filter_survey,]
+
+
+
+
+
+VAL = compute_metric(filtered_data,filtered_data_2)
+```
+```{r}
+compute_number_rows <- function(data_group1,data_group2){
+  return(1/dim(data_group1)[1]+1/dim(data_group2)[1])
+}
+```
+```{r}
+compute_metric <- function(data_group1,data_group2){
+  sum_metric_over_musical_covariates <- 0
+  for ( m in music_vars ){
+    conf_group1 = conformal_univariate_interval(data_group1[,m])      
+    conf_group2 = conformal_univariate_interval(data_group2[,m])
+    # cut if exceed [0,1], the prediction is still valid at alpha percent
+    conf_group1[1]=max(conf_group1[1],0)
+    conf_group2[1]=max(conf_group2[1],0)
+    conf_group1[2]=min(conf_group1[2],1)
+    conf_group2[2]=min(conf_group2[2],1)
+    
+    union = max(conf_group1[2],conf_group2[2])-min(conf_group1[1],conf_group2[1])
+    intersection = min(conf_group1[2],conf_group2[2]) - max(conf_group1[1],conf_group2[1])
+
+    sum_metric_over_musical_covariates =  sum_metric_over_musical_covariates + intersection/union
+  }
+  print(paste0("final metric: ",sum_metric_over_musical_covariates))
+  return(sum_metric_over_musical_covariates)
+}
+
+
+
+
+```
+
+```{r}
+check_numerosity <- function(dat1,dat2){
+  test = (length(unique(dat1$id))>2 && length(unique(dat2$id))>2)
+  return(test)
+}
+```
+
+
+```{r}
+permutation_levels <- function(survey_covs)  {
+  conditions_group_1 <- list()
+  conditions_group_2 <- list()
+  composition_group_1 <- list()
+  composition_group_2 <- list()
+  metric_list <- list()
+
+  m_count = 2
+  metric_list[[1]] = 100
+  num_levels = length(survey_covs)
+  for(s in 1:num_levels){
+  #for(s in 1:3){
+    levels_s = levels(as.factor(combined_data[,survey_covs[s]]))
+    print(survey_covs[s])
+    
+    if(s!=1){ # per la prima iterazione non serve controllare entrambe
+      # level 1-2
+      condition = combined_data[,survey_covs[s]]==levels_s[1]
+      conditions_group_1[[s]] <- condition
+      composition_group_1[[s]] <- paste0(survey_covs[s], "level: ",levels_s[1])
+      filter_survey <- Reduce(`&`, conditions_group_1)
+      data1 = combined_data[filter_survey,]
+    
+      condition = combined_data[,survey_covs[s]]==levels_s[2]
+      conditions_group_2[[s]] <- condition
+      composition_group_2[[s]] <- paste0(survey_covs[s], "level: ",levels_s[2])
+      filter_survey <- Reduce(`&`, conditions_group_2)
+      data2 = combined_data[filter_survey,]
+      
+      if(check_numerosity(data1,data2)){
+        metric = compute_metric(data1,data2)
+      }
+      else{
+        metric = 100
+      }
+      
+      
+    }else{
+      metric = 100
+    }
+
+    
+    
+    # level 2-1
+    condition = combined_data[,survey_covs[s]]==levels_s[2]
+    conditions_group_1[[s]] <- condition
+    composition_group_1[[s]] <- paste0(survey_covs[s], " level: ",levels_s[2])
+    filter_survey <- Reduce(`&`, conditions_group_1)
+    data1 = combined_data[filter_survey,]
+  
+    condition = combined_data[,survey_covs[s]]==levels_s[1]
+    conditions_group_2[[s]] <- condition
+    composition_group_2[[s]] <- paste0(survey_covs[s], " level: ",levels_s[1])
+    filter_survey <- Reduce(`&`, conditions_group_2)
+    data2 = combined_data[filter_survey,]
+
+    
+    if(check_numerosity(data1,data2)){
+      metric_2 = compute_metric(data1,data2)
+    }else{
+      metric_2 = 100
+    }
+
+    metric_list[[m_count]] = metric_2
+    
+    if(metric<metric_2){
+      condition = combined_data[,survey_covs[s]]==levels_s[1]
+      conditions_group_1[[s]] <- condition
+      composition_group_1[[s]] <- paste0(survey_covs[s], "level: ",levels_s[1])
+      
+      condition = combined_data[,survey_covs[s]]==levels_s[2]
+      conditions_group_2[[s]] <- condition
+      composition_group_2[[s]] <- paste0(survey_covs[s], "level: ",levels_s[2])
+      
+      metric_list[[m_count]] = metric
+    }
+    
+    
+    # if this level doesn't produce an increase in the metric we discard it and pass to the next
+    if(metric_list[[m_count-1]]< metric_list[[m_count]]){
+      conditions_group_1 <- conditions_group_1[-s]
+      conditions_group_2 <- conditions_group_2[-s]
+      composition_group_1 <- composition_group_1[-s]
+      composition_group_2 <- composition_group_2[-s]
+
+    }else{
+      m_count = m_count + 1
+    }
+
+  }
+  
+
+  
+  
+  return(list(cond1 = conditions_group_1,
+              cond2 = conditions_group_2,
+              comp1 = composition_group_1,
+              comp2 = composition_group_2,
+              metrics = metric_list))
+}
+
+```
+
+```{r}
+music_vars = colnames(data_numeric_cleaned)
+music_vars = music_vars[!(music_vars %in% c("id","year","duration","speechness"))] # exclude year and duration
+survey_covs = colnames(survey_data)
+survey_covs = survey_covs[!(survey_covs %in% c("genere","id","educazione","concerti","come.ascolti.musica","regione"))]
+
+
+music_vars = c("popularity","acousticness","instrumentalness","liveness")
+
+for ( i in survey_covs){
+  print(levels(as.factor(survey_data[,i])))
+  print("################")
+}
+```
+```{r}
+lis = list(1,2,3,4)
+lis2 = lis[-4]
+lis2[[4]]
+```
+
+
+```{r}
+music_vars = c("popularity"     ,  "acousticness")
+metric_list_permutation = list()
+survey_covs_permutations <- list()
+num_levels = length(survey_covs)
+
+survey_covs_permutations[[1]] <- survey_covs
+metric_list_permutation[[1]] <- permutation_levels(survey_covs)
+for(i in 11:20){# permutations of levels
+  print(paste0("permutation number: ",i))
+  survey_covs_permutations[[i]] <- sample(survey_covs)
+  metric_list_permutation[[i]] <- permutation_levels(sample(survey_covs))
+  
+}
+saveRDS(metric_list_permutation,"../best2groups.RData")
+```
+
+
+
+```{r}
+data1 = combined_data[combined_data$estero== levels(as.factor(combined_data$estero))[1] #no
+                    & combined_data$campo.studi== levels(as.factor(combined_data$campo.studi))[1] #STEM
+                    & combined_data$age== levels(as.factor(combined_data$age))[1] #OVER 22
+                        ,]
+
+
+
+data2 = combined_data[combined_data$estero== levels(as.factor(combined_data$estero))[2] #no
+                    & combined_data$campo.studi== levels(as.factor(combined_data$campo.studi))[2] #STEM
+                    & combined_data$age== levels(as.factor(combined_data$age))[2] #UNDER 22
+                        ,]
+
+
+length(unique(data1$id))
+
+length(unique(data2$id))
+
+#compute_metric(data1,data2)
+
+conformal_univariate_interval(data1[,"popularity"],TRUE)
+conformal_univariate_interval(data1[,"acousticness"],TRUE)
+conformal_univariate_interval(data2[,"popularity"],TRUE)
+conformal_univariate_interval(data2[,"acousticness"],TRUE)
+```
+
+
+```{r}
+vector_of_min = c()
+for(i in 1:length(metric_list_permutation)){
+  vector_of_min = c( vector_of_min,(min(as.numeric(metric_list_permutation[[i]]$metrics))))
+}
+#10
+#11
+metric_list_permutation[[11]]
+```
 
 # Multivariate
 
