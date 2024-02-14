@@ -111,7 +111,7 @@ plot(data.w, main=paste(distance, ' - ', linkages[4]), hang=-0.1, xlab='', label
 
 ```{r}
 #cut dendogram:
-k=2
+k=4
 data.hc<-data.w
 clusters <- cutree(data.hc, k=k)
 
@@ -123,6 +123,7 @@ table(clusters)
 
 ```{r}
 numeric_red$cluster<-clusters
+saveRDS(numeric_red,"../../data/numeric_clusters.RData")
 ```
 
 ## Assign people to clusters
@@ -156,7 +157,7 @@ cluster_df_centered<-as.data.frame(cluster_df_centered)
 ```
 
 ```{r}
-#cluster_df_centered<-cluster_df[,-1]
+cluster_df_centered<-cluster_df[,-1]
 cluster_df_centered$final<-apply(cluster_df_centered, 1, function(row) which.max(row))
 table(cluster_df_centered$final)
 ```
@@ -228,7 +229,7 @@ best_rf_model <- rf_model$finalModel
 #indices <- sample(1:nrow(survey_data), 60)
 #train_data <- survey_data[indices, ]
 #test_data <- survey_data[-indices, ]
-fit_RF<-randomForest(as.factor(cluster) ~ ., data = survey_data, mtry=10, ntree=5000, replace=T)
+fit_RF<-randomForest(as.factor(cluster) ~ ., data = survey_data, mtry=4, ntree=5000, replace=T)
 fit_RF
 #predictions <- predict(fit_RF, test_data, type = "class")
 #conf_matrix <- confusionMatrix(predictions, as.factor(test_data$cluster))

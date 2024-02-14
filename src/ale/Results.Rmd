@@ -1,0 +1,32 @@
+---
+title: "Results"
+author: "Alessandra Pescina"
+date: "2024-02-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+B=1000
+seed=2024
+```
+
+```{r}
+
+```
+
+```{r}
+data1 = combined_data[combined_data$estero== levels(as.factor(combined_data$estero))[1] #no
+                    & combined_data$campo.studi== levels(as.factor(combined_data$campo.studi))[1] #STEM
+                    & combined_data$age== levels(as.factor(combined_data$age))[1] #OVER 22
+                        ,]
+
+
+
+data2 = combined_data[combined_data$estero== levels(as.factor(combined_data$estero))[2] #no
+                    & combined_data$campo.studi== levels(as.factor(combined_data$campo.studi))[2] #STEM
+                    & combined_data$age== levels(as.factor(combined_data$age))[2] #UNDER 22
+                        ,]
+
+```
+
