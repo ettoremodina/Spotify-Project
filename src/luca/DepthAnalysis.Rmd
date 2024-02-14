@@ -14,43 +14,7 @@ library(spatstat.geom)
 
 ```{r}
 data_numeric_cleaned = readRDS("../../data/data_numeric_cleaned2.RData")
-survey_data = readRDS("../../data/Surveycleaned.RData")
-test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
-survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
-survey_data$campo.studi[is.na(survey_data$campo.studi)] = "missing"
-###########
-test<-survey_data$stato!="Italia"         
-survey_data$stato<-ifelse(test,"Others","Italia")
-survey_data$stato[is.na(survey_data$stato)] = "missing"
-###########
-test<-survey_data$libri!="0"         
-survey_data$libri<-ifelse(test,"1+","0")
-survey_data$libri[is.na(survey_data$libri)] = "missing"
-##########
-test<-survey_data$estero!="No"         
-survey_data$estero<-ifelse(test,"Si","No")
-survey_data$estero[is.na(survey_data$estero)] = "missing"
-##########
-colnames(survey_data)[1] = "age"
-
-test<-survey_data$age < 22.5         
-survey_data$age<-ifelse(test,"Under22.5","Over22.5")
-survey_data$age[is.na(survey_data$age)] = "missing"
-######### TO DO
-# test<-survey_data$genere!="No"         
-# survey_data$genere<-ifelse(test,"Si","No")
-# survey_data$genere[is.na(survey_data$genere)] = "missing"
-######### 
-test<-survey_data$concerti>5         
-survey_data$concerti<-ifelse(test,"more than 5","less than 5")
-######### 
-survey_data$regione[is.na(survey_data$regione)] = "missing"
-######### TO DO
-survey_data$abitanti.citta[survey_data$abitanti.citta=="Meno di 1000 abitanti"] = "Tra 10.000 e 100.000"
-# Rimuovi livelli vuoti
-survey_data$abitanti.citta <- droplevels(survey_data$abitanti.citta)
-
-
+survey_data = readRDS("../../data/survey_reduced.RData")
 ```
 
 ```{r}
@@ -186,11 +150,13 @@ n <- nrow(person_data)
 alpha <- 0.99  # Puoi regolare il valore di alpha
 weights_ecdf <- create_exponential_weights(n, alpha)
 
-music_vars = colnames(data_numeric_cleaned)[1:12]
-music_vars = music_vars[!(music_vars %in% c("year","duration"))]
-survey_covs = colnames(survey_data)[1:16]
-survey_covs = survey_covs[!(survey_covs %in% c("genere","id"))]
+survey
 
+music_vars = colnames(data_numeric_cleaned)[1:12]
+music_vars = music_vars[!(music_vars %in% c("year","duration","id"))]
+survey_covs = colnames(survey_data)
+survey_covs = survey_covs[!(survey_covs %in% c("genere","id"))]
+survey_covs
 
 ```
 
@@ -288,7 +254,8 @@ IWT_covcov <- function(music_cov, survey_cov){
 
 
 ```{r}
-val = IWT_covcov("liveness","educazione")
+val = IWT_covcov("danceability","strumento")
+colnames(combined_data)
 ```
 
 
@@ -312,8 +279,9 @@ covariate_iterator <- function(){
   return(results_IWT)
 }
 
+music_vars = colnames(data_numeric_cleaned)
 results_IWT_list <- list()
-alpha_vect = c(0.1,0.5,0.7,0.9)
+alpha_vect = c(0.1)
 index = 1
 for(a in alpha_vect){
   print(a)

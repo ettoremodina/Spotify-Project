@@ -223,14 +223,77 @@ for(s in survey_covs){
 list_intervals = readRDS("../conformal_intervals_byGroups.RData")
 ```
 
+```{r}
+tabler <- function(s,m){  
+  text = c()
+  lev = levels(as.factor(combined_data[,s]))
+  temp_text = c("\\begin{table}[]",paste(c("\\begin{tabular}{\\" , paste(rep("l", length(lev)+1), collapse = ""),"}"),collapse = ""))
+  
+
+  temp_text_2 =    paste(s,(paste((paste("&",lev, collapes="")),collapse = " "))," \\",collapse  = " ")
+  
+  temp_level = c()
+  for(g in lev ) {
+    index = paste0(s,": ",g,", VAR: ",m)
+    temp_level= c(temp_level,paste(c("&","LB",round(list_intervals[[index]][1],3),"UB",round(list_intervals[[index]][2],3)),
+                                   collapse = " "))
+  }
+  
+  temp_level = paste(temp_level,collapse = " ")
+  temp_text_3 = paste(c(m, temp_level ),collapse= " ")
+  combined = c(temp_text,temp_text_2,temp_text_3,"\\end{tabular}","\\end{table}")
+  return(combined)
+}
+    
+
+
+surv_chosen = c("sesso","age","libri","estero", "lavoro")
+
+mus_chosen = c("popularity","acousticness","danceability","energy","instrumentalness",
+               "liveness", "loudness","tempo" )
+
+
+text = c()
+
+text = c(text, tabler("sesso","popularity") )
+text = c(text, tabler("age","acousticness") )
+text = c(text, tabler("estero","acousticness") )
+text = c(text, tabler("lavoro","acousticness") )
+text = c(text, tabler("libri","danceability") )
+text = c(text, tabler("age","energy") )
+text = c(text, tabler("estero","energy") )
+text = c(text, tabler("estero","instrumentalness") )
+text = c(text, tabler("sesso","liveness") )
+text = c(text, tabler("estero","liveness") )
+text = c(text, tabler("age","loudness") )
+text = c(text, tabler("estero","loudness") )
+text = c(text, tabler("strumento","loudness") )
+text = c(text, tabler("lavoro","tempo") )
+
+
+    
+    
+writeLines(text, "output_fda.txt")
+
+
+text = c(text, tabler(s,m) )#\begin{table}[]
+#\begin{tabular}{lll}
+#a & lv1 & lv2 \\
+# b & x   & y  
+# \end{tabular}
+# \end{table}
+
+```
+
+
 # Relevant variables from other tests
 (permutational and band depth)
 ```{r}
 # dunctional band depth
 survey_covs_chosen = c("sesso","campo.studi","stato","lavoro","importanza.musica",
-                       "come.ascolti.musica","politica","regione","abitanti.citta",
+                       "come.ascolti.musica","politica","regione",
                        "educazione")
-music_vars_chosen = c("popularity","acousticness","liveness")
+music_vars_chosen = c("popularity","acousticness","liveness","instrumentalness")
 music_vars_chosen = c("popularity","acousticness","danceability","energy","instrumentalness","liveness","loudness","tempo","valence")
 ```
 
@@ -250,12 +313,46 @@ plot_CI <- function(temp_list_CI,title){
 
 ```
 
+```{r}
+library(ggplot2)
+plot_CI_2 <- function(temp_list_CI, title, groups_survey) {
+  g <- length(temp_list_CI)
+  data <- data.frame(
+    index = rep(1:g, each = 2),
+    value = unlist(temp_list_CI)
+  )
+  
+  ggplot(data, aes(x = index, y = value)) +
+    geom_line(aes(group = index), color = 'grey55', size = 1.5) +
+    geom_point(aes(color = factor(index)), shape = 16, size = 4) + # Riduce la larghezza delle barre sull'asse x
+    scale_x_continuous(expand = c(0.5, 0.5)) +  # Contract the x-axis
+    scale_color_manual(values = rainbow(g), name = "Levels", labels = groups_survey) +
+    labs(
+      x = "Levels",
+      y = 'Conformal prediction interval',
+      title = title
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      plot.title = element_text(size = 20, hjust = 0.5, vjust = 1) # Centra e fa andare a capo il titolo se è troppo lungo
+    )
+}
+
+# Esempio di utilizzo:
+# temp_list_CI <- list(c(0.1, 0.2), c(0.15, 0.25), c(0.12, 0.22))
+# groups_survey <- c("Group A", "Group B", "Group C")
+# plot_CI_2(temp_list_CI, "Titolo molto lungo che si estende oltre i margini dell'area del titolo", groups_survey)
+
+```
+
+
 
 
 ```{r}
-for(s in survey_covs){
+for(s in survey_covs_chosen){
   groups_survey = levels(as.factor(combined_data[,s]))
-  for ( m in music_vars){
+  for ( m in music_vars_chosen){
     temp_list_CI = list()
     count = 1
     for( g in groups_survey){
@@ -264,13 +361,14 @@ for(s in survey_covs){
       
       temp_list_CI[[count]] = list_intervals[[name_for_list]]
       count = count + 1
-      title = paste0(s," ",", VAR: ",m)
+      title = paste0("Survey var: ",s," \n, Music var: ",m)
     
     }
-    plot_CI(temp_list_CI,title)
+   print(plot_CI_2(temp_list_CI,title,groups_survey))
     
   }
 }
+
 ```
 ```{r}
 Intersection_Over_Union <- function(list){
@@ -289,6 +387,7 @@ Intersection_Over_Union <- function(list){
 
 ```{r}
 IoU_list = list()
+k = 1
 for(s in survey_covs){
   groups_survey = levels(as.factor(combined_data[,s]))
   for ( m in music_vars){

@@ -1,0 +1,84 @@
+\begin{table}[]
+\begin{tabular}{\lll}
+sesso & Femmina  & Maschio   \
+popularity & LB 0.265 UB 0.932 & LB 0.151 UB 0.943
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+age & Over22.5  & Under22.5   \
+acousticness & LB 0 UB 0.78 & LB 0 UB 0.947
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+estero & No  & Si   \
+acousticness & LB 0 UB 0.765 & LB 0 UB 0.917
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\llll}
+lavoro & Full time  & no  & Part time   \
+acousticness & LB 0 UB 0.818 & LB 0 UB 0.886 & LB 0 UB 0.749
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+libri & 0  & 1+   \
+danceability & LB 0.368 UB 0.993 & LB 0.311 UB 0.947
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+age & Over22.5  & Under22.5   \
+energy & LB 0.341 UB 1 & LB 0.161 UB 1
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+estero & No  & Si   \
+energy & LB 0.371 UB 1 & LB 0.207 UB 1
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+estero & No  & Si   \
+instrumentalness & LB 0 UB 0.235 & LB 0 UB 0.794
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+sesso & Femmina  & Maschio   \
+liveness & LB 0 UB 0.384 & LB 0 UB 0.447
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+estero & No  & Si   \
+liveness & LB 0 UB 0.417 & LB 0 UB 0.416
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+age & Over22.5  & Under22.5   \
+loudness & LB 0.704 UB 0.979 & LB 0.583 UB 1
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+estero & No  & Si   \
+loudness & LB 0.714 UB 0.976 & LB 0.629 UB 1
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\lll}
+strumento & No  & Si   \
+loudness & LB 0.689 UB 0.977 & LB 0.622 UB 1
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{\llll}
+lavoro & Full time  & no  & Part time   \
+tempo & LB 0.104 UB 0.711 & LB 0.103 UB 0.711 & LB 0.112 UB 0.709
+\end{tabular}
+\end{table}
