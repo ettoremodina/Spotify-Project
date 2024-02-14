@@ -53,6 +53,14 @@ survey_data$abitanti.citta <- droplevels(survey_data$abitanti.citta)
 
 ```
 
+```{r}
+for( i in 1:dim(data_numeric_cleaned)[2])
+  print(range(data_numeric_cleaned[,i]))
+
+colnames(data_numeric_cleaned)
+```
+
+
 # combine the data
 
 ```{r}
