@@ -64,7 +64,7 @@ newdata<-rbind(person1_cl, person2_cl)
 ```{r}
 library(randomForest)
 library(caret)
-set.seed(2024)
+
 fit_RF<-randomForest(as.factor(cluster) ~ ., data = survey_data, mtry=4, ntree=5000, replace=T)
 fit_RF
 ```
@@ -87,13 +87,13 @@ songs1<-numeric_clusters[numeric_clusters$cluster=="1",]
 Select relevant ranges of descriptors previously computed by conformal prediction
 
 ```{r}
-list_intervals = readRDS("../../conformal_intervals_byGroups.RData")
+list_intervals = readRDS("data_final/conformal_intervals_byGroups_medians.RData")
 ind1<-paste0( "sesso",": ","Maschio",", VAR: ","popularity") #person1
 ind2<-paste0( "sesso",": ","Femmina",", VAR: ","popularity") #person2
 male_pop<-list_intervals[[ind1]]
 female_pop<-list_intervals[[ind2]]
-ind3<-paste0( "age",": ","Over22.5",", VAR: ","acousticness") #person1
-ind4<-paste0( "age",": ","Under22.5",", VAR: ","acousticness") #person2
+ind3<-paste0( "age",": ","Over23",", VAR: ","acousticness") #person1
+ind4<-paste0( "age",": ","Under23",", VAR: ","acousticness") #person2
 acu_Over23<-list_intervals[[ind3]]
 acu_Under23<-list_intervals[[ind4]] 
 ind5<-paste0( "lavoro",": ","no",", VAR: ","acousticness") #person2
@@ -104,8 +104,8 @@ ind7<-paste0( "libri",": ","1+",", VAR: ","danceability") #person2
 ind8<-paste0( "libri",": ","0",", VAR: ","danceability") #person1
 danc_libri1<-list_intervals[[ind7]]
 danc_libri0<-list_intervals[[ind8]]
-ind9<-paste0( "age",": ","Over22.5",", VAR: ","energy") #person1
-ind10<-paste0( "age",": ","Under22.5",", VAR: ","energy") #person2
+ind9<-paste0( "age",": ","Over23",", VAR: ","energy") #person1
+ind10<-paste0( "age",": ","Under23",", VAR: ","energy") #person2
 energy_Over23<-list_intervals[[ind9]]
 energy_Under23<-list_intervals[[ind10]]
 ind11<-paste0( "estero",": ","Si",", VAR: ","energy") #person1
@@ -115,7 +115,7 @@ energy_abroadNO<-list_intervals[[ind12]]
 ind13<-paste0( "estero",": ","Si",", VAR: ","instrumentalness") #person1
 ind14<-paste0( "estero",": ","No",", VAR: ","instrumentalness") #person2
 inst_abroadSI<-list_intervals[[ind13]]
-inst_abroadNO<-list_intervals[[ind14]]
+inst_abroadNO<-list(c(0.000,0.000))
 ind15<-paste0( "estero",": ","Si",", VAR: ","liveness") #person1
 ind16<-paste0( "estero",": ","No",", VAR: ","liveness") #person2
 live_abroadSI<-list_intervals[[ind15]]
@@ -124,8 +124,8 @@ ind17<-paste0( "sesso",": ","Maschio",", VAR: ","liveness") #person1
 ind18<-paste0( "sesso",": ","Femmina",", VAR: ","liveness") #person2
 male_live<-list_intervals[[ind17]]
 female_live<-list_intervals[[ind18]]
-ind19<-paste0( "age",": ","Over22.5",", VAR: ","loudness") #person1
-ind20<-paste0( "age",": ","Under22.5",", VAR: ","loudness") #person2
+ind19<-paste0( "age",": ","Over23",", VAR: ","loudness") #person1
+ind20<-paste0( "age",": ","Under23",", VAR: ","loudness") #person2
 loud_Over23<-list_intervals[[ind19]]
 loud_Under23<-list_intervals[[ind20]] 
 ind21<-paste0( "estero",": ","Si",", VAR: ","loudness") #person1
@@ -145,44 +145,43 @@ tempo_Parttime<-list_intervals[[ind26]]
 Filtrate songs of cluster one that are coherent with the expected ranges
 
 ```{r}
-selected_songs1 <- songs1[
-  songs1$popularity>= male_pop[1] & songs1$popularity <= male_pop[2] &
-  songs1$acousticness>= acu_Over23[1] & songs1$acousticness<=acu_Over23[2] &
-  songs1$acousticness>= acu_Parttime[1] & songs1$acousticness<=acu_Parttime[2] &
-  songs1$danceability>= danc_libri0[1] & songs1$danceability<=danc_libri0[2] &
-  songs1$energy>= energy_abroadSI[1] & songs1$energy<=energy_abroadSI[2] &
-  songs1$energy>= energy_Over23[1] & songs1$energy<=energy_Over23[2] &
-  songs1$instrumentalness>= inst_abroadSI[1] & songs1$instrumentalness<=inst_abroadSI[2] &
-  songs1$liveness>= live_abroadSI[1] & songs1$liveness<=live_abroadSI[2] &
-  songs1$liveness>= male_live[1] & songs1$liveness<=male_live[2] &
-  songs1$loudness>= loud_abroadSI[1] & songs1$loudness<=loud_abroadSI[2] &
-  songs1$loudness>= loud_Over23[1] & songs1$loudness<=loud_Over23[2] &
-  songs1$loudness>= loud_strumentoSI[1] & songs1$loudness<=loud_strumentoSI[2] &
-  songs1$tempo>= tempo_Parttime[1] & songs1$tempo<=tempo_Parttime[2] ,
+selected_songs2 <- songs2[
+  songs2$popularity>= male_pop[1] & songs2$popularity <= male_pop[2] &
+  songs2$acousticness>= acu_Over23[1] & songs2$acousticness<=acu_Over23[2] &
+  songs2$acousticness>= acu_Parttime[1] & songs2$acousticness<=acu_Parttime[2] &
+  songs2$danceability>= danc_libri0[1] & songs2$danceability<=danc_libri0[2] &
+  songs2$energy>= energy_abroadSI[1] & songs2$energy<=energy_abroadSI[2] &
+  songs2$energy>= energy_Over23[1] & songs2$energy<=energy_Over23[2] &
+  songs2$instrumentalness>= inst_abroadSI[1] & songs2$instrumentalness<=inst_abroadSI[2] &
+  songs2$liveness>= live_abroadSI[1] & songs2$liveness<=live_abroadSI[2] &
+  songs2$liveness>= male_live[1] & songs2$liveness<=male_live[2] &
+  songs2$loudness>= loud_abroadSI[1] & songs2$loudness<=loud_abroadSI[2] &
+  songs2$loudness>= loud_Over23[1] & songs2$loudness<=loud_Over23[2] &
+  songs2$loudness>= loud_strumentoSI[1] & songs2$loudness<=loud_strumentoSI[2] &
+  songs2$tempo>= tempo_Parttime[1] & songs2$tempo<=tempo_Parttime[2] ,
 ]
-selected_songs1_cleaned <- selected_songs1[!duplicated(selected_songs1[ colnames(selected_songs1) ]), ]
-songs1_cleaned <- songs1[!duplicated(songs1[ colnames(songs1) ]), ]
+
 ```
 
 
 Filtrate songs of cluster two that are coherent with the expected ranges
 ```{r}
-selected_songs2 <- songs2[
- songs2$popularity>= female_pop[1] &songs2$popularity <= female_pop[2] &
- songs2$acousticness>= acu_Under23[1] &songs2$acousticness<=acu_Under23[2] &
- songs2$acousticness>= acu_Nowork[1] &songs2$acousticness<=acu_Nowork[2] &
- songs2$danceability>= danc_libri1[1] &songs2$danceability<=danc_libri1[2] &
- songs2$energy>= energy_abroadNO[1] &songs2$energy<=energy_abroadNO[2] &
- songs2$energy>= energy_Under23[1] &songs2$energy<=energy_Under23[2] &  
- songs2$instrumentalness>= inst_abroadNO[1] &songs2$instrumentalness<=inst_abroadNO[2] &  
- songs2$liveness>= live_abroadNO[1] &songs2$liveness<=live_abroadNO[2] &  
- songs2$liveness>= female_live[1] &songs2$liveness<=female_live[2] &
- songs2$loudness>= loud_abroadNO[1] &songs2$liveness<=loud_abroadNO[2] &
- songs2$loudness>= loud_Under23[1] &songs2$liveness<=loud_Under23[2] & 
- songs2$loudness>= loud_strumentoNO[1] &songs2$liveness<=loud_strumentoNO[2] & 
- songs2$tempo>= tempo_Nowork[1] &songs2$tempo<=tempo_Nowork[2] ,
+selected_songs1 <- songs1[
+ songs1$popularity>= female_pop[1] &songs1$popularity <= female_pop[2] &
+ songs1$acousticness>= acu_Under23[1] &songs1$acousticness<=acu_Under23[2]& 
+ songs1$acousticness>= acu_Nowork[1] &songs1$acousticness<=acu_Nowork[2] &
+ songs1$danceability>= danc_libri1[1] &songs1$danceability<=danc_libri1[2] &
+ songs1$energy>= energy_abroadNO[1] &songs1$energy<=energy_abroadNO[2] &
+ songs1$energy>= energy_Under23[1] &songs1$energy<=energy_Under23[2] &
+ songs1$instrumentalness>= unlist(inst_abroadNO)[1] &songs1$instrumentalness<=unlist(inst_abroadNO)[2] &
+ songs1$liveness>= live_abroadNO[1] &songs1$liveness<=live_abroadNO[2] &
+ songs1$liveness>= female_live[1] &songs1$liveness<=female_live[2] &
+ songs1$loudness>= loud_abroadNO[1] &songs1$liveness<=loud_abroadNO[2] &
+ songs1$loudness>= loud_Under23[1] &songs1$liveness<=loud_Under23[2] &
+ songs1$loudness>= loud_strumentoNO[1] &songs1$liveness<=loud_strumentoNO[2] &
+ songs1$tempo>= tempo_Nowork[1] &songs1$tempo<=tempo_Nowork[2] ,
 ]
-selected_songs2_cleaned <- selected_songs2[!duplicated(selected_songs2[ colnames(selected_songs2) ]), ]
+
 ```
 
 Check that the set of songs obtained for person 
