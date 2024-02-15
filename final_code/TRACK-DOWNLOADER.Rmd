@@ -22,8 +22,8 @@ library(dplyr )
 
 # Get access
 ```{r}
-CLIENT_ID='e862d6e00b244fe090bcb7bd0edd2fc8'
-CLIENT_SECRET='d00ce12e600741ad8b614769eb52b7b8'
+CLIENT_ID='###################'
+CLIENT_SECRET='#####################'
 
 Sys.setenv(SPOTIFY_CLIENT_ID = CLIENT_ID)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = CLIENT_SECRET)
