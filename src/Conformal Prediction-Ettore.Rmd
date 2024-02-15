@@ -28,7 +28,7 @@ library(robustbase)
 
 ```{r}
 data_numeric_cleaned = readRDS("../data/data_numeric_cleaned2.RData")
-survey_data = readRDS("../data/Surveycleaned.RData")
+survey_data = readRDS("../data/survey_reduced.RData")
 test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
 survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
 survey_data$campo.studi[is.na(survey_data$campo.studi)] = "missing"
@@ -203,7 +203,74 @@ for(s in survey_covs){
       if(!(name_for_list%in%names(list_intervals))){
         print(name_for_list)
         univariate_data_filtered = combined_data[combined_data[,s] == g, m]
+        
         list_intervals[[name_for_list]] = conformal_univariate_interval(univariate_data_filtered)
+
+      }
+      
+   
+    }
+  }
+}
+
+```
+
+# correzione: list intervals on median
+```{r}
+music_variables = colnames(data_numeric_cleaned)
+
+# Create an empty dataset with the specified columns
+numeric_data_median <- data.frame(matrix(ncol = length(music_variables), nrow = 69))
+colnames(numeric_data_median) <- music_variables
+
+music_variables = colnames(data_numeric_cleaned)[1:11]
+
+k = 1
+for (ids in unique(combined_data$id)){
+  numeric_data_median$id[k] = ids 
+  numeric_data_median[,music_variables] =
+        colMedians(as.matrix(data_numeric_cleaned[data_numeric_cleaned$id==ids,music_variables]))
+  k = k+1
+
+}
+
+
+combined_data_median <- merge(numeric_data_median, survey_data, by.x = "id", by.y = "id")
+head(combined_data_median)
+dim(combined_data_median)
+
+```
+
+```{r}
+alpha = 0.05
+
+survey_covs = colnames(survey_data)
+music_vars = music_variables
+list_intervals_median = list()
+for(s in survey_covs){
+  groups_survey = levels(as.factor(combined_data_median[,s]))
+  for ( m in music_vars ){
+    for( g in groups_survey){
+      
+      name_for_list = paste0(s,": ",g,", VAR: ",m)
+
+      
+      # jump tests that have already been done
+      if(!(name_for_list%in%names(list_intervals_median))){
+        print(name_for_list)
+        univariate_data_filtered = combined_data_median[combined_data_median[,s] == g, m]
+        # Try to compute the conformal prediction interval
+        tryCatch(
+          {
+            list_intervals_median[[name_for_list]] <- conformal_univariate_interval(univariate_data_filtered)
+          },
+          error = function(e) {
+            cat("An error occurred:", conditionMessage(e), "\n")
+            cat("Skipping to the next iteration.\n")
+          }
+        )
+        
+      
 
       }
       
@@ -217,31 +284,33 @@ for(s in survey_covs){
 
 
 
+
 # Saving data
 ```{r}
-#saveRDS(list_intervals,"../conformal_intervals_byGroups.RData")
+#saveRDS(list_intervals_median,"../conformal_intervals_byGroups_medians.RData")
 list_intervals = readRDS("../conformal_intervals_byGroups.RData")
 ```
 
 ```{r}
+h_line = "\\hline"
 tabler <- function(s,m){  
   text = c()
   lev = levels(as.factor(combined_data[,s]))
-  temp_text = c("\\begin{table}[]",paste(c("\\begin{tabular}{\\" , paste(rep("l", length(lev)+1), collapse = ""),"}"),collapse = ""))
+  temp_text = c("\\begin{table}[]",paste(c("\\begin{tabular}{|" , paste(rep("l|", length(lev)+1), collapse = ""),"}"),collapse = ""))
   
 
-  temp_text_2 =    paste(s,(paste((paste("&",lev, collapes="")),collapse = " "))," \\",collapse  = " ")
+  temp_text_2 =    paste(s,(paste((paste("&",lev, collapes="")),collapse = " ")),"\\","\\",collapse  = "")
   
   temp_level = c()
   for(g in lev ) {
     index = paste0(s,": ",g,", VAR: ",m)
-    temp_level= c(temp_level,paste(c("&","LB",round(list_intervals[[index]][1],3),"UB",round(list_intervals[[index]][2],3)),
+    temp_level= c(temp_level,paste(c("&",round(list_intervals_median[[index]][1],3),"-",round(list_intervals_median[[index]][2],3)),
                                    collapse = " "))
   }
   
   temp_level = paste(temp_level,collapse = " ")
-  temp_text_3 = paste(c(m, temp_level ),collapse= " ")
-  combined = c(temp_text,temp_text_2,temp_text_3,"\\end{tabular}","\\end{table}")
+  temp_text_3 = paste(c(m, temp_level,"\\","\\" ),collapse= "")
+  combined = c(temp_text,h_line,temp_text_2,h_line,temp_text_3,h_line,"\\end{tabular}","\\end{table}")
   return(combined)
 }
     
@@ -256,16 +325,23 @@ mus_chosen = c("popularity","acousticness","danceability","energy","instrumental
 text = c()
 
 text = c(text, tabler("sesso","popularity") )
+#
 text = c(text, tabler("age","acousticness") )
+#
 text = c(text, tabler("estero","acousticness") )
 text = c(text, tabler("lavoro","acousticness") )
 text = c(text, tabler("libri","danceability") )
+#
 text = c(text, tabler("age","energy") )
+#
 text = c(text, tabler("estero","energy") )
+
 text = c(text, tabler("estero","instrumentalness") )
 text = c(text, tabler("sesso","liveness") )
 text = c(text, tabler("estero","liveness") )
+#
 text = c(text, tabler("age","loudness") )
+#
 text = c(text, tabler("estero","loudness") )
 text = c(text, tabler("strumento","loudness") )
 text = c(text, tabler("lavoro","tempo") )
@@ -276,7 +352,7 @@ text = c(text, tabler("lavoro","tempo") )
 writeLines(text, "output_fda.txt")
 
 
-text = c(text, tabler(s,m) )#\begin{table}[]
+#text = c(text, tabler(s,m) )#\begin{table}[]
 #\begin{tabular}{lll}
 #a & lv1 & lv2 \\
 # b & x   & y  

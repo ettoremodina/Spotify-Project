@@ -1,84 +1,126 @@
 \begin{table}[]
-\begin{tabular}{\lll}
-sesso & Femmina  & Maschio   \
-popularity & LB 0.265 UB 0.932 & LB 0.151 UB 0.943
+\begin{tabular}{|l|l|l|}
+\hline
+sesso & Femmina  & Maschio  \ \
+\hline
+popularity& 0.432 - 0.726 & 0.326 - 0.808\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-age & Over22.5  & Under22.5   \
-acousticness & LB 0 UB 0.78 & LB 0 UB 0.947
+\begin{tabular}{|l|l|l|}
+\hline
+age & Over23  & Under23  \ \
+\hline
+acousticness& 0 - 0.32 & 0 - 0.714\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-estero & No  & Si   \
-acousticness & LB 0 UB 0.765 & LB 0 UB 0.917
+\begin{tabular}{|l|l|l|}
+\hline
+estero & No  & Si  \ \
+\hline
+acousticness& 0 - 0.32 & 0 - 0.595\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\llll}
-lavoro & Full time  & no  & Part time   \
-acousticness & LB 0 UB 0.818 & LB 0 UB 0.886 & LB 0 UB 0.749
+\begin{tabular}{|l|l|l|l|}
+\hline
+lavoro & Full time  & no  & Part time  \ \
+\hline
+acousticness& 0 - 0.479 & 0 - 0.536 & 0 - 0.341\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-libri & 0  & 1+   \
-danceability & LB 0.368 UB 0.993 & LB 0.311 UB 0.947
+\begin{tabular}{|l|l|l|}
+\hline
+libri & 0  & 1+  \ \
+\hline
+danceability& 0.566 - 0.799 & 0.52 - 0.755\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-age & Over22.5  & Under22.5   \
-energy & LB 0.341 UB 1 & LB 0.161 UB 1
+\begin{tabular}{|l|l|l|}
+\hline
+age & Over23  & Under23  \ \
+\hline
+energy& 0.585 - 0.801 & 0.379 - 0.882\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-estero & No  & Si   \
-energy & LB 0.371 UB 1 & LB 0.207 UB 1
+\begin{tabular}{|l|l|l|}
+\hline
+estero & No  & Si  \ \
+\hline
+energy& 0.603 - 0.804 & 0.459 - 0.847\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-estero & No  & Si   \
-instrumentalness & LB 0 UB 0.235 & LB 0 UB 0.794
+\begin{tabular}{|l|l|l|}
+\hline
+estero & No  & Si  \ \
+\hline
+instrumentalness& Inf - -Inf & 0 - 0.006\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-sesso & Femmina  & Maschio   \
-liveness & LB 0 UB 0.384 & LB 0 UB 0.447
+\begin{tabular}{|l|l|l|}
+\hline
+sesso & Femmina  & Maschio  \ \
+\hline
+liveness& 0.088 - 0.122 & 0.088 - 0.139\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-estero & No  & Si   \
-liveness & LB 0 UB 0.417 & LB 0 UB 0.416
+\begin{tabular}{|l|l|l|}
+\hline
+estero & No  & Si  \ \
+\hline
+liveness& 0.09 - 0.134 & 0.088 - 0.125\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-age & Over22.5  & Under22.5   \
-loudness & LB 0.704 UB 0.979 & LB 0.583 UB 1
+\begin{tabular}{|l|l|l|}
+\hline
+age & Over23  & Under23  \ \
+\hline
+loudness& 0.797 - 0.886 & 0.729 - 0.908\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-estero & No  & Si   \
-loudness & LB 0.714 UB 0.976 & LB 0.629 UB 1
+\begin{tabular}{|l|l|l|}
+\hline
+estero & No  & Si  \ \
+\hline
+loudness& 0.797 - 0.889 & 0.777 - 0.877\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\lll}
-strumento & No  & Si   \
-loudness & LB 0.689 UB 0.977 & LB 0.622 UB 1
+\begin{tabular}{|l|l|l|}
+\hline
+strumento & No  & Si  \ \
+\hline
+loudness& 0.8 - 0.882 & 0.73 - 0.935\\
+\hline
 \end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{\llll}
-lavoro & Full time  & no  & Part time   \
-tempo & LB 0.104 UB 0.711 & LB 0.103 UB 0.711 & LB 0.112 UB 0.709
+\begin{tabular}{|l|l|l|l|}
+\hline
+lavoro & Full time  & no  & Part time  \ \
+\hline
+tempo& 0.356 - 0.469 & 0.338 - 0.471 & 0.378 - 0.442\\
+\hline
 \end{tabular}
 \end{table}
