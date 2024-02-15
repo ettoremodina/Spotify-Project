@@ -123,7 +123,8 @@ table(clusters)
 
 ```{r}
 numeric_red$cluster<-clusters
-saveRDS(numeric_red,"../../data/numeric_clusters.RData")
+numeric_data$cluster<-clusters
+saveRDS(numeric_data,"../../data/numeric_clusters.RData")
 ```
 
 ## Assign people to clusters

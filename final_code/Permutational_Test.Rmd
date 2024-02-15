@@ -1,0 +1,787 @@
+---
+title: 'Permutation_tests'
+author: "Alessandra Pescina"
+date: "2023-11-22"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+set.seed(53)
+```
+
+
+## Loading numeric and survey data
+```{r}
+survey_data<-readRDS("data_final/Surveycleaned.RData")
+numeric_data<-readRDS("data_final/data_numeric_cleaned.RData")
+```
+
+
+```{r}
+perm_t_test=function(x,y,iter=1e3){
+  
+  T0=abs(mean(x)-mean(y))  # define the test statistic
+  T_stat=numeric(iter) # a vector to store the values of each iteration
+  x_pooled=c(x,y) # pooled sample
+  n=length(x_pooled)
+  n1=length(x)
+  
+  for(perm in 1:iter){ # loop for conditional MC
+    # permutation:
+    permutation <- sample(1:n)
+    x_perm <- x_pooled[permutation]
+    x1_perm <- x_perm[1:n1]
+    x2_perm <- x_perm[(n1+1):n]
+    # test statistic:
+    T_stat[perm] <- abs(mean(x1_perm) - mean(x2_perm))
+    
+  }
+  
+  # p-value
+  p_val <- sum(T_stat>=T0)/iter
+  return(p_val)
+}
+```
+
+## 2 sample Permutational test using geometric sample to provide independence of the observations 
+
+```{r}
+
+my_perm<-function(cat1,cat2){
+cols<-colnames(numeric_data)
+res<-{ }
+
+for (j in 1:12){
+  p_value<-{ } 
+
+  for (i in 1:100){
+     
+    selected_data_cat1 <- numeric_data %>%
+        filter(id %in% cat1)
+
+     cov1 <- selected_data_cat1 %>%
+        group_by(id) %>%
+        sample_n(1, weight = dgeom(1:n(), prob = 0.3), replace = TRUE) %>%
+        pull(!!cols[j])
+
+     
+      selected_data_cat2 <- numeric_data %>%
+        filter(id %in% cat2)
+
+    
+      cov2 <- selected_data_cat2 %>%
+        group_by(id) %>%
+        sample_n(1, weight = dgeom(1:n(), prob = 0.3), replace = TRUE) %>%
+        pull(!!cols[j])
+
+    p_value[i]<-perm_t_test(cov1,cov2)
+
+}
+
+  res[j]<-sum(p_value)/100
+}
+return (res)
+}
+
+```
+
+
+## 2 sample Permutational test using median of the playlist descriptors to provide independence of the observations 
+
+```{r}
+my_perm_median<-function(cat1,cat2){
+cols<-colnames(numeric_data)
+res<-{ }
+
+for (j in 1:12){
+     
+    selected_data_cat1 <- numeric_data %>%
+        filter(id %in% cat1)
+
+     cov1 <- selected_data_cat1 %>%
+        group_by(id) %>%
+        summarize(mean_col_j = median(!!sym(cols[j]))) %>%
+        pull()
+
+  
+
+     
+      selected_data_cat2 <- numeric_data %>%
+        filter(id %in% cat2)
+
+    
+      cov2 <- selected_data_cat2 %>%
+        group_by(id) %>%
+        summarize(mean_col_j = median(!!sym(cols[j]))) %>%
+        pull()
+
+      
+    res[j]<-perm_t_test(cov1,cov2)
+
+}
+return (res)
+}
+```
+
+### Permutation Test each num_cov by sex
+
+
+```{r}
+cat1<-survey_data$id[survey_data$sesso=="Maschio"]
+cat2<-survey_data$id[survey_data$sesso=="Femmina"]
+
+```
+
+ 
+```{r}
+res_sex<-my_perm_median(cat1,cat2)
+res_sex
+```
+
+### Permutation Test each num_cov by field of study
+
+```{r}
+test<-survey_data$campo.studi!="STEM (Science, Technology, Engineering, Mathematics)"         
+survey_data$campo.studi<-ifelse(test,"Others","STEM (Science, Technology, Engineering, Mathematics)")
+temp<-survey_data$id[!is.na(survey_data$campo.studi)]
+selected_campostudi <- survey_data$campo.studi[!is.na(survey_data$campo.studi)]
+cat1<-temp[selected_campostudi =="STEM (Science, Technology, Engineering, Mathematics)"]
+cat2<-temp[selected_campostudi =="Others"]
+```
+
+
+```{r}
+res_fieldofstudy<-my_perm_median(cat1,cat2) 
+res_fieldofstudy
+```
+
+### Permutation Test each num_cov by instrument
+
+```{r}
+cat1<-survey_data$id[survey_data$strumento=="Si"]
+cat2<-survey_data$id[survey_data$strumento=="No"]
+
+```
+
+
+```{r}
+res_instrument<-my_perm_median(cat1,cat2) #pvalue year 0.029
+res_instrument
+```
+
+### Permutation Test each num_cov by country 
+
+```{r}
+test<-survey_data$stato!="Italia"         
+survey_data$stato<-ifelse(test,"Others","Italia")
+temp<-survey_data$id[!is.na(survey_data$stato)]
+selected_stato <- survey_data$stato[!is.na(survey_data$stato)]
+cat1<-temp[selected_stato =="Italia"]
+cat2<-temp[selected_stato =="Others"]
+```
+
+
+```{r}
+res_country<-my_perm_median(cat1,cat2)
+res_country 
+```
+
+### Permutation Test each num_cov by number of books
+
+```{r}
+test<-survey_data$libri!="0"         
+survey_data$libri<-ifelse(test,"1+","0")
+temp<-survey_data$id[!is.na(survey_data$libri)]
+selected_libri <- survey_data$libri[!is.na(survey_data$libri)]
+cat1<-temp[selected_libri =="0"]
+cat2<-temp[selected_libri =="1+"]
+```
+
+
+```{r}
+res_books<-my_perm_median(cat1,cat2)
+res_books
+```
+
+### Permutation Test each num_cov by abroad 
+
+```{r}
+test<-survey_data$estero!="No"         
+survey_data$estero<-ifelse(test,"Si","No")
+temp<-survey_data$id[!is.na(survey_data$estero)]
+selected_estero <- survey_data$estero[!is.na(survey_data$estero)]
+cat1<-temp[selected_estero =="No"]
+cat2<-temp[selected_estero =="Si"]
+```
+
+
+```{r}
+res_abroad<-my_perm_median(cat1,cat2)
+res_abroad
+```
+
+### Permutation Test each num_cov by age
+
+```{r}
+colnames(survey_data)[1] ="age"
+# Count values below 22.5 in the 'age' column
+values_below_23 <- sum(survey_data$age < 23, na.rm = TRUE)
+values_below_23
+
+# Count missing data in the 'age' column
+missing_data_age <- sum(is.na(survey_data$age))
+missing_data_age
+
+```
+
+```{r}
+test<-survey_data$age < 23        
+survey_data$age<-ifelse(test,"Under23","Over23")
+temp<-survey_data$id[!is.na(survey_data$age)]
+selected_age <- survey_data$age[!is.na(survey_data$age)]
+cat1<-temp[selected_age =="Under23"]
+cat2<-temp[selected_age =="Over23"]
+```
+
+
+```{r}
+res_age<-my_perm_median(cat1,cat2)
+res_age
+```
+
+
+### Permutation Test each num_cov by region
+
+```{r}
+test<-survey_data$regione!="nord"         
+survey_data$regione<-ifelse(test,"centro-sud","nord")
+temp<-survey_data$id[!is.na(survey_data$regione)]
+selected_regione <- survey_data$regione[!is.na(survey_data$regione)]
+cat1<-temp[selected_regione =="nord"]
+cat2<-temp[selected_regione =="centro-sud"]
+```
+
+
+```{r}
+res_region<-my_perm_median(cat1,cat2)
+res_region
+```
+
+Let's bind the results in a dataframe
+```{r}
+res_perm<-rbind(res_sex,res_fieldofstudy, res_age, res_books, res_abroad, res_country,
+                res_instrument, res_region)
+cnames<-colnames(numeric_data[,-13])
+colnames(res_perm)<-cnames
+```
+
+Let's assess if the category are balanced as well
+
+country and region might give problems..
+
+```{r}
+selected_indices <- c(2,4,1,6,13,5,12,15)
+selected_data <- survey_data[, selected_indices]
+
+
+for (i in seq_along(selected_indices)) {
+
+  barplot(table(selected_data[, i]), col = "lightblue",
+          main = colnames(selected_data)[i], xlab = "", ylab = "Frequency")
+}
+
+```
+
+
+## One-way Anova
+
+```{r}
+#Non parametric one way anova function
+one_way_anova <- function(x, cat, iter=1e3){
+  T_stat <- numeric(iter) 
+  n <- length(x)
+  fit <- aov(x ~ cat)
+  T0 <- summary(fit)[[1]][1,4]
+ 
+  
+  for(perm in 1:iter){
+    # Permutation:
+    permutation <- sample(1:n)
+    x_perm <- x[permutation]
+    fit_perm <- aov(x_perm ~ cat)
+  
+    # Test statistic:
+    T_stat[perm] <- summary(fit_perm)[[1]][1,4]
+  }
+  p_val <- sum(T_stat>=T0)/iter
+  return (p_val)
+} 
+
+```
+
+
+
+```{r}
+#One way anova on all 12 covariates with extraction
+
+my_one_way <- function(cat){
+  res <- vector("numeric", length = 12)
+  for (j in 1:12) {
+    #missing
+    res[j] <- one_way_anova(unlist(median_data[,j]), cat)
+  }
+  return(res)
+}
+
+```
+
+
+```{r}
+median_data <- numeric_data %>%
+        group_by(id) %>%
+        summarise(across(everything(), median))
+     
+```
+
+```{r}
+id_col<-median_data$id
+median_data<-median_data[,-1]
+median_data$id<-id_col
+
+```
+
+
+### Anova Permutation test for Work 
+
+```{r}
+res_work<-my_one_way(survey_data$lavoro)
+res_work
+```
+
+
+### Anova Permutation test for Importance of music
+
+
+```{r}
+res_importance.music<-my_one_way(survey_data$importanza.musica)
+res_importance.music
+```
+
+### Anova Permutiation test for How do you listen to music
+
+
+```{r}
+res_how.listen<-my_one_way(survey_data$come.ascolti.musica)
+res_how.listen
+```
+
+### Anova Permutation test for Number of concerts
+
+```{r}
+# Define the breakpoints for the categories
+breakpoints <- c(-Inf, 1, 3, Inf)
+
+# Create a new categorical column based on the numeric_column
+survey_data$concerti <- cut(survey_data$concerti, breaks = breakpoints, labels = c("<=1", "(1,3]", ">3"), include.lowest = TRUE)
+```
+
+rejecting H0: none. 
+```{r}
+res_concerts<-my_one_way(survey_data$concerti)
+res_concerts
+```
+
+### Anova Permutation for Number of inhabitants
+
+```{r}
+table(survey_data$abitanti.citta)
+
+# Transform the column based on conditions
+survey_data <- survey_data %>%
+  mutate(
+    abitanti.citta = case_when(
+      abitanti.citta %in% c("Meno di 1000 abitanti", "Tra 1.000 e 10.000 abitanti", "Tra 10.000 e 100.000") ~ "Meno di 100.000 abitanti",
+      TRUE ~ abitanti.citta
+    )
+  )
+table(survey_data$abitanti.citta)
+```
+```{r}
+
+survey_data <- survey_data %>%
+  mutate(abitanti.citta= case_when(
+    abitanti.citta %in% c("Meno di 1000 abitanti", "Tra 1.000 e 10.000 abitanti") ~ "Meno di 100.000 abitanti",
+    abitanti.citta == "Tra 100.000 e 500.000 abitanti" ~ "Tra 100.000 e 500.000 abitanti",
+    abitanti.citta == "Più di 500 000 abitanti" ~ "Più di 500 000 abitanti",
+    TRUE ~ abitanti.citta  
+  ))
+table(survey_data$abitanti.citta)
+```
+
+
+```{r}
+res_inhabitants<-my_one_way(survey_data$abitanti.citta)
+res_inhabitants
+```
+
+### Anova Permutation for Genre
+
+We consider only people in the most listened genres, since it doesn't make sense compare other genres with to few people (hiphop,pop,rock)
+
+```{r}
+genre_counts<-table(survey_data$genere)
+selected_genres <- names(genre_counts[genre_counts > 10])
+
+survey_data$genere[!(survey_data$genere %in% selected_genres)] <- NA
+
+table(survey_data$genere)
+```
+
+```{r}
+res_genre<-my_one_way(survey_data$genere)
+res_genre
+```
+
+Let's bind results
+```{r}
+res_anova<-rbind(res_work,res_importance.music, res_how.listen, res_concerts, res_inhabitants, res_genre)
+cnames<-colnames(numeric_data[,-13])
+colnames(res_anova)<-cnames
+```
+
+
+```{r}
+res<-rbind(res_perm,res_anova)
+```
+
+
+```{r}
+selected_indices <- c(7,8,10,11,16,9)
+selected_data <- survey_data[, selected_indices]
+
+
+for (i in seq_along(selected_indices)) {
+
+  barplot(table(selected_data[, i]), col = "lightblue",
+          main = colnames(selected_data)[i], xlab = "", ylab = "Frequency",cex.names = 0.7, las=2)
+}
+
+```
+
+
+## Results 
+
+
+```{r}
+
+threshold <- 0.05
+condition0.05 <- ifelse(res< threshold, 1, 0)
+
+condition0.05<-as.data.frame(condition0.05)
+count0.05<-numeric()
+for (i in 1:12){
+count0.05[i]<-sum(condition0.05[,i]==1)}
+
+threshold <- 0.1
+condition0.1 <- ifelse(res< threshold, 1, 0)
+
+condition0.1<-as.data.frame(condition0.1)
+count0.1<-numeric()
+for (i in 1:12){
+count0.1[i]<-sum(condition0.1[,i]==1)}
+
+```
+
+```{r}
+reduced<-survey_data[,-c(3,14)]
+```
+
+```{r}
+saveRDS(res,"data_final/pvalues_cat.RData")
+saveRDS(reduced,"data_final/survey_reduced.RData")
+
+```
+
+
+## Two-way Anova
+
+```{r}
+survey_data<-readRDS("data_final/survey_reduced.RData")
+res<-readRDS("data_final/pvalues_cat.RData")
+```
+
+###energy:age, abroad 
+reject HO-> keep interaction
+p-value:0.048
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$energy~ survey_data$age+ survey_data$estero+survey_data$age:survey_data$estero))[[1]][3,4]  
+T0_stat
+
+aov.H0 <- aov(median_data$energy~ survey_data$age+ survey_data$estero)
+aov.H0
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$energy)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$age + survey_data$estero + survey_data$age:survey_data$estero))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
+### liveness: sex,abroad
+accept H0-> no interaction
+p-value 0.427
+
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$liveness~ survey_data$sesso+ survey_data$estero+survey_data$sesso:survey_data$estero))[[1]][3,4]  
+T0_stat
+
+aov.H0 <- aov(median_data$liveness~ survey_data$sesso+ survey_data$estero)
+aov.H0
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$liveness)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$sesso + survey_data$estero + survey_data$sesso:survey_data$estero))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
+### acusticness: age,abroad,work (no interactions)
+
+H1 all interaction, H0 no 3 interactions
+accept H0
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero+survey_data$lavoro:survey_data$estero:survey_data$age))[[1]][3,4]  
+
+
+aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero)
+
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$acousticness)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero+survey_data$lavoro:survey_data$estero:survey_data$age))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
+H1 as before H0 remove estero:lavoro
+accept H0
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]  
+
+
+aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero)
+
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$acousticness)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
+H1 as before H0 remove estero:age
+accept H0
+
+
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]  
+
+
+aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age)
+
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$acousticness)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
+H1 as before H0 remove lavoro:age
+accept H0
+
+-> no interactions
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age))[[1]][3,4]  
+
+
+aov.H0 <- aov(median_data$acousticness~ survey_data$lavoro+ survey_data$age+ survey_data$estero)
+
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$acousticness)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$lavoro+ survey_data$age+ survey_data$estero+survey_data$lavoro:survey_data$age))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
+### loudness: age, abroad, instrument (no interactions)
+
+H1 all interaction, H0 no 3 interactions
+accept H0
+
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero+survey_data$strumento:survey_data$estero:survey_data$age))[[1]][3,4]  
+
+
+aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero)
+
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$loudness)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero+survey_data$strumento:survey_data$estero:survey_data$age))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
+
+H0 remove age:estero
+accept H0
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]  
+
+
+aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age)
+
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$loudness)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age+survey_data$age:survey_data$estero))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
+H0 remove age:strumento
+accept H0
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age))[[1]][3,4]  
+
+
+aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero)
+
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$loudness)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero+survey_data$strumento:survey_data$age))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
+H0 remove estero:strumento
+accept H0
+-> no interactions
+```{r}
+B=1000
+
+T0_stat <- summary.aov(aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero))[[1]][3,4]  
+
+
+aov.H0 <- aov(median_data$loudness~ survey_data$strumento+ survey_data$age+ survey_data$estero)
+
+
+residuals.H0 <- aov.H0$residuals 
+n = length(median_data$loudness)
+
+
+T_stat <- numeric(B)
+for(perm in 1:B){
+  permutation <- sample(n)
+  # permute the residuals
+  residuals.H0 <- residuals.H0[permutation]
+  perm.response.H0 <- aov.H0$fitted + residuals.H0
+  # re-fit full model to calculate statistic
+  T_stat[perm] <- summary.aov(aov(   perm.response.H0  ~ survey_data$strumento+ survey_data$age+ survey_data$estero+survey_data$strumento:survey_data$estero))[[1]][3,4]
+}
+sum(T_stat >= T0_stat)/B
+```
