@@ -1,0 +1,580 @@
+---
+title: 'Preprocess_numeric'
+author: "Alessandra Pescina"
+date: "2023-11-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(848)
+```
+
+Libraries
+```{r}
+library(dplyr)
+```
+
+
+Upload useful function and load data
+```{r}
+source("normalize_numeric_global.R")
+dataset_list = readRDS("data_final/data_list.RData")
+```
+
+
+Remove dataframe in the list that are of too poor/rich of data
+```{r}
+#clean dataset
+n_row <- numeric(length(dataset_list ))
+
+for (i in seq_along(dataset_list )) {
+  n_row[i] <- nrow(dataset_list [[i]])
+}
+
+hist(n_row,main = "before")
+# Function to filter out data frames with wrong nrow and crop the one too long
+filter_nrow <- function(df) {
+  nrow(df) > 5
+}
+
+
+filtered_list <- Filter(filter_nrow, dataset_list)
+filtered_list[[26]] <- filtered_list[[26]][1:101, ]
+dataset_list<- filtered_list
+
+n_row <- numeric(length(dataset_list ))
+for (i in seq_along(dataset_list )) {
+  n_row[i] <- nrow(dataset_list [[i]])
+}
+hist(n_row, main = "after")
+
+```
+
+## Preprocessing numeric data
+
+This chunk provides numeric data normalized in a global way
+Note that the covariates *duration* and *years* are not normalized on purpose
+```{r}
+
+numeric_list <- list()
+for (i in seq_along(dataset_list)) {
+  data <- dataset_list[[i]]
+  numeric_list[[i]] <- data[, c(5, 7:15, 18, 19)]
+}
+numeric_list <- normalize_numeric_global(numeric_list)
+
+combined_numeric <- do.call(rbind, numeric_list)
+combined_numeric <-round(combined_numeric,3)
+
+names<-names(dataset_list)
+temp <- rep(names, times = n_row)
+combined_numeric$id<-temp
+
+head(combined_numeric)
+dim(combined_numeric)
+```
+Let's save in two different dataframes the mean and variance  for each variable in each playlist
+to consider a first quantitative coarse analysis 
+
+
+```{r}
+temp<-combined_numeric
+temp <- temp %>%
+  group_by(id) %>%
+  summarize_all(mean)
+
+mean_df<-temp
+mean_df$id<-names(dataset_list)
+
+temp<-combined_numeric
+temp <- temp %>%
+  group_by(id) %>%
+  summarize_all(var)
+
+variance_df<-temp
+variance_df$id<-names(dataset_list)
+
+```
+
+Save cleaned numeric data
+```{r}
+saveRDS(combined_numeric,"data_final/data_numeric_cleaned.RData")
+
+```
+
+## Visualize numeric data
+```{r}
+#use this to have a boxplot of the variables you want to visualize
+#change this line with the number of the numeric dataset you want to open
+numeric<-numeric_list[[9]]
+
+par(mfrow = c(2, 3))
+numeric<-numeric_list[[45]]
+col_names<-colnames(numeric)
+boxplot(numeric[,1:2], col = "lightblue", main = "Boxplots", names = col_names[1:2], cex.axis = 0.5)
+boxplot(numeric[,3:4], col = "lightblue", main = "Boxplots", names = col_names[3:4], cex.axis = 0.5)
+boxplot(numeric[,5:6], col = "lightblue", main = "Boxplots", names = col_names[5:6], cex.axis = 0.5)
+abline(h=c(0.5,0.8),col="red")
+boxplot(numeric[,7:8], col = "lightblue", main = "Boxplots", names = col_names[7:8], cex.axis = 0.5)
+boxplot(numeric[,9:10], col = "lightblue", main = "Boxplots", names = col_names[9:10], cex.axis = 0.5)
+par(mfrow = c(1, 2))
+boxplot(numeric[,11], col = "lightblue", main = "Duration", names = col_names[11], cex.axis = 0.5)
+boxplot(numeric[,12], col = "lightblue", main = "Year", names = col_names[12], cex.axis = 0.5)
+
+```
+
+
+
+## Preprocessing factors
+
+
+```{r}
+factor_list <- list()
+for (i in seq_along(dataset_list)) {
+  data <- dataset_list[[i]]
+factor_list[[i]] <- data[,c(2,3,4,6,16,17,20:ncol(data))]
+}
+```
+
+Cleaning genres
+
+```{r}
+#function to rename the single genre
+transform_genre <- function(old_g){
+  worlds <- unlist(strsplit(old_g, " "))
+  
+
+  pop <- c("indie", "pop", "Indie", "Pop", "hyperpop", "mellow", "britpop", "folk-pop", "boy", "dreamo", "europop", "show", "romantic", "austropop", "bubblegum", "cartoni", "group", "electropop", "afropop", "beat", "austindie", "standards", "broadway", "musical", "tontipop","etherpop", "cover","nederpop","c86", "alley", "sophisti-pop")
+  
+  rock <- c("rock", "alternative", "rock-and-roll", "beatlesque", "madchester", "punk", "alt", "revival", "shoegaze", "grunge", "j-rock", "bubblegrunge","emo")
+  
+  electronic <- c("techno", "wave", "electropowerpop", "afrofuturism", "electro", "disco", "edm", "dembow", "tech", "psytrance","afrobeat", "touch", "tekk", "chillwave","vapor", "cubaton", "house", "electronic", "afrobeats", "indietronica", "downtempo", "brostep", "room", "fi", "lo-fi", "ambient", "ai", "afroswing", "acidcore", "soundtrack", "ambient", "experimental", "dance", "electronica", "folktronica", "eurodance", "aussietronica", "psych","basshall", "neo-psychedelic", "covertronica", "easy", "electra", "hi-nrg", "balearic","bass", "speedrun", "video", "dub", "chiptune", "moombahton", "lounge", "weirdcore", "dancehall", "vogue")
+  
+  hiphop <- c("rap", "trap", "hip", "drill", "urbano", "reggaeton", "phonk", "grime", "plugg", "neoperreo")
+  
+  country <- c("country", "tejano")
+  
+  jazz <- c("jazz", "blues", "bebop", "bossa", "americana", "melancholia", "post-bop")
+  
+  classical <- c("classical", "orchestra", "chamber", "baroque", "violin")
+  
+  folk <- c("folk", "cantautorato", "autore", "d'autore", "singer-songwriter", "neomelodici", "cantautora", "musica", "anime", "brasileiro", "tuareg", "sebene", "chicha", "bajki", "cumbia", "bachata", "cha-cha-cha", "cantautor", "mariachi", "bolero", "christian", "ccm", "canzone", "celtic", "chanson", "cappella", "canadian", "native", "mambo", "stomp", "mpb", "flamenco", "ska", "calypso")
+  
+  soul <- c("soul", "R&B", "funk", "r&b", "reggae", "groove", "funky", "charango", "motown", "souldies", "storm", "afro-funk")
+  
+  metal <- c("metal", "metalcore", "deathcore", "slayer", "djent")
+  
+  missing <- c("previa", "fluxwork", "metropopolis", "meme", "bossbeat", "comic", "concurso")
+  
+  #l'output della funzione è il nuvo genere
+  if (is.na(old_g)){
+    return ("missing")
+  }
+  if (any(!is.na(match(worlds, pop)))){
+    return ("pop")}
+  if (any(!is.na(match(worlds, rock)))){
+    return ("rock")}
+  if (any(!is.na(match(worlds, electronic)))){
+    return ("electronic")}
+  if (any(!is.na(match(worlds, hiphop)))){
+    return ("hiphop")}
+  if (any(!is.na(match(worlds, country)))){
+    return ("country")}
+  if (any(!is.na(match(worlds, jazz)))){
+    return ("jazz")}
+  if (any(!is.na(match(worlds, classical)))){
+    return ("classical")}
+  if (any(!is.na(match(worlds, folk)))){
+    return ("folk")}
+  if (any(!is.na(match(worlds, soul)))){
+    return ("soul")}
+  if (any(!is.na(match(worlds, metal)))){
+    return ("metal")}
+  if (any(!is.na(match(worlds, missing)))){
+    return ("missing")
+  }
+  return (old_g)
+}
+
+```
+
+function to update genres of the playlist
+```{r}
+transform_playlist <- function(genre) {
+  #matching_indices <- c()
+  for (i in 1:dim(genre)[1]) {
+    new_g <- transform_genre(genre[i,])
+   genre[i,] <- new_g
+  }
+  #print (genre[matching_indices,])
+  return(unlist(genre))
+}
+```
+
+Updating factor list
+```{r}
+for (i in 1:69){
+  temp<-factor_list[[i]]
+  old_g <- temp["genre_1"]
+  factor_list[[i]] <- factor_list[[i]][, 1:8]
+  factor_list[[i]]$genre <- transform_playlist(old_g)
+  
+}
+```
+
+
+```{r}
+combined_factor <- do.call(rbind,factor_list)
+names<-names(dataset_list)
+temp <- rep(names, times = n_row)
+combined_factor$id<-temp
+id_playlists <- unique(combined_factor$id)
+combined_factor<- as.data.frame(lapply(combined_factor, as.factor))
+saveRDS(combined_factor,"data_final/data_factor_cleaned.RData")
+```
+
+## Preprocessing Surveys
+
+Load Data Surveys
+
+```{r}
+Survey_data = readRDS("../data/Questionario_eng.RData")
+Quest_data = readRDS("../data/Questionario.RData")
+```
+
+Rename cols
+
+```{r}
+names_cols<-c("age", "sesso", "educazione", "campo.studi", "stato", "libri", "lavoro", "importanza.musica", "genere", "come.ascolti.musica","quando.ascolti.musica", "concerti", "strumento", "sport", "estero", "politica", "hobby", "regione", "abitanti.citta", "id" )
+names(Quest_data)<-names_cols
+names(Survey_data)<-names_cols
+```
+
+Merging dataframes
+
+```{r}
+Data<-rbind(Quest_data, Survey_data)
+```
+
+```{r}
+dataset_list = readRDS("data_final/data_list.RData")
+id_keep<-names(dataset_list)
+```
+
+we keep only the rows corresponding to people having a proper playlist
+
+```{r}
+filtered_data <- Data[Data$id %in% id_keep, ]
+```
+
+Adjusting factors ->Grammar corrections..
+
+```{r}
+temp<-filtered_data$importanza.musica
+temp[7]="tanto"
+filtered_data$importanza.musica<-temp
+```
+
+```{r}
+temp<-filtered_data$strumento
+temp[11]="piano"
+temp[29]="chitarra"
+filtered_data$strumento<-temp
+```
+
+
+```{r}
+temp<-filtered_data$politica
+temp[c(68)]="Si molto"
+filtered_data$politica<-temp
+```
+
+```{r}
+temp<-filtered_data$abitanti.citta
+temp[c(69)]= "Tra 100.000 e 500.000 abitanti"
+temp[c(64,65,66,67,68,70)]="Pi? di 500 000 abitanti" 
+temp[1]="Tra 100.000 e 500.000 abitanti"
+filtered_data$abitanti.citta<-temp
+```
+
+```{r}
+temp<-filtered_data$estero
+temp[c(1,64,65,66,67,68,69,70)]= "Europa occidentale"
+filtered_data$estero<-temp
+```
+
+People not living in Italy or no longer living in Italy ->"/"
+
+```{r}
+temp<-filtered_data$regione
+Lombardia<-c(5,9,13,15,17,19,25,27,29,33,35,41,43,45,53,55,59,61,63,4,6,8,12,14,18,20,22,36,40,42,44,46,48,50,52,54,56,58,60,62)
+na<-c(11,23,34,47,64:70)
+Lazio<-c(7,57,28,38)
+Toscana<-c(1,21,37,16,30,31,32,49)
+temp[Lombardia]<-"Lombardia"
+temp[na]="/"
+temp[Lazio]="Lazio"
+temp[Toscana]="Toscana"
+filtered_data$regione<-temp
+```
+
+
+Collecting people playing more then  one instrument
+```{r}
+index<-c(2,28,57,70)
+filtered_data$strumento[index]="2+"
+
+```
+
+Converting to factors
+
+```{r}
+filtered_data$sesso<-as.factor(filtered_data$sesso)
+filtered_data$educazione<-as.factor(filtered_data$educazione)
+filtered_data$campo.studi<-as.factor(filtered_data$campo.studi)
+filtered_data$libri<-as.factor(filtered_data$libri)
+filtered_data$lavoro<-as.factor(filtered_data$lavoro)
+filtered_data$importanza.musica<-as.factor(filtered_data$importanza.musica)
+filtered_data$come.ascolti.musica<-as.factor(filtered_data$come.ascolti.musica)
+filtered_data$politica<-as.factor(filtered_data$politica)
+filtered_data$abitanti.citta<-as.factor(filtered_data$abitanti.citta)
+filtered_data$estero<-as.factor(filtered_data$estero)
+filtered_data$sport<-as.factor(filtered_data$sport)
+
+```
+
+ I had to adjust capslocks in order to have unique levels 
+ 
+```{r}
+col.stato<-filtered_data$stato
+Italia<- c(1,2,3,4,5,6,8,9,10,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27,28,29,30,31,32,33,35,36,37,38,39,40,41,42,43,44,45,46,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,67)
+Svizzera<-c(7,23)
+Germania<-c(34,70)
+Olanda<-c(47)
+Spagna<-c(11,68,69)
+Canada<-c(64,65,66)
+col.stato[Canada]="Canada"
+col.stato[Italia]="Italia"
+col.stato[Spagna]="Spagna"
+col.stato[Svizzera]="Svizzera"
+
+col.stato<-as.factor(col.stato)
+levels(col.stato)
+```
+```{r}
+filtered_data$stato<-col.stato
+```
+
+removing the guy with only 3 songs in the playlist
+the one with id: "4YjSpxvniwzXvBB"
+
+```{r}
+filtered_data<-filtered_data[-which(filtered_data$id=="4YjSpxvniwzXvBB"),]
+```
+
+Process genres in the surveys
+
+```{r}
+transform_genre <- function(old_g){
+
+  worlds <- unlist(strsplit(old_g, " "))
+  
+
+  pop <- c("Pop-rock","indie","pop","Indie","Pop","Pop/Indie","Pop-commerciale", "emergente")
+  
+  rock <- c("rock", "Pop/Rock","Rock", "Rock/pop")
+  
+  electronic <- c("EDM","elettronica")
+  
+  hiphop <- c("Rap","hop","urban", "rap/trap", "Raggaetton","Spanish","rap")
+  
+  country <- c()
+  
+  jazz <- c("Jazz","blues")
+  
+  classical <- c("Classica")
+  
+  folk <- c("Cantautori","italiano", "italiana")
+  
+  soul <- c( "r&b;")
+  
+  metal <- c("Metal")
+  
+  missing <- c("Non","non"," ")
+  
+  #l'output della funzione è il nuvo genere
+  if (is.na(old_g)){
+    return ("missing")
+  }
+  if (any(!is.na(match(worlds, rock)))){
+    return ("rock")}
+  if (any(!is.na(match(worlds, pop)))){
+    return ("pop")}
+  if (any(!is.na(match(worlds, electronic)))){
+    return ("electronic")}
+  if (any(!is.na(match(worlds, hiphop)))){
+    return ("hiphop")}
+  if (any(!is.na(match(worlds, country)))){
+    return ("country")}
+  if (any(!is.na(match(worlds, jazz)))){
+    return ("jazz")}
+  if (any(!is.na(match(worlds, classical)))){
+    return ("classical")}
+  if (any(!is.na(match(worlds, folk)))){
+    return ("folk")}
+  if (any(!is.na(match(worlds, soul)))){
+    return ("soul")}
+  if (any(!is.na(match(worlds, metal)))){
+    return ("metal")}
+  if (any(!is.na(match(worlds, missing)))){
+    return ("missing")
+  }
+  return (old_g)
+}
+
+```
+
+```{r}
+genre<-filtered_data[,9]
+for (i in 1:69){
+ filtered_data[i,9]<-transform_genre(genre[i]) 
+}
+ filtered_data[1,9]="missing"
+
+filtered_data$genere<-as.factor( filtered_data$genere)
+```
+
+
+Categorize *strumento*
+```{r}
+instrument=filtered_data[,13]
+test<-instrument!="No"
+instrument_new<-ifelse(test,"Si","No")
+filtered_data[,13]<-instrument_new
+filtered_data$strumento<-as.factor(filtered_data$strumento)
+```
+
+Categorize *regioni*
+
+```{r}
+filtered_data$regione[which(filtered_data$regione %in% c("Lombardia", "Veneto", "Emilia Romagna "))] <- "nord"
+filtered_data$regione[which(filtered_data$regione %in% c("Toscana","Abruzzo"))] <- "centro"
+filtered_data$regione[which(filtered_data$regione %in% c("Puglia", "Lazio"))] <- "sud"
+filtered_data$regione[which(filtered_data$regione %in% c("/"))] <- "missing"
+filtered_data$regione<-as.factor(filtered_data$regione)
+```
+
+
+## Visualize survey data
+
+
+```{r}
+reduced<-filtered_data[,-c(11,14,17)]
+```
+
+```{r}
+summary(reduced)
+```
+
+Save processed data so far
+
+```{r}
+factor_columns<-c(2,3,4,5,6,7,8,9,10,12,13,14,15,16)
+cols<-names(reduced[,factor_columns])
+reduced_factors<-reduced[,factor_columns]
+```
+
+
+```{r}
+library(ggplot2)
+names<-colnames(reduced_factors)
+do_barplot<-function(i){
+ggplot(as.data.frame(reduced_factors)) + 
+  geom_bar(mapping = aes(x =reduced_factors[[i]], fill = reduced_factors[[i]]))+
+    ggtitle(names[i])}
+
+
+```
+
+
+```{r}
+do_barplot(1)
+do_barplot(2)
+do_barplot(3)
+do_barplot(4)
+do_barplot(5)
+do_barplot(6)
+do_barplot(7)
+do_barplot(8)
+do_barplot(9)
+do_barplot(10)
+do_barplot(11)
+do_barplot(12)
+do_barplot(13)
+```
+
+Missing data analysis
+```{r}
+reduced[reduced == "/"] <- "NA"
+reduced[reduced == "missing"] <- "NA"
+na_counts <- colSums(is.na(reduced)) 
+#11 NA in region given by people who live abroad, 4 NA in field of studies
+```
+
+Saving Survey data cleaned
+```{r}
+saveRDS(reduced,"data_final/Surveycleaned.RData")
+```
+
+
+## Diversity coefficient
+
+This was used to assess the percentage of variance in the playlist of each individual
+
+$$ D=1-N_a/N_p$$
+The more D increase the more artists in the playlist
+
+```{r}
+survey_data<-readRDS("data_final/Surveycleaned.RData")
+```
+
+```{r}
+compute_D <- function(df) {
+  # Inizializza un vettore per immagazzinare i valori di D
+  results_D <- numeric(69)
+
+  # Itera su ogni riga del dataframe
+  for (i in 1:69) {
+    # Estrai l'id della playlist corrente
+    
+    # Filtra il dataframe per la playlist corrente
+    playlist_current <- df[df$id == id_playlists[i], ]
+
+    # Calcola il numero unico di artisti (Na)
+    artists <- length(unique(playlist_current$artists))
+
+    # Calcola il numero di canzoni nella playlist (Np)
+    num_songs <- nrow(playlist_current)
+
+    # Calcola il valore D e assegnalo alla posizione corrente nel vettore risultati_D
+    results_D[i] <- artists /   num_songs
+    
+    
+    survey_data[which(survey_data$id == id_playlists[i]), "D_coef"] <- results_D[i]
+
+
+  }
+
+  # Restituisci il dataframe con la colonna 'D' aggiunta
+  return(survey_data )
+}
+
+```
+
+```{r}
+survey_data<- compute_D(combined_factor)
+```
+
+
+
