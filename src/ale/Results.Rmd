@@ -157,43 +157,43 @@ tempo_Parttime<-list_intervals[[ind26]]
 ```
 
 ```{r}
-selected_songs1 <- songs1[
-  songs1$popularity>= male_pop[1] & songs1$popularity <= male_pop[2] &
-  songs1$acousticness>= acu_Over23[1] & songs1$acousticness<=acu_Over23[2] &
-  songs1$acousticness>= acu_Parttime[1] & songs1$acousticness<=acu_Parttime[2] &
-  songs1$danceability>= danc_libri0[1] & songs1$danceability<=danc_libri0[2] &
-  songs1$energy>= energy_abroadSI[1] & songs1$energy<=energy_abroadSI[2] &
-  songs1$energy>= energy_Over23[1] & songs1$energy<=energy_Over23[2] &
-  songs1$instrumentalness>= inst_abroadSI[1] & songs1$instrumentalness<=inst_abroadSI[2] &
-  songs1$liveness>= live_abroadSI[1] & songs1$liveness<=live_abroadSI[2] &
-  songs1$liveness>= male_live[1] & songs1$liveness<=male_live[2] &
-  songs1$loudness>= loud_abroadSI[1] & songs1$loudness<=loud_abroadSI[2] &
-  songs1$loudness>= loud_Over23[1] & songs1$loudness<=loud_Over23[2] &
-  songs1$loudness>= loud_strumentoSI[1] & songs1$loudness<=loud_strumentoSI[2] &
-  songs1$tempo>= tempo_Parttime[1] & songs1$tempo<=tempo_Parttime[2] ,
+selected_songs2 <- songs2[
+  songs2$popularity>= male_pop[1] & songs2$popularity <= male_pop[2] &
+  songs2$acousticness>= acu_Over23[1] & songs2$acousticness<=acu_Over23[2] &
+  songs2$acousticness>= acu_Parttime[1] & songs2$acousticness<=acu_Parttime[2] &
+  songs2$danceability>= danc_libri0[1] & songs2$danceability<=danc_libri0[2] &
+  songs2$energy>= energy_abroadSI[1] & songs2$energy<=energy_abroadSI[2] &
+  songs2$energy>= energy_Over23[1] & songs2$energy<=energy_Over23[2] &
+  songs2$instrumentalness>= inst_abroadSI[1] & songs2$instrumentalness<=inst_abroadSI[2] &
+  songs2$liveness>= live_abroadSI[1] & songs2$liveness<=live_abroadSI[2] &
+  songs2$liveness>= male_live[1] & songs2$liveness<=male_live[2] &
+  songs2$loudness>= loud_abroadSI[1] & songs2$loudness<=loud_abroadSI[2] &
+  songs2$loudness>= loud_Over23[1] & songs2$loudness<=loud_Over23[2] &
+  songs2$loudness>= loud_strumentoSI[1] & songs2$loudness<=loud_strumentoSI[2] &
+  songs2$tempo>= tempo_Parttime[1] & songs2$tempo<=tempo_Parttime[2] ,
 ]
-selected_songs1_cleaned <- selected_songs1[!duplicated(selected_songs1[ colnames(selected_songs1) ]), ]
-songs1_cleaned <- songs1[!duplicated(songs1[ colnames(songs1) ]), ]
+selected_songs2_cleaned <- selected_songs2[!duplicated(selected_songs2[ colnames(selected_songs2) ]), ]
+songs2_cleaned <- songs2[!duplicated(songs2[ colnames(songs2) ]), ]
 ```
 
 
 ```{r}
-selected_songs2 <- songs2[
- songs2$popularity>= female_pop[1] &songs2$popularity <= female_pop[2] &
- songs2$acousticness>= acu_Under23[1] &songs2$acousticness<=acu_Under23[2] &
- songs2$acousticness>= acu_Nowork[1] &songs2$acousticness<=acu_Nowork[2] &
- songs2$danceability>= danc_libri1[1] &songs2$danceability<=danc_libri1[2] &
- songs2$energy>= energy_abroadNO[1] &songs2$energy<=energy_abroadNO[2] &
- songs2$energy>= energy_Under23[1] &songs2$energy<=energy_Under23[2] &  
- songs2$instrumentalness>= inst_abroadNO[1] &songs2$instrumentalness<=inst_abroadNO[2] &  
- songs2$liveness>= live_abroadNO[1] &songs2$liveness<=live_abroadNO[2] &  
- songs2$liveness>= female_live[1] &songs2$liveness<=female_live[2] &
- songs2$loudness>= loud_abroadNO[1] &songs2$liveness<=loud_abroadNO[2] &
- songs2$loudness>= loud_Under23[1] &songs2$liveness<=loud_Under23[2] & 
- songs2$loudness>= loud_strumentoNO[1] &songs2$liveness<=loud_strumentoNO[2] & 
- songs2$tempo>= tempo_Nowork[1] &songs2$tempo<=tempo_Nowork[2] ,
+selected_songs1 <- songs1[
+ songs1$popularity>= female_pop[1] &songs1$popularity <= female_pop[2] &
+ songs1$acousticness>= acu_Under23[1] &songs1$acousticness<=acu_Under23[2] &
+ songs1$acousticness>= acu_Nowork[1] &songs1$acousticness<=acu_Nowork[2] &
+ songs1$danceability>= danc_libri1[1] &songs1$danceability<=danc_libri1[2] &
+ songs1$energy>= energy_abroadNO[1] &songs1$energy<=energy_abroadNO[2] &
+ songs1$energy>= energy_Under23[1] &songs1$energy<=energy_Under23[2] &  
+ songs1$instrumentalness>= inst_abroadNO[1] &songs1$instrumentalness<=inst_abroadNO[2] &  
+ songs1$liveness>= live_abroadNO[1] &songs1$liveness<=live_abroadNO[2] &  
+ songs1$liveness>= female_live[1] &songs1$liveness<=female_live[2] &
+ songs1$loudness>= loud_abroadNO[1] &songs1$liveness<=loud_abroadNO[2] &
+ songs1$loudness>= loud_Under23[1] &songs1$liveness<=loud_Under23[2] & 
+ songs1$loudness>= loud_strumentoNO[1] &songs1$liveness<=loud_strumentoNO[2] & 
+ songs1$tempo>= tempo_Nowork[1] &songs1$tempo<=tempo_Nowork[2] ,
 ]
-selected_songs2_cleaned <- selected_songs2[!duplicated(selected_songs2[ colnames(selected_songs2) ]), ]
+selected_songs1_cleaned <- selected_songs1[!duplicated(selected_songs1[ colnames(selected_songs1) ]), ]
 ```
 
 
