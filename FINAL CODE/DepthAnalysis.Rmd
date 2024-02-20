@@ -1,0 +1,300 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library(hexbin)
+library(ggplot2)
+library(roahd)
+library("fdatest")
+library(spatstat.geom)
+```
+
+# load and preprocess the data
+
+```{r}
+data_numeric_cleaned = readRDS("data_final/data_numeric_cleaned.RData")
+survey_data = readRDS("data_final/survey_reduced.RData")
+
+```
+
+
+
+# combine the data
+
+```{r}
+combined_data <- merge(data_numeric_cleaned, survey_data, by.x = "id", by.y = "id")
+```
+
+# single ecdf
+
+```{r}
+person_id <- "03Nplw4GO2h5ut5"  # Sostituisci con l'ID della persona desiderata
+covariate <- "danceability"  # Sostituisci con la covariata desiderata
+
+# Seleziona le osservazioni per la persona specifica
+person_data <- combined_data[combined_data$id == person_id, ]
+
+# Funzione per creare un vettore di pesi esponenziali
+create_exponential_weights <- function(n, alpha) {
+  weights <- exp(-alpha * seq(0, n-1))
+  return(weights)
+}
+
+# Calcola il numero di osservazioni
+n <- nrow(person_data)
+
+# Calcola i pesi esponenziali
+alpha <- 2  # Puoi regolare il valore di alpha
+weights_ecdf <- create_exponential_weights(n, alpha)
+
+# Calcola l'EDF per la covariata specifica
+edf <- spatstat.geom::ewcdf(person_data[[covariate]], weights = weights_ecdf, normalise = TRUE)
+
+# Visualizza l'EDF
+plot(edf, main = "",
+     xlab = covariate, ylab = "Empirical Probability")
+# main = paste("EDF for", covariate, "for Person", person_id)
+```
+
+#ecdf per una covariata musica
+
+```{r}
+# Esempio di calcolo della profondit? della funzione per una covariata specifica
+covariate <- "energy"  # Sostituisci con la covariata desiderata
+
+# Creare una lista di EDF per tutte le persone
+edf_list <- lapply(unique(combined_data$id), function(person_id) {
+  person_data <- combined_data[combined_data$id == person_id, ]
+  spatstat.geom::ewcdf(person_data[[covariate]], weights = NULL, normalise = TRUE) # weights = weights_ecdf for weighted version
+})
+
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+     main = "Empirical Distribution Functions (EDF)",
+     xlab = "Data Values", ylab = "Probability")
+
+# Tracciare ogni EDF dalla lista
+for (i in seq_along(edf_list)) {
+  lines(edf_list[[i]], lwd = 0.5, cex = 0.1)
+}
+```
+
+# auxiliarry functions
+
+```{r}
+grid <- seq(0, 1, length.out = 50)
+create_edf_list <- function(music_cov){
+  edf_list <-  lapply(unique(combined_data$id), function(person_id) {
+    ecdf <- spatstat.geom::ewcdf(combined_data[combined_data$id == person_id,music_cov ],weights = NULL, normalise = TRUE)
+    val = ecdf(grid)
+    return(val)
+  })
+  return(edf_list)
+}
+
+create_indices_list <- function(unique_groups,survey_cov,median_curve_list){
+  indices_list <- list()
+  for (group in unique_groups) {
+    indices <- which(survey_data[,survey_cov] == group)
+    indices_list[[as.character(group)]] <- indices
+  }
+  return(indices_list)
+}
+
+plot_ecdf <- function(music_cov,survey_cov,edf_list,color_palette,median_curve_list){
+  unique_groups = levels(as.factor(combined_data[,survey_cov]))
+  plot(NULL, xlim = c(0, 1), ylim = c(0, 1),
+  main = "",
+  #main = paste0(c("Empirical Distribution Functions (EDF) ",music_cov,"-",survey_cov)),
+  xlab = "Data Values", ylab = "Probability")
+  
+  lapply(seq_along(edf_list), function(i) {
+    group_value <- survey_data[i + 1, survey_cov]
+    lines(grid, edf_list[[i]], lwd = 0.5, col = color_palette[unique_groups == group_value], cex = 0.1)
+  })
+  
+  # Utilizza lapply e sapply per evitare il secondo ciclo for
+  sapply(seq_along(unique_groups), function(i) {
+    lines(grid, median_curve_list[[i]]$values, col = color_palette[i], lwd = 4)
+  })
+  legend("bottomright", legend = unique_groups, col = color_palette, lwd = 2, cex = 0.8)
+}
+
+
+create_factors <- function(indices_list){
+  length_list = length(unlist(indices_list))
+  return_vect <- rep(0,length_list)
+  for( g in 2:length(names(indices_list))){
+    sub_group = indices_list[[g]]
+    for(i in 1:length(sub_group))
+      return_vect[sub_group[i]] = g-1
+  }
+  return(return_vect)
+}
+
+
+# Funzione per creare un vettore di pesi esponenziali
+create_exponential_weights <- function(n, alpha) {
+  weights <- exp(-alpha * seq(0, n-1))
+  return(weights)
+}
+
+# Calcola il numero di osservazioni
+n <- nrow(person_data)
+
+# Calcola i pesi esponenziali
+alpha <- 0.99  # Puoi regolare il valore di alpha
+weights_ecdf <- create_exponential_weights(n, alpha)
+
+music_vars = colnames(data_numeric_cleaned)[1:12]
+#music_vars = music_vars[!(music_vars %in% c("year","duration"))]
+survey_covs = colnames(survey_data)[1:14]
+survey_covs = survey_covs[!(survey_covs %in% c("genere","id"))]
+
+
+```
+
+
+```{r}
+ecdf_plotter <- function(music_cov, survey_cov){ 
+  
+  # Creare una lista di EDF per tutte le persone
+  edf_list <- create_edf_list(music_cov)
+
+  
+  # Definisci una palette di colori in base ai valori unici nella colonna di gruppo
+  unique_groups = levels(as.factor(combined_data[,survey_cov]))
+  num_groups <- length(unique_groups)
+  color_palette <- rainbow(num_groups)
+  indices_list <- create_indices_list(unique_groups,survey_cov)  
+  median_curve_list = list()
+  for (i in 1:num_groups) {
+   matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
+   f_data = fData(grid, t(matrice_da_lista_i))
+   median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
+  
+  }
+  plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+
+}
+
+
+ecdf_plotter("popularity","sesso")
+for (s in survey_covs){
+  ecdf_plotter("acousticness",s )
+}
+
+```
+
+# depth function
+```{r}
+depth_covcov <- function(music_cov, survey_cov){ 
+  
+  # Creare una lista di EDF per tutte le persone
+  edf_list <- create_edf_list(music_cov)
+  matrice_da_lista_all <- do.call(cbind, edf_list)
+  response = t(matrice_da_lista_all)
+  f_data_all = fData(grid, response)
+  
+  # Definisci una palette di colori in base ai valori unici nella colonna di gruppo
+  unique_groups = levels(as.factor(combined_data[,survey_cov]))
+  print(unique_groups)
+  num_groups <- length(unique_groups)
+  color_palette <- rainbow(num_groups)
+  indices_list <- create_indices_list(unique_groups,survey_cov)  
+  
+  
+  quantile_list <- list()
+  relative_BD_list <- list()
+  
+  for (i in 1:num_groups) {
+   matrice_da_lista_i <- do.call(cbind, edf_list[indices_list[[i]]])
+   matrice_da_lista_ALTRI <- do.call(cbind, edf_list[-indices_list[[i]]])
+   f_data_i = fData(grid, t(matrice_da_lista_i))
+   f_data_ALTRI = fData(grid, t(matrice_da_lista_ALTRI))
+   # median_curve_list[[i]] <- median_fData(fData = f_data, type = "MBD")
+  
+   #relative depth function
+   relative_BD_result <- MBD_relative(f_data_i, f_data_ALTRI)
+   quantile_list[[i]] <- quantile(relative_BD_result, probs = 0.05)
+  
+   # Memorizza il risultato insieme al nome del gruppo
+   #relative_BD_list[[i]] <- list(group_name = unique_groups[i], result = relative_BD_result)
+  }
+  return (quantile_list)
+  #for (i in 1:num_groups)
+    #print(paste(paste("Group:", relative_BD_list[[i]]$group_name),relative_BD_list[[i]]$result))
+  #plot_ecdf(music_cov,survey_cov,edf_list,color_palette,median_curve_list)
+
+}
+```
+https://www.rdocumentation.org/packages/roahd/versions/1.4
+```{r}
+depth_covcov("popularity","abitanti.citta")
+```
+
+# covariata persona fissata
+```{r,warning=FALSE}
+for(m in music_vars){
+  print(m)
+  depth_covcov(m,"libri")
+}
+```
+
+# all music all survey covs
+```{r,warning=FALSE}
+quantile_list_list_list = list()
+i = 1
+for(m in music_vars){
+  print(paste("------MUSIC COVARIATE:",m))
+  quantile_list_list = list()
+  j = 1
+  for (s in survey_covs){
+    print(paste("**SURVEY COVARIATE:",s))
+    quantile_list_list[[j]] <- depth_covcov(m,s)
+    j = j + 1
+  }
+  quantile_list_list_list[[i]] <- quantile_list_list
+  i = i + 1
+}
+
+```
+
+```{r}
+list = list()
+value = list()
+u = 1
+a= 1
+for (l in quantile_list_list_list){
+  b = 1
+  for (g in l){
+    c = 1
+      for (v in g) {
+        if (v <0.08) {
+          list[[u]] <- c(a,b,c)
+          value[[u]] <- v
+          u = u + 1
+        }
+        c = c + 1
+      }
+    b = b + 1
+  }  
+  a = a + 1
+}
+          
+```
+
+
+```{r}
+# qui
+ecdf_plotter("acousticness","come.ascolti.musica")
+ecdf_plotter("acousticness","strumento")
+ecdf_plotter("instrumentalness","libri")
+ecdf_plotter("instrumentalness","lavoro")
+
+
+# just an example
+ecdf_plotter("popularity", "sesso")
+```
+
+
